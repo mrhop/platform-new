@@ -1,0 +1,74 @@
+ 【安装mogilefs】
+ https://code.google.com/p/mogilefs/wiki/InstallOnUbuntu 【安装】
+ http://www.cnblogs.com/xiaocen/p/3721390.html 【mogilefs-部分添加】
+ http://www.alongsky.com/?p=811【mogilefs特性】
+ CREATE DATABASE mogilefs; 
+ CREATE USER 'mogilefs'@'127.0.0.1' IDENTIFIED BY 'mogilefs'; 
+  GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,ALTER ON mogilefs.* TO 'mogilefs'@'127.0.0.1';
+  flush privileges;
+  mogdbsetup --dbhost=127.0.0.1 --dbname=mogilefs --dbuser=mogilefs --dbpassword=mogilefs
+   
+  
+  
+  mogadm --trackers=127.0.0.1:7001 host add 127.0.0.1 --ip=127.0.0.1 --status=alive
+  
+  mogadm --trackers=127.0.0.1:7001 host list
+  
+  mogadm --trackers=127.0.0.1:7001 device add 127.0.0.1 1
+  
+  mogadm --trackers=127.0.0.1:7001 domain add images
+  mogadm --trackers=127.0.0.1:7001 domain add files
+  mogadm --trackers=127.0.0.1:7001 domain add docs
+  
+  
+  
+  mogupload --trackers=127.0.0.1:7001 --domain=images --key='bg.jpg' --file='/home/temp/bg.jpg'
+  mogupload --trackers=127.0.0.1:7001 --domain=files --key='/abc/bg.jpg' --file='/home/temp/bg.jpg'
+moglistkeys --trackers=127.0.0.1:7001 --domain=files
+mogfileinfo --trackers=127.0.0.1:7001 --domain=files --key='vendor.css'
+
+mogdelete --trackers=127.0.0.1:7001 --domain='files' --key="/abc/bg.jpg"
+
+  
+
+【nginx安装并和mogilefs整合】
+wget  https://nginx.org/download/nginx-1.10.1.tar.gz
+wget http://www.grid.net.ru/nginx/download/nginx_mogilefs_module-1.0.4.tar.gz
+./configure --add-module=/usr/local/nginx_mogilefs_module-1.0.4
+grep -nr '-Wno-unused-parameter'  *
+find -name 'Makef*'
+make
+make install
+
+接下来【tomcat+nginx+mogilefs】
+http://essun.blog.51cto.com/721033/1410834
+
+
+安装jdk
+http://www.cnblogs.com/a2211009/p/4265225.html
+http://www.webupd8.org/2012/09/install-oracle-java-8-in-ubuntu-via-ppa.html
+
+安装tomcat
+http://blog.topspeedsnail.com/archives/4551
+sudo tar xzvf apache-tomcat-8*tar.gz -C /opt/tomcat --strip-components=1
+【设置tomcat服务】
+http://askubuntu.com/questions/223944/how-to-automatically-restart-tomcat7-on-system-reboots
+
+
+【设置nginx服务】
+http://askubuntu.com/questions/257108/trying-to-start-nginx-on-vps-i-get-nginx-unrecognized-service
+http://kbeezie.com/debian-ubuntu-nginx-init-script/
+update-rc.d -f nginx remove
+【redis安装以及集群】
+http://blog.fens.me/linux-redis-install/
+https://www.digitalocean.com/community/tutorials/how-to-configure-a-redis-cluster-on-ubuntu-14-04
+http://www.redis.cn/topics/cluster-tutorial.html
+
+
+postgresql 安装并修改用户
+https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-14-04
+ALTER USER postgres WITH PASSWORD ' <***password***> ';
+
+需要jredis的其他操作查看
+http://docs.spring.io/spring-data/redis/docs/1.7.4.RELEASE/reference/html/
+

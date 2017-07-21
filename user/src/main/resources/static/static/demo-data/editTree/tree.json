@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "title": "Sample1",
+    "iconClass": "glyphicon glyphicon-th-large",
+    "deletable": false,
+    "children": [
+      {
+        "id": 2,
+        "title": "Panel"
+      },
+      {
+        "id": 3,
+        "title": "Tab"
+      },
+      {
+        "id": 4,
+        "title": "Modal"
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "title": "Sample2",
+    "iconClass": "glyphicon glyphicon-th-large",
+    "children": [
+      {
+        "id": 6,
+        "title": "Form",
+        "iconClass": "glyphicon glyphicon-th-large",
+        "children": [
+          {
+            "id": 7,
+            "title": "Tree"
+          },
+          {
+            "id": 8,
+            "title": "Date"
+          },
+          {
+            "id": 9,
+            "title": "TestClick"
+          },
+          {
+            "id": 10,
+            "title": "OnlyText"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Tree"
+      },
+      {
+        "id": 12,
+        "title": "Date"
+      },
+      {
+        "id": 13,
+        "title": "TestClick"
+      },
+      {
+        "id": 14,
+        "title": "OnlyText"
+      }
+    ]
+  }
+]

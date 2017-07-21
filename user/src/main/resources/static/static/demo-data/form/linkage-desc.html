@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>linkage-desc</title>
+</head>
+<body>
+<h1>联动相关form json 变动</h1>
+<h2>触发元素样例</h2>
+<p>{
+  "name": "testRadio",
+  "label": "测试Radio",
+  "type": "radio",
+  "validate": [{
+  "errorMsg": "不能为空",
+  "regex": "^\\S+$"
+  }],
+  "defaultValue": "1",
+  "items": [
+  {
+  "label": "测试1",
+  "value": "1"
+  },
+  {
+  "label": "测试2",
+  "value": "2"
+  },
+  {
+  "label": "测试3",
+  "value": "3"
+  }
+  ],
+  <b style="color: red">"ruleChange": true</b>
+  }</p>
+<h2>响应元素样例</h2>
+<p>{
+  "name": "ruleChange1",
+  "label": "联动1",
+  "type": "text",
+  "validate": [{
+  "errorMsg": "不能为空",
+  "regex": "^\\S+$"
+  }],
+  "defaultValue": "联动测试1",
+  "placeholder": "联动测试1",
+  "locked": false,
+  <b style="color: red">"hidden": false,</b>
+  "error": true
+  },<br/>
+  {
+  "name": "ruleChange2",
+  "label": "联动2",
+  "type": "text",
+  "validate": [{
+  "errorMsg": "不能为空",
+  "regex": "^\\S+$"
+  }],
+  "defaultValue": "联动测试2",
+  "placeholder": "联动测试2",
+  "locked": false,
+  <b style="color: red">"hidden": true,</b>
+  "error": true
+  },<br/>
+  {
+  "name": "ruleChange3",
+  "label": "联动3",
+  "type": "text",
+  "validate": [{
+  "errorMsg": "不能为空",
+  "regex": "^\\S+$"
+  }],
+  "defaultValue": "联动测试3",
+  "placeholder": "联动测试3",
+  "locked": false,
+  <b style="color: red">"hidden": true,</b>
+  "error": true
+  },</p>
+<hr>
+<h1>联动相关说明</h1>
+<h2>请求</h2>
+<p>http post 请求，请求内容为 json 格式的{name:value},对应的触发元素的名称和变动值</p>
+
+<h2>响应</h2>
+<p>[
+  {
+  "name": "ruleChange1",
+  <b style="color: red">"hidden": true</b>
+  },<br/>
+  {
+  "name": "ruleChange2",
+  <b style="color: red">"hidden": true</b>
+  },<br/>
+  {
+  "name": "ruleChange3",
+  <b style="color: red">"defaultValue": "联动测试3" + new Date().getMilliseconds(),
+    "hidden": false</b>
+  }
+  ]</p>
+<p>响应会返回相应的json数组，映射需要变动的form element，其中hidden和defaultvalue对应元素中需要进行的变动，也可以添加其他属性，都会反映到页面的对应form 元素中</p>
+</body>
+</html>

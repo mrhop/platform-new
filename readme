@@ -1,0 +1,3 @@
+重头开始要考虑，从user开始
+作为一个server+resource server+ auth server，需要进行接口的区分，哪些是需要oauth进行框定的，哪些是本身应用需要的
+哪些是可以跨域的

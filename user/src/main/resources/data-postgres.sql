@@ -1,0 +1,10 @@
+--INSERT INTO platform_user_user(account_non_locked,email,enabled,password,phone,user_name) values (TRUE,'a@a.com',TRUE,'$2a$10$POTZsVX.VBAtJUtjYGJrc.L5OGsV8.13qS4ubw6bT9gj5ztc/sBgS','15309861499','admin')
+--insert INTO platform_user_role(authority,level) VALUES('super_admin',0);
+--insert INTO platform_user_role(authority,level) VALUES('admin',1);
+--insert INTO platform_user_role(authority,level) VALUES('common_user',2);
+--insert INTO platform_user_user_role(user_id,role_id) VALUES(1,1)
+--insert INTO platform_user_client(authorized_grant_types,client_id,client_secret,scoped,scope,secret_required) VALUES('client_credentials,password,authorization_code,refresh_token','user_admin_client','secret',true,'user_admin_client,internal_client',true);
+--insert INTO platform_user_client_role(authority,level) VALUES('user_admin_client',0);
+--insert INTO platform_user_client_role(authority,level) VALUES('internal_client',1);
+--insert INTO platform_user_client_client_role(client_id,role_id) VALUES(1,1);
+--insert INTO platform_user_client_client_role(client_id,role_id) VALUES(1,2);

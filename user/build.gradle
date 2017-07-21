@@ -1,0 +1,10 @@
+war {
+    baseName = 'user'
+}
+
+bootRepackage {
+    //mainClass = 'cn.hopever.platform.user.example.Example'
+}
+dependencies {
+    compile project(':utils')
+}
