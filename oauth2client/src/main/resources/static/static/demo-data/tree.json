@@ -1,0 +1,68 @@
+[
+  {
+    "title": "Dashboard",
+    "url": "/",
+    "iconClass": "glyphicon glyphicon-th-large"
+  },
+  {
+    "title": "Sample",
+    "iconClass": "glyphicon glyphicon-th-large",
+    "children": [
+      {
+        "title": "Panel",
+        "url": "/panel"
+      },
+      {
+        "title": "Tab",
+        "url": "/tab"
+      },
+      {
+        "title": "Modal",
+        "url": "/modal"
+      },
+      {
+        "title": "Table",
+        "url": "/table"
+      },
+      {
+        "title": "Form",
+        "url": "/form"
+      },
+      {
+        "title": "Tree",
+        "url": "/tree"
+      },
+      {
+        "title": "Date",
+        "url": "/date"
+      },
+      {
+        "title": "TreeWithTable",
+        "url": "/treewithtable"
+      },
+      {
+        "title": "EditTree",
+        "url": "/edittree"
+      }
+    ]
+  },
+  {
+    "title": "ActionComponents",
+    "url": "/",
+    "iconClass": "glyphicon glyphicon-th-large",
+    "children": [
+      {
+        "title": "ActionForm",
+        "url": "/actionform"
+      },
+      {
+        "title": "ActionTable",
+        "url": "/actiontable"
+      },
+      {
+        "title": "ActionTree",
+        "url": "/actiontree"
+      }
+    ]
+  }
+]

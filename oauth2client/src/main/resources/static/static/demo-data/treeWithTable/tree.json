@@ -1,0 +1,35 @@
+[
+  {
+    "title": "Sample",
+    "iconClass": "glyphicon glyphicon-th-large",
+    "children": [
+      {
+        "title": "显示全部",
+        "emitClick": true
+      },
+      {
+        "title": "显示1-10",
+        "emitClick": true,
+        "emitClickArgs": {
+          "from": 1,
+          "to": 10
+        }
+      },
+      {
+        "title": "显示11-20",
+        "emitClick": true,
+        "emitClickArgs": {
+          "from": 11,
+          "to": 20
+        }
+      },
+      {
+        "title": "显示>20",
+        "emitClick": true,
+        "emitClickArgs": {
+          "from": 21
+        }
+      }
+    ]
+  }
+]

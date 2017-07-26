@@ -1,0 +1,49 @@
+config:
+    oauth2:
+        accessTokenUri: http://localhost:9091/oauth/token
+        userAuthorizationUri: http://localhost:9091/oauth/authorize
+        #domainName: hopever.cn #用于保证单点登录的实现，在不同的子系统之间，但是为了保证唯一性，以cookie为首要准则
+        secretKey: .hopever #用于加密accesstoken，并返回客户端
+        validateUserUri: http://localhost:9091/resources/principal/check/ #用于校验用户是否符合该内部客户端
+        userUri: http://localhost:9091/resources/principal #用于返回登录的用户的基本信息
+        moduleList: http://localhost:9091/hateoas/module/list/
+        # as a sample to test
+        clientID: cms_admin_client
+        clientSecret: secret
+        clientScopes:
+                  - cms_admin_client
+                  - internal_client
+    common:
+        pageSize: 10
+        relatedusers: http://localhost:9091/user/user/list/relatedusers/options
+#        imageUpload: http://localhost:8084/utilsweb/upload/image
+#        fileUpload: http://localhost:8084/utilsweb/upload/file
+#        docUpload: http://localhost:8084/utilsweb/upload/doc
+        imageUpload: http://utils.hopever.cn/upload/image
+        fileUpload: http://utils.hopever.cn/upload/file
+        docUpload: http://utils.hopever.cn/upload/doc
+        imageDel: http://utils.hopever.cn/delete/image
+        fileDel: http://utils.hopever.cn/delete/file
+        docDel: http://utils.hopever.cn/delete/doc
+#        imagePathPrev: /mogilefs/images/
+#        filePathPrev:  /mogilefs/files/
+#        docPathPrev:  /mogilefs/docs/
+        imagePathPrev: http://www.hopever.cn/mogilefs/images/
+        filePathPrev:  http://www.hopever.cn/mogilefs/files/
+        docPathPrev:  http://www.hopever.cn/mogilefs/docs/
+        defaultUserPhoto: http://localhost/utils/images/user/defaultphoto.png
+spring:
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+
+security:
+    basic:
+        enabled: false
+    oauth2:
+           resource:
+               jwt:
+                   # Tells the JWT framework to fetch the public key from the authorization server during startup
+                   # Note: The authorization server needs to be running...
+                   key-uri: "http://localhost:9091/oauth/token_key"

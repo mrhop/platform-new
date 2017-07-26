@@ -1,0 +1,305 @@
+{
+  "rules": {
+    "items": [
+      {
+        "name": "name",
+        "label": "姓名",
+        "type": "text",
+        "validate": [{
+          "errorMsg": "不能为空",
+          "regex": "^\\S+$"
+        }],
+        "defaultValue": "姓名",
+        "placeholder": "请输入姓名",
+        "locked": false,
+        "error": true
+      },
+      {
+        "name": "testPassword",
+        "label": "测试Password",
+        "type": "password"
+      },
+      {
+        "name": "testNumber",
+        "label": "测试Number",
+        "type": "number",
+        "validate": [{
+          "errorMsg": "不能为空",
+          "regex": "^\\S+$"
+        }]
+      },
+      {
+        "name": "testFile",
+        "label": "测试File",
+        "type": "file",
+        "quantity": 5,
+        "validate": [{
+          "errorMsg": "只能为图片文件",
+          "regex": "\\.(png|jpe?g|gif|svg)(\\?.*)?$"
+        }],
+        "maxSize": 5000,
+        "required": true,
+        "path": ["http://www.hopever.cn/mogilefs/images/user/photo/14817789496788475104059462733375755.jpg"]
+      },
+      {
+        "name": "testDate",
+        "label": "测试日期",
+        "type": "date",
+        "validate": [
+          {
+            "errorMsg": "不能为空",
+            "regex": "^\\S+$"
+          }
+        ]
+      },
+      {
+        "name": "testDateRange",
+        "label": "测试范围日期",
+        "type": "daterange",
+        "validate": [
+          {
+            "errorMsg": "不能为空",
+            "regex": "^\\S+$"
+          }
+        ]
+      },
+      {
+        "name": "testSelect",
+        "label": "测试select",
+        "type": "select",
+        "validate": [{
+          "errorMsg": "不能为空",
+          "regex": "^\\S+$"
+        }],
+        "defaultValue": "2",
+        "items": [
+          {
+            "label": "测试1",
+            "value": "1"
+          },
+          {
+            "label": "测试2",
+            "value": "2"
+          },
+          {
+            "label": "测试3",
+            "value": "3"
+          }
+        ]
+      },
+      {
+        "name": "testRadio",
+        "label": "测试Radio",
+        "type": "radio",
+        "validate": [{
+          "errorMsg": "不能为空",
+          "regex": "^\\S+$"
+        }],
+        "defaultValue": "1",
+        "items": [
+          {
+            "label": "测试1",
+            "value": "1"
+          },
+          {
+            "label": "测试2",
+            "value": "2"
+          },
+          {
+            "label": "测试3",
+            "value": "3"
+          }
+        ],
+        "ruleChange": true
+      },
+      {
+        "name": "ruleChange1",
+        "label": "联动1",
+        "type": "text",
+        "validate": [{
+          "errorMsg": "不能为空",
+          "regex": "^\\S+$"
+        }],
+        "defaultValue": "联动测试1",
+        "placeholder": "联动测试1",
+        "locked": false,
+        "hidden": false,
+        "error": true
+      },
+      {
+        "name": "ruleChange2",
+        "label": "联动2",
+        "type": "text",
+        "validate": [{
+          "errorMsg": "不能为空",
+          "regex": "^\\S+$"
+        }],
+        "defaultValue": "联动测试2",
+        "placeholder": "联动测试2",
+        "locked": false,
+        "hidden": true,
+        "error": true
+      },
+      {
+        "name": "ruleChange3",
+        "label": "联动3",
+        "type": "text",
+        "validate": [{
+          "errorMsg": "不能为空",
+          "regex": "^\\S+$"
+        }],
+        "defaultValue": "联动测试3",
+        "placeholder": "联动测试3",
+        "locked": false,
+        "hidden": true,
+        "error": true
+      },
+      {
+        "name": "testCheckbox",
+        "label": "测试Checkbox",
+        "type": "checkbox",
+        "validate": [{
+          "errorMsg": "不能为空",
+          "regex": "^\\S+$"
+        }],
+        "defaultValue": [
+          "1",
+          "2"
+        ],
+        "items": [
+          {
+            "label": "测试1",
+            "value": "1"
+          },
+          {
+            "label": "测试2",
+            "value": "2"
+          },
+          {
+            "label": "测试3",
+            "value": "3"
+          }
+        ]
+      },
+      {
+        "name": "testTree",
+        "label": "下拉树控件",
+        "type": "tree",
+        "treeData": "/static/demo-data/form/tree.json",
+        "defaultLabel": "测试3",
+        "defaultValue": "3",
+        "validate": [
+          {
+            "errorMsg": "不能为空",
+            "regex": "^\\S+$"
+          }
+        ],
+        "placeholder": "点击选择树"
+      },
+      {
+        "name": "testTextArea",
+        "label": "测试TextArea",
+        "type": "textarea",
+        "validate": [{
+          "errorMsg": "不能为空",
+          "regex": "^\\S+$"
+        }],
+        "defaultValue": "看一看，瞧一瞧",
+        "rows": 10,
+        "placeholder": "this is textarea"
+      },
+      [
+        {
+          "name": "testInline1",
+          "label": "测试Inline1",
+          "type": "text",
+          "validate": [
+            {
+              "errorMsg": "不能为空",
+              "regex": "^\\S+$"
+            }
+          ]
+        },
+        {
+          "name": "testInline2",
+          "label": "测试Inline2",
+          "type": "text"
+        },
+        {
+          "name": "addLine",
+          "label": "添加新行",
+          "defaultValue": "添加新行",
+          "type": "button",
+          "ruleChange": true
+        }
+      ],
+      [
+        {
+          "name": "testInline4",
+          "label": "测试Inline4",
+          "type": "text",
+          "validate": [
+            {
+              "errorMsg": "不能为空",
+              "regex": "^\\S+$"
+            }
+          ],
+          "hidden": true
+        },
+        {
+          "name": "testInline5",
+          "label": "测试Inline5",
+          "type": "text",
+          "hidden": true
+        },
+        {
+          "name": "delLine1",
+          "label": "删除本行",
+          "defaultValue": "删除本行",
+          "type": "button",
+          "ruleChange": true,
+          "hidden": true
+        }
+      ],
+      [
+        {
+          "name": "testInline6",
+          "label": "测试Inline6",
+          "type": "text",
+          "validate": [
+            {
+              "errorMsg": "不能为空",
+              "regex": "^\\S+$"
+            }
+          ],
+          "hidden": true
+        },
+        {
+          "name": "testInline7",
+          "label": "测试Inline7",
+          "type": "text",
+          "hidden": true
+        },
+        {
+          "name": "delLine2",
+          "label": "删除本行",
+          "defaultValue": "删除本行",
+          "type": "button",
+          "ruleChange": true,
+          "hidden": true
+        }
+      ]
+    ],
+    "action": {
+      "save": {
+        "label": "保存"
+      },
+      "reset": {
+        "label": "重置"
+      },
+      "backup": {
+        "label": "返回列表"
+      }
+    }
+  }
+}

@@ -8,7 +8,7 @@ import cn.hopever.platform.user.service.ClientTableService;
 import cn.hopever.platform.user.service.ModuleRoleTableService;
 import cn.hopever.platform.user.service.ModuleTableService;
 import cn.hopever.platform.user.service.RoleTableService;
-import cn.hopever.platform.user.web.hateoas.ModuleRoleResourceAssembler;
+import cn.hopever.platform.user.vo.ModuleRoleVoAssembler;
 import cn.hopever.platform.utils.json.JacksonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
@@ -47,7 +47,7 @@ public class ModuleRoleController {
     private ClientTableService clientTableService;
 
     @Autowired
-    ModuleRoleResourceAssembler moduleRoleResourceAssembler;
+    ModuleRoleVoAssembler moduleRoleVoAssembler;
 
 
     @PreAuthorize("#oauth2.hasScope('internal_client') and ( hasRole('ROLE_super_admin') or hasRole('ROLE_admin'))")
@@ -187,7 +187,7 @@ public class ModuleRoleController {
     public Map info(@RequestParam Long id, Principal principal) {
         //返回user是无法解析的，要使用对象解析为map 的形式
         ModuleRoleTable mrt = moduleRoleTableService.getById(id);
-        return JacksonUtil.mapper.convertValue(moduleRoleResourceAssembler.toResource(mrt), Map.class);
+        return JacksonUtil.mapper.convertValue(moduleRoleVoAssembler.toResource(mrt), Map.class);
     }
 
 

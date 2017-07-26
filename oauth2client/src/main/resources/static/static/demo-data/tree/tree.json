@@ -1,0 +1,48 @@
+[
+  {
+    "title": "Dashboard",
+    "url": "/",
+    "iconClass": "glyphicon glyphicon-th-large"
+  },
+  {
+    "title": "Sample",
+    "iconClass": "glyphicon glyphicon-th-large",
+    "children": [
+      {
+        "title": "Panel",
+        "url": "/panel"
+      },
+      {
+        "title": "Tab",
+        "url": "/tab"
+      },
+      {
+        "title": "Modal",
+        "url": "/modal"
+      },
+      {
+        "title": "Table",
+        "url": "/table"
+      },
+      {
+        "title": "Form",
+        "url": "/form"
+      },
+      {
+        "title": "Tree",
+        "url": "/tree"
+      },
+      {
+        "title": "Date",
+        "url": "/date"
+      },
+      {
+        "title": "TestClick",
+        "emitClick": true
+      },
+      {
+        "title": "OnlyText"
+      }
+    ]
+  }
+]

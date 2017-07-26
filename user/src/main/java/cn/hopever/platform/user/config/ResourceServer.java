@@ -17,9 +17,11 @@ public class ResourceServer extends ResourceServerConfigurerAdapter {
         http
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 .and()
+                .cors()
+                .and()
                 .requestMatchers().antMatchers("/resources/**")
                 .and()
                 .authorizeRequests()
-                .antMatchers("/resources/**").access("#oauth2.hasScope('read')");
+                .antMatchers("/resources/**").access("#oauth2.hasScope('internal_client') and isAuthenticated()");
     }
 }

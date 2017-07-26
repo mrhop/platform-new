@@ -1,0 +1,44 @@
+[
+  {
+    "title": "Sample",
+    "iconClass": "glyphicon glyphicon-th-large",
+    "children": [
+      {
+        "id": 1,
+        "title": "测试1",
+        "emitClick": true,
+        "emitClickArgs": {
+          "label": "测试1",
+          "value": 1
+        }
+      },
+      {
+        "id": 2,
+        "title": "测试2",
+        "emitClick": true,
+        "emitClickArgs": {
+          "label": "测试2",
+          "value": 2
+        }
+      },
+      {
+        "id": 3,
+        "title": "测试3",
+        "emitClick": true,
+        "emitClickArgs": {
+          "label": "测试3",
+          "value": 3
+        }
+      },
+      {
+        "id": 4,
+        "title": "测试4",
+        "emitClick": true,
+        "emitClickArgs": {
+          "label": "测试4",
+          "value": 4
+        }
+      }
+    ]
+  }
+]

@@ -65,12 +65,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     @Autowired
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth .authenticationProvider(authenticationProvider());
+        auth.authenticationProvider(authenticationProvider());
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/webjars/**", "/static/**");
+        web.ignoring().antMatchers("/webjars/**", "/static/**", "/error/*.html");
     }
 
     @Override
@@ -81,7 +81,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
-                .accessDeniedPage("/login.jsp?authorization_error=true")
+                .accessDeniedPage("/login.html#/?authorization_error=true")
                 .and()
                 .csrf()
                 .requireCsrfProtectionMatcher(new AntPathRequestMatcher("/oauth/authorize"))
@@ -91,8 +91,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl("/login.html")
                 .and()
                 .formLogin()
-                .loginProcessingUrl("/login")
-                .failureUrl("/login.html?authentication_error=true")
+                .loginProcessingUrl("/login").defaultSuccessUrl("/index.html")
+                .failureUrl("/login.html#/?authentication_error=true")
                 .loginPage("/login.html");
     }
 }

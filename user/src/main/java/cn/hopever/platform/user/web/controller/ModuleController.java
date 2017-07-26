@@ -7,7 +7,7 @@ import cn.hopever.platform.user.service.ClientTableService;
 import cn.hopever.platform.user.service.ModuleRoleTableService;
 import cn.hopever.platform.user.service.ModuleTableService;
 import cn.hopever.platform.user.service.RoleTableService;
-import cn.hopever.platform.user.web.hateoas.ModuleResourceAssembler;
+import cn.hopever.platform.user.vo.ModuleVoAssembler;
 import cn.hopever.platform.utils.json.JacksonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
@@ -33,8 +33,7 @@ import java.util.Map;
 public class ModuleController {
 
     Logger logger = LoggerFactory.getLogger(ModuleController.class);
-//    @Autowired
-//    private ModuleRoleTableService moduleRoleTableService;
+
 
     @Autowired
     private RoleTableService roleTableService;
@@ -50,7 +49,7 @@ public class ModuleController {
 
 
     @Autowired
-    ModuleResourceAssembler moduleResourceAssembler;
+    ModuleVoAssembler moduleVoAssembler;
 
 
     @PreAuthorize("#oauth2.hasScope('internal_client') and hasRole('ROLE_super_admin')")
@@ -115,7 +114,7 @@ public class ModuleController {
         //返回user是无法解析的，要使用对象解析为map 的形式
         //do info update
         ModuleTable mt = moduleTableService.getById(id);
-        Map map = JacksonUtil.mapper.convertValue(moduleResourceAssembler.toResource(mt), Map.class);
+        Map map = JacksonUtil.mapper.convertValue(moduleVoAssembler.toResource(mt), Map.class);
         boolean isTop = (mt.getParent() == null && mt.getModuleUrl() == null && mt.getIconClass() != null) ? true : false;
         map.put("isTop", isTop);
         if (isTop) {

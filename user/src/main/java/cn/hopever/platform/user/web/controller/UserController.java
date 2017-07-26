@@ -3,12 +3,12 @@ package cn.hopever.platform.user.web.controller;
 import cn.hopever.platform.user.domain.ClientTable;
 import cn.hopever.platform.user.domain.ModuleRoleTable;
 import cn.hopever.platform.user.domain.UserTable;
-import cn.hopever.platform.user.resources.UserResource;
 import cn.hopever.platform.user.service.ClientTableService;
 import cn.hopever.platform.user.service.ModuleRoleTableService;
 import cn.hopever.platform.user.service.RoleTableService;
 import cn.hopever.platform.user.service.UserTableService;
-import cn.hopever.platform.user.web.hateoas.UserResourceAssembler;
+import cn.hopever.platform.user.vo.UserVo;
+import cn.hopever.platform.user.vo.UserVoAssembler;
 import cn.hopever.platform.utils.json.JacksonUtil;
 import cn.hopever.platform.utils.tools.DateFormat;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -42,7 +42,7 @@ public class UserController {
     @Autowired
     private ModuleRoleTableService moduleRoleTableService;
     @Autowired
-    private UserResourceAssembler userTableAssembler;
+    private UserVoAssembler userVoAssembler;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -114,7 +114,7 @@ public class UserController {
     public Map info(@RequestParam Long id, Principal principal) {
         //返回user是无法解析的，要使用对象解析为map 的形式
         UserTable ut = userTableService.get(id);
-        UserResource ur = userTableAssembler.toResource(ut);
+        UserVo ur = userVoAssembler.toResource(ut);
         ur.setPhoto(null);
         if (validateUserOperation(userTableService.getUserByUsername(principal.getName()), ut)) {
             return JacksonUtil.mapper.convertValue(ur, Map.class);
@@ -128,7 +128,7 @@ public class UserController {
     public Map info(Principal principal) {
         //返回user是无法解析的，要使用对象解析为map 的形式
         UserTable ut = this.userTableService.getUserByUsername(principal.getName());
-        UserResource ur = userTableAssembler.toResource(ut);
+        UserVo ur = userVoAssembler.toResource(ut);
         ur.setPhoto(null);
         return JacksonUtil.mapper.convertValue(ur, Map.class);
     }

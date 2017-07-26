@@ -1,0 +1,25 @@
+[
+  {
+    "title": "控制台",
+    "url": "/",
+    "iconClass": "glyphicon glyphicon-th-large"
+  },
+  {
+    "title": "用户管理",
+    "iconClass": "glyphicon glyphicon-th-large",
+    "children": [
+      {
+        "title": "用户列表",
+        "url": "/userlist"
+      },
+      {
+        "title": "新增用户",
+        "url": "/adduser"
+      },
+      {
+        "title": "个人信息",
+        "url": "/personalinfo"
+      }
+    ]
+  }
+]
