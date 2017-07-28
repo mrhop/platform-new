@@ -39,7 +39,6 @@ public class CommonInterceptor extends LocaleChangeInterceptor {
             if (c == null) {
                 OAuth2AccessToken t = (OAuth2AccessToken) authentication.getDetails();
                 c = new Cookie("accesstoken", t.getValue());
-                c.setPath("/");
                 c.setMaxAge(-1);
                 response.addCookie(c);
             }

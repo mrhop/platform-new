@@ -16,10 +16,12 @@ public class Oauth2Properties {
     // client使用
     private String accessTokenUri;
     private String userAuthorizationUri;
+    private String domainName;
+    private String path;
     private String clientID;
     private String clientSecret;
     private List<String> clientScopes;
-    private String domainName;
+    private boolean clientUseCurrentUri = true;
     private String secretKey;
     private String validateUserUri;
     private String userUri;

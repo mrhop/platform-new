@@ -1,13 +1,10 @@
 package cn.hopever.platform.oauth2client.web.rest;
 
-import cn.hopever.platform.oauth2client.config.CommonProperties;
 import cn.hopever.platform.oauth2client.config.Oauth2Properties;
 import cn.hopever.platform.oauth2client.web.common.CommonMethods;
-import cn.hopever.platform.oauth2client.web.common.ExposedResourceBundleMessageSource;
-import cn.hopever.platform.oauth2client.web.common.LocaleMessageSource;
-import cn.hopever.platform.utils.security.DesECBUtil;
 import cn.hopever.platform.utils.web.CommonResult;
 import cn.hopever.platform.utils.web.CommonResultStatus;
+import cn.hopever.platform.utils.web.CookieUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,10 +12,10 @@ import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Created by Donghui Huo on 2016/9/6.
@@ -40,15 +37,6 @@ public class Oauth2ClientController {
     private Oauth2Properties oauth2Properties;
 
     @Autowired
-    private CommonProperties commonProperties;
-
-    @Autowired
-    private ExposedResourceBundleMessageSource commonResources;
-
-    @Resource
-    private LocaleMessageSource localeMessageSource;
-
-    @Autowired
     @Qualifier("authorizationCodeRestTemplate")
     private OAuth2RestOperations authorizationCodeRestTemplate;
 
@@ -57,43 +45,39 @@ public class Oauth2ClientController {
     private OAuth2RestOperations clientRestTemplate;
 
 
-
     @Autowired
     private CommonMethods commonMethods;
 
     @RequestMapping(value = "/gettokenbycode", method = RequestMethod.GET)
-    public CommonResult getTokenByCode(HttpServletRequest request, HttpServletResponse response) {
-        CommonResult c = new CommonResult();
-        try {
+    public void getTokenByCode(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Cookie c = CookieUtil.getCookieByName("accesstoken", request.getCookies());
+        if(c==null){
             OAuth2AccessToken oa = authorizationCodeRestTemplate.getAccessToken();
-            Cookie cookie = new Cookie("accesstoken", DesECBUtil.encryptDES(oa.getValue(), oauth2Properties.getSecretKey()));
+            Cookie cookie = new Cookie("accesstoken", oa.getValue());
             //cookie.setPath(request.getContextPath());
             cookie.setMaxAge(oa.getExpiresIn());
-            //设置domain，保证一键登陆的可行性--目前来看还不可设置，考虑localhost的重新指向来设置
             if (oauth2Properties.getDomainName() != null) {
                 cookie.setDomain(oauth2Properties.getDomainName());
             }
             response.addCookie(cookie);
-            c.setStatus(CommonResultStatus.SUCCESS.toString());
-        } catch (Exception e) {
-            c.setStatus(CommonResultStatus.SERVERFAILURE.toString());
-            c.setMessage(e.getMessage());
         }
-        return c;
+        response.sendRedirect(request.getContextPath() + "/index.html");
     }
 
     @RequestMapping(value = "/gettokenbyclient", method = RequestMethod.GET)
-    public CommonResult getTokenByClient(HttpServletRequest request) {
-        CommonResult c = new CommonResult();
-        if (request.getSession().getAttribute("clientAccessToken") != null) {
-            //说明已经进行过client的登录，否则进行登录
-            c.setStatus(CommonResultStatus.SUCCESS.toString());
-        } else {
+    public void getTokenByClient(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Cookie c = CookieUtil.getCookieByName("accesstoken", request.getCookies());
+        if(c==null){
             OAuth2AccessToken oa = clientRestTemplate.getAccessToken();
-            c.setStatus(CommonResultStatus.SUCCESS.toString());
-            request.getSession().setAttribute("clientAccessToken", oa.getValue());
+            Cookie cookie = new Cookie("accesstoken", oa.getValue());
+            //cookie.setPath(request.getContextPath());
+            cookie.setMaxAge(oa.getExpiresIn());
+            if (oauth2Properties.getDomainName() != null) {
+                cookie.setDomain(oauth2Properties.getDomainName());
+            }
+            response.addCookie(cookie);
         }
-        return c;
+        response.sendRedirect(request.getContextPath() + "/index.html");
     }
 
     @RequestMapping(value = "/postresource", method = RequestMethod.POST)

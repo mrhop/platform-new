@@ -1,6 +1,6 @@
 server:
     port: 9090
-    contextPath: /
+    contextPath: /oauth2client
 config:
     oauth2:
         # as a sample to test
@@ -9,3 +9,4 @@ config:
         clientScopes:
                   - cms_admin_client
                   - internal_client
+        clientUseCurrentUri: true

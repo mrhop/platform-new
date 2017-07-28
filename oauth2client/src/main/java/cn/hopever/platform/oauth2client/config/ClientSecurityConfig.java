@@ -23,22 +23,6 @@ public class ClientSecurityConfig {
     @Autowired
     private Oauth2Properties oauth2Properties;
 
-//    @Bean(name = "authorizationCodeOAuth2ClientContext")
-//    public OAuth2ClientContext getOAuth2ClientContext() {
-//        return new DefaultOAuth2ClientContext(new DefaultAccessTokenRequest());
-//    }
-//
-//    @Bean(name = "clientOAuth2ClientContext")
-//    public OAuth2ClientContext getClientOAuth2ClientContext() {
-//        return new DefaultOAuth2ClientContext(new DefaultAccessTokenRequest());
-//    }
-//
-//    @Bean(name = "passwordOAuth2ClientContext")
-//    public OAuth2ClientContext getPasswordOAuth2ClientContext() {
-//        return new DefaultOAuth2ClientContext(new DefaultAccessTokenRequest());
-//    }
-
-
     @Bean(name = "authorizationCodeRestTemplate")
     public OAuth2RestOperations restCodeTemplate(OAuth2ClientContext clientContext) {
         return new OAuth2RestTemplate(resource(), clientContext);
@@ -62,6 +46,7 @@ public class ClientSecurityConfig {
         resource.setAccessTokenUri(oauth2Properties.getAccessTokenUri());
         resource.setUserAuthorizationUri(oauth2Properties.getUserAuthorizationUri());
         resource.setScope(oauth2Properties.getClientScopes());
+        resource.setUseCurrentUri(oauth2Properties.isClientUseCurrentUri());
         return resource;
     }
 
