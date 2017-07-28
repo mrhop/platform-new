@@ -255,7 +255,7 @@ public class UserController {
         return null;
     }
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and ( hasRole('ROLE_super_admin') or hasRole('ROLE_admin'))")
+    @PreAuthorize("#oauth2.hasScope('user_admin_client') and hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public Map saveUser(@RequestBody Map<String,Object> body, Principal principal) {
         UserTable user = new UserTable();

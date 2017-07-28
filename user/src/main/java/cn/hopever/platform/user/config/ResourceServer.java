@@ -22,6 +22,9 @@ public class ResourceServer extends ResourceServerConfigurerAdapter {
                 .requestMatchers().antMatchers("/resources/**")
                 .and()
                 .authorizeRequests()
-                .antMatchers("/resources/**").access("#oauth2.hasScope('internal_client') and isAuthenticated()");
+                .antMatchers("/resources/test/testresource").access("#oauth2.hasScope('internal_client') and ( hasRole('ROLE_super_admin') or hasRole('ROLE_admin'))")
+                .and()
+                .authorizeRequests()
+                .antMatchers("/resources/test/testclientresource").access("(#oauth2.hasScope('internal_client') or #oauth2.hasScope('out_client')) and isAuthenticated()");
     }
 }

@@ -14,6 +14,10 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.approval.ApprovalStore;
+import org.springframework.security.oauth2.provider.approval.ApprovalStoreUserApprovalHandler;
+import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
+import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
@@ -53,6 +57,24 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         return new JwtTokenStore(tokenEnhancer());
     }
 
+    @Bean
+    public ApprovalStore approvalStore() throws Exception {
+        TokenApprovalStore store = new TokenApprovalStore();
+        store.setTokenStore(tokenStore());
+        return store;
+    }
+
+    @Bean
+    public ApprovalStoreUserApprovalHandler approvalHandler() throws Exception {
+        ApprovalStoreUserApprovalHandler approvalHandler = new ApprovalStoreUserApprovalHandler();
+        approvalHandler.setApprovalStore(approvalStore());
+        approvalHandler.setRequestFactory(new DefaultOAuth2RequestFactory(clientDetailsService));
+        approvalHandler.setClientDetailsService(clientDetailsService);
+        return approvalHandler;
+    }
+
+
+
     @Override
     public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
         oauthServer
@@ -70,6 +92,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
                 // Use JwtTokenStore and our jwtAccessTokenConverter
                 .tokenStore(tokenStore())
+                .userApprovalHandler(approvalHandler())
                 .accessTokenConverter(tokenEnhancer())
         ;
     }

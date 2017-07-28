@@ -16,7 +16,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.io.UnsupportedEncodingException;
@@ -28,7 +27,6 @@ import java.security.SecureRandom;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-@EnableResourceServer
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
