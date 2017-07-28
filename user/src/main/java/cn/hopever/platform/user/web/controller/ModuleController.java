@@ -6,7 +6,6 @@ import cn.hopever.platform.user.domain.ModuleTable;
 import cn.hopever.platform.user.service.ClientTableService;
 import cn.hopever.platform.user.service.ModuleRoleTableService;
 import cn.hopever.platform.user.service.ModuleTableService;
-import cn.hopever.platform.user.service.RoleTableService;
 import cn.hopever.platform.user.vo.ModuleVoAssembler;
 import cn.hopever.platform.utils.json.JacksonUtil;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -34,10 +33,6 @@ public class ModuleController {
 
     Logger logger = LoggerFactory.getLogger(ModuleController.class);
 
-
-    @Autowired
-    private RoleTableService roleTableService;
-
     @Autowired
     private ClientTableService clientTableService;
 
@@ -52,7 +47,7 @@ public class ModuleController {
     ModuleVoAssembler moduleVoAssembler;
 
 
-    @PreAuthorize("#oauth2.hasScope('internal_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody JsonNode body, Principal principal) {
         Map<String, Object> map = new HashMap<>();
@@ -108,7 +103,7 @@ public class ModuleController {
         return map;
     }
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public Map info(@RequestParam Long id, Principal principal) {
         //返回user是无法解析的，要使用对象解析为map 的形式
@@ -126,7 +121,7 @@ public class ModuleController {
     }
 
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public Map updateUser(@RequestBody JsonNode body, Principal principal) {
         Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
@@ -182,7 +177,7 @@ public class ModuleController {
         return null;
     }
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public Map saveUser(@RequestBody JsonNode body, Principal principal) {
         Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
@@ -238,14 +233,14 @@ public class ModuleController {
         return null;
     }
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long id, Principal principal) {
         this.moduleTableService.deleteById(id);
     }
 
 
-    @PreAuthorize("#oauth2.hasScope('internal_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list/parent/options", method = {RequestMethod.GET})
     public List getListOptions() {
         //应该根据client获取对应的options，如果没有client，则不进行返回！！！
@@ -264,7 +259,7 @@ public class ModuleController {
     }
 
 
-    @PreAuthorize("#oauth2.hasScope('internal_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list/parent/client/options", method = {RequestMethod.POST})
     public Map getListOptionsOfclient(@RequestBody JsonNode body, Principal principal) {
         Map mapReturn = null;

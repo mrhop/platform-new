@@ -50,7 +50,7 @@ public class ModuleRoleController {
     ModuleRoleVoAssembler moduleRoleVoAssembler;
 
 
-    @PreAuthorize("#oauth2.hasScope('internal_client') and ( hasRole('ROLE_super_admin') or hasRole('ROLE_admin'))")
+    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/list/options", method = {RequestMethod.POST})
     public Map getListOptions(@RequestBody JsonNode body, Principal principal) {
         Map mapReturn = null;
@@ -97,7 +97,7 @@ public class ModuleRoleController {
         return mapReturn;
     }
 
-    @PreAuthorize("#oauth2.hasScope('internal_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list/module/options", method = {RequestMethod.POST})
     public Map getListOptionsOfModule(@RequestBody JsonNode body, Principal principal) {
         Map mapReturn = null;
@@ -135,7 +135,7 @@ public class ModuleRoleController {
     }
 
 
-    @PreAuthorize("#oauth2.hasScope('internal_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody JsonNode body, Principal principal) {
         Map<String, Object> map = new HashMap<>();
@@ -182,7 +182,7 @@ public class ModuleRoleController {
         return map;
     }
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public Map info(@RequestParam Long id, Principal principal) {
         //返回user是无法解析的，要使用对象解析为map 的形式
@@ -191,7 +191,7 @@ public class ModuleRoleController {
     }
 
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public Map updateUser(@RequestBody JsonNode body, Principal principal) {
         Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
@@ -207,7 +207,7 @@ public class ModuleRoleController {
         return null;
     }
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public Map saveUser(@RequestBody JsonNode body, Principal principal) {
         Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
@@ -231,7 +231,7 @@ public class ModuleRoleController {
         return null;
     }
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long id, Principal principal) {
         this.moduleRoleTableService.deleteById(id);

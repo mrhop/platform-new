@@ -11,6 +11,7 @@ import cn.hopever.platform.user.vo.UserVo;
 import cn.hopever.platform.user.vo.UserVoAssembler;
 import cn.hopever.platform.utils.json.JacksonUtil;
 import cn.hopever.platform.utils.tools.DateFormat;
+import cn.hopever.platform.utils.web.TableParameters;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,7 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
 
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and ( hasRole('ROLE_super_admin') or hasRole('ROLE_admin'))")
+    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody JsonNode body, Principal principal) {
         Map<String, Object> map = new HashMap<>();
@@ -101,7 +102,56 @@ public class UserController {
         return map;
     }
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and ( hasRole('ROLE_super_admin') or hasRole('ROLE_admin'))")
+    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
+    @RequestMapping(value = "/list", method = {RequestMethod.POST})
+    public Map getList(@RequestBody TableParameters body, Principal principal) {
+        Map<String, Object> map = new HashMap<>();
+        List<HashMap<String, Object>> listReturn;
+        String authority = ((OAuth2Authentication) principal).getAuthorities().iterator().next().getAuthority();
+        Page<UserTable> list;
+        PageRequest pageRequest;
+        if (body.getSorts() == null) {
+            pageRequest = new PageRequest(body.getPager().getCurrentPage(), body.getPager().getPageSize(), Sort.Direction.ASC, "id");
+        } else {
+            pageRequest = new PageRequest(body.getPager().getCurrentPage(), body.getPager().getPageSize(), Sort.Direction.fromString(body.get("sort").get("sortDirection").textValue()), body.get("sort").get("sortName").textValue());
+        }
+        if ("ROLE_super_admin".equals(authority)) {
+            list = userTableService.getListWithOutSelf(principal.getName(), pageRequest, body.getFilters());
+        } else {
+            list = userTableService.getSubList(principal.getName(), pageRequest, body.getFilters());
+        }
+        if (list != null && list.iterator().hasNext()) {
+            listReturn = new ArrayList<>();
+            for (UserTable ut : list) {
+                HashMap<String, Object> mapTemp = new HashMap<>();
+                mapTemp.put("key", ut.getId());
+                List<Object> listTmp = new ArrayList<>();
+                listTmp.add("");
+                listTmp.add(ut.getUsername());
+                listTmp.add(ut.getName());
+                listTmp.add(ut.getEmail());
+                listTmp.add(ut.getPhone());
+                listTmp.add(ut.getCreateUser() != null ? ut.getCreateUser().getUsername() : "");
+                listTmp.add(ut.getCreatedDate() != null ? DateFormat.sdfDate.format(ut.getCreatedDate()) : "");
+                listTmp.add(ut.isEnabled() ? "Y" : "N");
+                listTmp.add(ut.isAccountNonExpired() ? "Y" : "N");
+                mapTemp.put("value", listTmp);
+                listReturn.add(mapTemp);
+            }
+            map.put("data", listReturn);
+            map.put("totalCount", list.getTotalElements());
+            map.put("rowSize", body.get("rowSize").asInt());
+            map.put("currentPage", list.getNumber());
+        } else {
+            map.put("data", null);
+            map.put("totalCount", 0);
+            map.put("rowSize", body.get("rowSize").asInt());
+            map.put("currentPage", 0);
+        }
+        return map;
+    }
+
+    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long id, Principal principal) {
         if (validateUserOperation(userTableService.getUserByUsername(principal.getName()), this.userTableService.get(id))) {
@@ -109,7 +159,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and ( hasRole('ROLE_super_admin') or hasRole('ROLE_admin'))")
+    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public Map info(@RequestParam Long id, Principal principal) {
         //返回user是无法解析的，要使用对象解析为map 的形式
@@ -123,7 +173,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client')")
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = {"/", ""}, method = {RequestMethod.GET})
     public Map info(Principal principal) {
         //返回user是无法解析的，要使用对象解析为map 的形式
@@ -133,14 +183,14 @@ public class UserController {
         return JacksonUtil.mapper.convertValue(ur, Map.class);
     }
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client')")
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/personal/update", method = {RequestMethod.POST})
-    public Map updatePersonalUser(@RequestBody Map<String,Object> body, Principal principal) {
+    public Map updatePersonalUser(@RequestBody Map<String, Object> body, Principal principal) {
         long id = Long.valueOf(body.get("id").toString());
         UserTable user = this.userTableService.get(id);
         if (body.get("email") != null) {
             UserTable ut = this.userTableService.getUserByEmail(body.get("email").toString());
-            if (ut != null && id !=ut.getId()) {
+            if (ut != null && id != ut.getId()) {
                 Map mapReturn = new HashMap<>();
                 mapReturn.put("message", "用户Email已存在");
                 return mapReturn;
@@ -150,7 +200,7 @@ public class UserController {
 
         if (body.get("phone") != null) {
             UserTable ut = this.userTableService.getUserByPhone(body.get("phone").toString());
-            if (ut != null && id !=ut.getId()) {
+            if (ut != null && id != ut.getId()) {
                 Map mapReturn = new HashMap<>();
                 mapReturn.put("message", "用户电话号码已存在");
                 return mapReturn;
@@ -171,9 +221,9 @@ public class UserController {
     }
 
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and ( hasRole('ROLE_super_admin') or hasRole('ROLE_admin'))")
+    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public Map updateUser(@RequestBody Map<String,Object> body, Principal principal) {
+    public Map updateUser(@RequestBody Map<String, Object> body, Principal principal) {
         UserTable userController = userTableService.getUserByUsername(principal.getName());
         String authority = ((OAuth2Authentication) principal).getAuthorities().iterator().next().getAuthority();
         long id = Long.valueOf(body.get("id").toString());
@@ -255,9 +305,9 @@ public class UserController {
         return null;
     }
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public Map saveUser(@RequestBody Map<String,Object> body, Principal principal) {
+    public Map saveUser(@RequestBody Map<String, Object> body, Principal principal) {
         UserTable user = new UserTable();
         if (this.userTableService.getUserByUsername(body.get("username").toString()) != null) {
             Map mapReturn = new HashMap<>();
@@ -298,16 +348,16 @@ public class UserController {
         List clientsUpdate = new ArrayList<>();
         clientsUpdate.add(clientTableService.loadClientByClientId("user_admin_client"));
         if (body.get("clients") != null) {
-            clientTableService.getByIds((List<Object>)body.get("clients"));
-            clientsUpdate.addAll(clientTableService.getByIds((List<Object>)body.get("clients")));
+            clientTableService.getByIds((List<Object>) body.get("clients"));
+            clientsUpdate.addAll(clientTableService.getByIds((List<Object>) body.get("clients")));
         }
         user.setClients(clientsUpdate);
         if (body.get("modulesAuthorities") != null) {
-            user.setModulesAuthorities(moduleRoleTableService.getByIds((List<Object>)body.get("modulesAuthorities")));
+            user.setModulesAuthorities(moduleRoleTableService.getByIds((List<Object>) body.get("modulesAuthorities")));
         } else {
             user.setModulesAuthorities(null);
         }
-        if (body.get("limitedDate") != null ) {
+        if (body.get("limitedDate") != null) {
             user.setLimitedDate(new Date(Long.valueOf(body.get("limitedDate").toString())));
         } else {
             user.setLimitedDate(null);
@@ -326,7 +376,7 @@ public class UserController {
         return null;
     }
 
-    @PreAuthorize("#oauth2.hasScope('internal_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list/relatedusers/options", method = {RequestMethod.GET})
     public List getListOptionsByClients(@RequestParam String clientId) {
         List listOptions = null;

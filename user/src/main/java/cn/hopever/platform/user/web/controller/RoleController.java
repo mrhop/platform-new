@@ -27,7 +27,7 @@ public class RoleController {
     private RoleTableService roleTableService;
 
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list", method = RequestMethod.GET)
     public List getList() {
         List<HashMap<String, Object>> listReturn = null;
@@ -49,7 +49,7 @@ public class RoleController {
         return listReturn;
     }
 
-    @PreAuthorize("#oauth2.hasScope('user_admin_client') and ( hasRole('ROLE_super_admin') or hasRole('ROLE_admin'))")
+    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/options", method = RequestMethod.GET)
     public List getOptionsList(Principal principal) {
         String authority = ((OAuth2Authentication) principal).getAuthorities().iterator().next().getAuthority();
