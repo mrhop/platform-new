@@ -187,7 +187,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
 },staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticStyle: {
-      "margin": "20px 0"
+      "margin": "80px 0 20px"
     }
   }, [_c('a', {
     staticClass: "btn btn-primary",
@@ -294,4 +294,4 @@ module.exports = Component.exports
 /***/ })
 
 },[118]);
-//# sourceMappingURL=test.1baf5b8887394187547b.js.map
+//# sourceMappingURL=test.7255060d89d6794041bb.js.map

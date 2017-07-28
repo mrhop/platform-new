@@ -7,4 +7,5 @@ bootRepackage {
 }
 dependencies {
     compile project(':utils')
+    compile('org.webjars:bootstrap:3.0.3')
 }
