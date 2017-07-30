@@ -44,76 +44,22 @@ public class UserController {
     private ModuleRoleTableService moduleRoleTableService;
     @Autowired
     private UserVoAssembler userVoAssembler;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-
-    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
-    @RequestMapping(value = "/list", method = {RequestMethod.POST})
-    public Map getList(@RequestBody JsonNode body, Principal principal) {
-        Map<String, Object> map = new HashMap<>();
-        List<HashMap<String, Object>> listReturn;
-        String authority = ((OAuth2Authentication) principal).getAuthorities().iterator().next().getAuthority();
-        Page<UserTable> list;
-        PageRequest pageRequest;
-        if (body.get("sort") == null || body.get("sort").isNull()) {
-            pageRequest = new PageRequest(body.get("currentPage").asInt(), body.get("rowSize").asInt(), Sort.Direction.ASC, "id");
-        } else {
-            pageRequest = new PageRequest(body.get("currentPage").asInt(), body.get("rowSize").asInt(), Sort.Direction.fromString(body.get("sort").get("sortDirection").textValue()), body.get("sort").get("sortName").textValue());
-        }
-        Map<String, Object> filterMap = null;
-        if (body.get("filters") != null && !body.get("filters").isNull()) {
-            filterMap = JacksonUtil.mapper.convertValue(body.get("filters"), Map.class);
-        }
-        if ("ROLE_super_admin".equals(authority)) {
-            list = userTableService.getListWithOutSelf(principal.getName(), pageRequest, filterMap);
-        } else {
-            list = userTableService.getSubList(principal.getName(), pageRequest, filterMap);
-        }
-        if (list != null && list.iterator().hasNext()) {
-            listReturn = new ArrayList<>();
-            for (UserTable ut : list) {
-                HashMap<String, Object> mapTemp = new HashMap<>();
-                mapTemp.put("key", ut.getId());
-                List<Object> listTmp = new ArrayList<>();
-                listTmp.add("");
-                listTmp.add(ut.getUsername());
-                listTmp.add(ut.getName());
-                listTmp.add(ut.getEmail());
-                listTmp.add(ut.getPhone());
-                listTmp.add(ut.getCreateUser() != null ? ut.getCreateUser().getUsername() : "");
-                listTmp.add(ut.getCreatedDate() != null ? DateFormat.sdfDate.format(ut.getCreatedDate()) : "");
-                listTmp.add(ut.isEnabled() ? "Y" : "N");
-                listTmp.add(ut.isAccountNonExpired() ? "Y" : "N");
-                mapTemp.put("value", listTmp);
-                listReturn.add(mapTemp);
-            }
-            map.put("data", listReturn);
-            map.put("totalCount", list.getTotalElements());
-            map.put("rowSize", body.get("rowSize").asInt());
-            map.put("currentPage", list.getNumber());
-        } else {
-            map.put("data", null);
-            map.put("totalCount", 0);
-            map.put("rowSize", body.get("rowSize").asInt());
-            map.put("currentPage", 0);
-        }
-        return map;
-    }
 
     @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body, Principal principal) {
         Map<String, Object> map = new HashMap<>();
-        List<HashMap<String, Object>> listReturn;
+        List<HashMap<String, Object>> listReturn = new ArrayList<>();
         String authority = ((OAuth2Authentication) principal).getAuthorities().iterator().next().getAuthority();
         Page<UserTable> list;
         PageRequest pageRequest;
-        if (body.getSorts() == null) {
+        if (body.getSorts() == null || body.getSorts().isEmpty()) {
             pageRequest = new PageRequest(body.getPager().getCurrentPage(), body.getPager().getPageSize(), Sort.Direction.ASC, "id");
         } else {
-            pageRequest = new PageRequest(body.getPager().getCurrentPage(), body.getPager().getPageSize(), Sort.Direction.fromString(body.get("sort").get("sortDirection").textValue()), body.get("sort").get("sortName").textValue());
+            String key = body.getSorts().keySet().iterator().next();
+            pageRequest = new PageRequest(body.getPager().getCurrentPage(), body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
         }
         if ("ROLE_super_admin".equals(authority)) {
             list = userTableService.getListWithOutSelf(principal.getName(), pageRequest, body.getFilters());
@@ -126,28 +72,29 @@ public class UserController {
                 HashMap<String, Object> mapTemp = new HashMap<>();
                 mapTemp.put("key", ut.getId());
                 List<Object> listTmp = new ArrayList<>();
-                listTmp.add("");
                 listTmp.add(ut.getUsername());
                 listTmp.add(ut.getName());
                 listTmp.add(ut.getEmail());
                 listTmp.add(ut.getPhone());
-                listTmp.add(ut.getCreateUser() != null ? ut.getCreateUser().getUsername() : "");
-                listTmp.add(ut.getCreatedDate() != null ? DateFormat.sdfDate.format(ut.getCreatedDate()) : "");
-                listTmp.add(ut.isEnabled() ? "Y" : "N");
-                listTmp.add(ut.isAccountNonExpired() ? "Y" : "N");
+                listTmp.add(ut.getCreateUser());
+                listTmp.add(ut.getCreatedDate());
+                listTmp.add(ut.isEnabled());
+                listTmp.add(ut.isAccountNonExpired());
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);
             }
-            map.put("data", listReturn);
+            map.put("rows", listReturn);
             map.put("totalCount", list.getTotalElements());
-            map.put("rowSize", body.get("rowSize").asInt());
-            map.put("currentPage", list.getNumber());
+
         } else {
-            map.put("data", null);
+            map.put("rows", null);
             map.put("totalCount", 0);
-            map.put("rowSize", body.get("rowSize").asInt());
-            map.put("currentPage", 0);
         }
+        map.put("pager", body.getPager());
+        map.put("filters", body.getFilters());
+        map.put("sorts", body.getSorts());
+        HashMap mapReturn = new HashMap();
+        mapReturn.put("data", map);
         return map;
     }
 
