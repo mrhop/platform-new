@@ -100,21 +100,21 @@ public class UserController {
 
     @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
-    public void delete(@RequestParam Long id, Principal principal) {
-        if (validateUserOperation(userTableService.getUserByUsername(principal.getName()), this.userTableService.get(id))) {
-            this.userTableService.delete(id);
+    public void delete(@RequestParam Long key, Principal principal) {
+        if (validateUserOperation(userTableService.getUserByUsername(principal.getName()), this.userTableService.get(key))) {
+            this.userTableService.delete(key);
         }
     }
 
     @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
-    public Map info(@RequestParam Long id, Principal principal) {
+    public UserVo info(@RequestParam Long key, Principal principal) {
         //返回user是无法解析的，要使用对象解析为map 的形式
-        UserTable ut = userTableService.get(id);
+        UserTable ut = userTableService.get(key);
         UserVo ur = userVoAssembler.toResource(ut);
         ur.setPhoto(null);
         if (validateUserOperation(userTableService.getUserByUsername(principal.getName()), ut)) {
-            return JacksonUtil.mapper.convertValue(ur, Map.class);
+            return ur;
         } else {
             return null;
         }
@@ -122,17 +122,17 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = {"/", ""}, method = {RequestMethod.GET})
-    public Map info(Principal principal) {
+    public UserVo info(Principal principal) {
         //返回user是无法解析的，要使用对象解析为map 的形式
         UserTable ut = this.userTableService.getUserByUsername(principal.getName());
         UserVo ur = userVoAssembler.toResource(ut);
-        ur.setPhoto(null);
-        return JacksonUtil.mapper.convertValue(ur, Map.class);
+        return ur;
     }
 
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/personal/update", method = {RequestMethod.POST})
     public Map updatePersonalUser(@RequestBody Map<String, Object> body, Principal principal) {
+        // 此处应该考虑form表单的file的属性，所以应该是form mate方式，update也一样
         long id = Long.valueOf(body.get("id").toString());
         UserTable user = this.userTableService.get(id);
         if (body.get("email") != null) {
@@ -342,6 +342,7 @@ public class UserController {
     }
 
     private static boolean validateUserOperation(UserTable ut1, UserTable ut2) {
+        // 此处应该判断user是否有相同的role，以及是否包含有相同的role
         if (ut1.getAuthorities().get(0).getAuthority().equals("ROLE_super_admin")) {
             return true;
         } else {
