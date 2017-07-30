@@ -1,2 +1,4 @@
 oauth2client 暂时不考虑单点登录部分
 单点登录的考虑【cookie设置统一的domain，】
+开始考虑user的其他部分，将所有的接口实现后，开始将client和user进行合并
+完成后，开始考虑其他模块
