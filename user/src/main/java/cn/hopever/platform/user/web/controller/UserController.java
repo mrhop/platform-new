@@ -10,9 +10,12 @@ import cn.hopever.platform.user.service.UserTableService;
 import cn.hopever.platform.user.vo.UserVo;
 import cn.hopever.platform.user.vo.UserVoAssembler;
 import cn.hopever.platform.utils.json.JacksonUtil;
+import cn.hopever.platform.utils.tools.BeanUtils;
 import cn.hopever.platform.utils.tools.DateFormat;
 import cn.hopever.platform.utils.web.TableParameters;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.*;
@@ -34,6 +38,8 @@ import java.util.*;
 @RequestMapping(value = "/user", produces = "application/json")
 public class UserController {
     Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    private ModelMapper modelMapper = new ModelMapper();
     @Autowired
     private UserTableService userTableService;
     @Autowired
@@ -131,39 +137,32 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/personal/update", method = {RequestMethod.POST})
-    public Map updatePersonalUser(@RequestBody Map<String, Object> body, Principal principal) {
+    public Map updatePersonalUser(@RequestPart(required = true) UserVo userVo, @RequestPart("photo") MultipartFile[] files, Principal principal) {
         // 此处应该考虑form表单的file的属性，所以应该是form mate方式，update也一样
-        long id = Long.valueOf(body.get("id").toString());
-        UserTable user = this.userTableService.get(id);
-        if (body.get("email") != null) {
-            UserTable ut = this.userTableService.getUserByEmail(body.get("email").toString());
-            if (ut != null && id != ut.getId()) {
+        UserTable user = this.userTableService.getUserByUsername(principal.getName());
+        if (userVo.getEmail() != null) {
+            UserTable ut = this.userTableService.getUserByEmail(userVo.getEmail());
+            if (ut != null && userVo.getId() != ut.getId()) {
                 Map mapReturn = new HashMap<>();
                 mapReturn.put("message", "用户Email已存在");
                 return mapReturn;
             }
-            user.setEmail(body.get("email").toString());
         }
 
-        if (body.get("phone") != null) {
-            UserTable ut = this.userTableService.getUserByPhone(body.get("phone").toString());
-            if (ut != null && id != ut.getId()) {
+        if (userVo.getPhone() != null) {
+            UserTable ut = this.userTableService.getUserByPhone(userVo.getPhone());
+            if (ut != null && userVo.getId() != ut.getId()) {
                 Map mapReturn = new HashMap<>();
                 mapReturn.put("message", "用户电话号码已存在");
                 return mapReturn;
             }
-            user.setPhone(body.get("phone").toString());
         }
-        if (body.get("name") != null) {
-            user.setName(body.get("name").toString());
-        }
-        if (body.get("password") != null) {
-            user.setPassword(passwordEncoder.encode(body.get("password").toString()));
-        }
-        if (body.get("photo") != null) {
-            user.setPhoto(body.get("photo").toString());
+        BeanUtils.copyNotNullProperties(userVo,user);
+        if(userVo.getPassword()!=null){
+            user.setPassword(passwordEncoder.encode(userVo.getPassword()));
         }
         userTableService.save(user);
+        //到此处了，需要返回,请在此处保证success和error返回相同的格式，所以success还需要考虑
         return null;
     }
 
