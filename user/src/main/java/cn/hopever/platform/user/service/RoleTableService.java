@@ -22,4 +22,6 @@ public interface RoleTableService {
 
     public RoleTable get(Long id);
 
+    public RoleTable getByAuthority(String authority);
+
 }

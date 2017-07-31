@@ -4,11 +4,11 @@ import cn.hopever.platform.user.domain.ClientTable;
 import cn.hopever.platform.user.domain.ModuleRoleTable;
 import cn.hopever.platform.user.domain.RoleTable;
 import cn.hopever.platform.user.domain.UserTable;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
+import cn.hopever.platform.utils.tools.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,79 +17,50 @@ import java.util.List;
 @Component
 public class UserVoAssembler {
 
-    private ModelMapper modelMapper;
-
-    public UserVoAssembler() {
-        modelMapper = new ModelMapper();
-        PropertyMap<UserTable, UserVo> map = new PropertyMap<UserTable, UserVo>() {
-            protected void configure() {
-                skip().setPassword(null);
-                skip().setModulesAuthorities(null);
-                skip().setAuthorities(null);
-                skip().setClients(null);
-            }
-        };
-        modelMapper.addMappings(map);
-    }
-
     public UserVo toResource(UserTable userTable) {
-
-        UserVo resource = createResource(userTable);
-        // … do further mapping
-        //关联其他资源
+        UserVo resource = new UserVo();
+        BeanUtils.copyNotNullProperties(userTable, resource, "password");
         if (userTable.getClients() != null) {
-            ArrayList<ClientVo> setCr = new ArrayList<>();
+            List<Long> setCr = new ArrayList<>();
             for (ClientTable ct : userTable.getClients()) {
-                ClientVo clientVo = new ClientVo();
-                clientVo.setId(ct.getId());
-                clientVo.setClientId(ct.getClientId());
-                clientVo.setClientName(ct.getClientName());
-                setCr.add(clientVo);
+                setCr.add(ct.getId());
             }
             resource.setClients(setCr);
         }
-
         if (userTable.getAuthorities() != null) {
-            ArrayList<RoleVo> setRr = new ArrayList<>();
             for (RoleTable rt : userTable.getAuthorities()) {
-                RoleVo roleVo = new RoleVo();
-                roleVo.setId(rt.getId());
-                roleVo.setAuthority(rt.getAuthority());
-                roleVo.setName(rt.getName());
-                setRr.add(roleVo);
+                if (rt.getLevel() < 3) {
+                    resource.setAuthorities(rt.getId());
+                    break;
+                }
             }
-            resource.setAuthorities(setRr);
         }
-
         if (userTable.getModulesAuthorities() != null) {
-            ArrayList<ModuleRoleVo> setMrr = new ArrayList<>();
+            List<Long> setMrr = new ArrayList<>();
             for (ModuleRoleTable mrt : userTable.getModulesAuthorities()) {
-                ModuleRoleVo moduleRoleVo = new ModuleRoleVo();
-                moduleRoleVo.setId(mrt.getId());
-                moduleRoleVo.setAuthority(mrt.getAuthority());
-                moduleRoleVo.setName(mrt.getName());
-                setMrr.add(moduleRoleVo);
+                setMrr.add(mrt.getId());
             }
             resource.setModulesAuthorities(setMrr);
+        }
+        if (userTable.getLimitedDate() != null) {
+            resource.setLimitedDate(userTable.getLimitedDate().getTime());
         }
         return resource;
     }
 
+    public UserTable toDomain(UserVo userVo, UserTable userTable) {
+        BeanUtils.copyNotNullProperties(userVo, userTable, "password","photo");
+        if (userVo.getLimitedDate() != null) {
+            userTable.setLimitedDate(new Date(userVo.getLimitedDate()));
+        }
+        return userTable;
+    }
 
-    public List<UserVo> toResourcesCustomized(Iterable<UserTable> userTables) {
+    public List<UserVo> toResources(Iterable<UserTable> userTables) {
         List<UserVo> returnList = new ArrayList<>();
         for (UserTable ut : userTables) {
-            returnList.add(this.createResource(ut));
+            returnList.add(this.toResource(ut));
         }
         return returnList;
     }
-
-    private UserVo createResource(UserTable userTable) {
-        UserVo userVo = null;
-        if (userTable != null) {
-            userVo = modelMapper.map(userTable, UserVo.class);
-        }
-        return userVo;
-    }
-
 }

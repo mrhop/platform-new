@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public interface ModuleRoleTableService {
     public List<ModuleRoleTable> getByClients(List<Object> clientIds);
-    public List<ModuleRoleTable> getByIds(List<Object> ids);
+    public List<ModuleRoleTable> getByIds(List<Long> ids);
     public List<ModuleRoleTable> getByUserId(Long userId);
 
     public Page<ModuleRoleTable> getList(Pageable pageable, Map<String, Object> filterMap);

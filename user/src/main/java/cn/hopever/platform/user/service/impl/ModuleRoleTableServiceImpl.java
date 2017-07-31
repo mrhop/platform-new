@@ -53,10 +53,10 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
     }
 
     @Override
-    public List<ModuleRoleTable> getByIds(List<Object> ids) {
+    public List<ModuleRoleTable> getByIds(List<Long> ids) {
         List<ModuleRoleTable> list = new ArrayList<>();
-        for (Object id : ids) {
-            ModuleRoleTable moduleRoleTable = moduleRoleTableRepository.findOne(Long.parseLong(id.toString()));
+        for (Long id : ids) {
+            ModuleRoleTable moduleRoleTable = moduleRoleTableRepository.findOne(id);
             list.add(moduleRoleTable);
         }
         return list;
@@ -90,11 +90,11 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
 
     @Override
     public void deleteById(Long id) {
-        ModuleRoleTable  mrt = moduleRoleTableRepository.findOne(id);
+        ModuleRoleTable mrt = moduleRoleTableRepository.findOne(id);
         mrt.setModules(null);
         mrt.setClient(null);
-        if(mrt.getUsers()!=null){
-            for(UserTable ut:mrt.getUsers()){
+        if (mrt.getUsers() != null) {
+            for (UserTable ut : mrt.getUsers()) {
                 ut.getModulesAuthorities().remove(mrt);
             }
         }

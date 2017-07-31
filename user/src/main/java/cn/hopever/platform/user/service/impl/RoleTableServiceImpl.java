@@ -59,4 +59,9 @@ public class RoleTableServiceImpl implements RoleTableService {
     public RoleTable get(Long id) {
         return roleTableRepository.findOne(id);
     }
+
+    @Override
+    public RoleTable getByAuthority(String authority) {
+        return roleTableRepository.findOneByAuthority(authority);
+    }
 }

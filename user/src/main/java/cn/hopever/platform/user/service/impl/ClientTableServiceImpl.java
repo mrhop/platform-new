@@ -97,10 +97,10 @@ public class ClientTableServiceImpl implements ClientTableService {
     }
 
     @Override
-    public List<ClientTable> getByIds(List<Object> ids) {
+    public List<ClientTable> getByIds(List<Long> ids) {
         List<ClientTable> list = new ArrayList<>();
-        for (Object id : ids) {
-            list.add(clientTableRepository.findOne(Long.parseLong(id.toString())));
+        for (Long id : ids) {
+            list.add(clientTableRepository.findOne(id));
         }
         return list;
     }

@@ -15,25 +15,6 @@ config:
         clientScopes:
                   - cms_admin_client
                   - internal_client
-    common:
-        pageSize: 10
-        relatedusers: http://localhost:9091/user/user/list/relatedusers/options
-#        imageUpload: http://localhost:8084/utilsweb/upload/image
-#        fileUpload: http://localhost:8084/utilsweb/upload/file
-#        docUpload: http://localhost:8084/utilsweb/upload/doc
-        imageUpload: http://utils.hopever.cn/upload/image
-        fileUpload: http://utils.hopever.cn/upload/file
-        docUpload: http://utils.hopever.cn/upload/doc
-        imageDel: http://utils.hopever.cn/delete/image
-        fileDel: http://utils.hopever.cn/delete/file
-        docDel: http://utils.hopever.cn/delete/doc
-#        imagePathPrev: /mogilefs/images/
-#        filePathPrev:  /mogilefs/files/
-#        docPathPrev:  /mogilefs/docs/
-        imagePathPrev: http://www.hopever.cn/mogilefs/images/
-        filePathPrev:  http://www.hopever.cn/mogilefs/files/
-        docPathPrev:  http://www.hopever.cn/mogilefs/docs/
-        defaultUserPhoto: http://localhost/utils/images/user/defaultphoto.png
 spring:
   mvc:
     view:

@@ -28,7 +28,7 @@ public interface ClientTableService extends ClientDetailsService {
     public List<ClientTable> getByUserId(Long userId);
 
     public ClientTable getByClientId(String clientId);
-    public List<ClientTable> getByIds(List<Object> ids);
+    public List<ClientTable> getByIds(List<Long> ids);
     public Page<ClientTable> getList(Pageable pageable, Map<String, Object> filterMap);
 
 
