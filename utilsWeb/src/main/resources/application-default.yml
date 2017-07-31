@@ -4,7 +4,7 @@ server:
 security:
     basic:
         enabled: false
-#    oauth2:
-#           resource:
-#               jwt:
-#                   key-uri: "http://localhost:9091/user/oauth/token_key"
+    oauth2:
+           resource:
+               jwt:
+                   key-uri: "http://localhost:9091/oauth/token_key"

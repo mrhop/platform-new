@@ -3,4 +3,6 @@ bootRepackage {
 }
 dependencies {
     //compile 'org.springframework.security.oauth:spring-security-oauth2'
+    //moji file
+    compile 'fm.last:moji:2.0.0'
 }

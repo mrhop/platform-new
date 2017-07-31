@@ -9,12 +9,9 @@ import cn.hopever.platform.user.service.RoleTableService;
 import cn.hopever.platform.user.service.UserTableService;
 import cn.hopever.platform.user.vo.UserVo;
 import cn.hopever.platform.user.vo.UserVoAssembler;
-import cn.hopever.platform.utils.json.JacksonUtil;
 import cn.hopever.platform.utils.tools.BeanUtils;
-import cn.hopever.platform.utils.tools.DateFormat;
 import cn.hopever.platform.utils.web.TableParameters;
-import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
+import cn.hopever.platform.utils.web.VueResults;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,24 +134,20 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/personal/update", method = {RequestMethod.POST})
-    public Map updatePersonalUser(@RequestPart(required = true) UserVo userVo, @RequestPart("photo") MultipartFile[] files, Principal principal) {
+    public VueResults.Result updatePersonalUser(@RequestPart(required = true) UserVo userVo, @RequestPart("photo") MultipartFile[] files, Principal principal) {
         // 此处应该考虑form表单的file的属性，所以应该是form mate方式，update也一样
         UserTable user = this.userTableService.getUserByUsername(principal.getName());
         if (userVo.getEmail() != null) {
             UserTable ut = this.userTableService.getUserByEmail(userVo.getEmail());
             if (ut != null && userVo.getId() != ut.getId()) {
-                Map mapReturn = new HashMap<>();
-                mapReturn.put("message", "用户Email已存在");
-                return mapReturn;
+                return VueResults.generateError("更新失败","用户Email已存在");
             }
         }
 
         if (userVo.getPhone() != null) {
             UserTable ut = this.userTableService.getUserByPhone(userVo.getPhone());
             if (ut != null && userVo.getId() != ut.getId()) {
-                Map mapReturn = new HashMap<>();
-                mapReturn.put("message", "用户电话号码已存在");
-                return mapReturn;
+                return VueResults.generateError("更新失败","用户电话号码已存在");
             }
         }
         BeanUtils.copyNotNullProperties(userVo,user);
@@ -163,7 +156,7 @@ public class UserController {
         }
         userTableService.save(user);
         //到此处了，需要返回,请在此处保证success和error返回相同的格式，所以success还需要考虑
-        return null;
+        return VueResults.generateSuccess("更新成功","用户更新完成");
     }
 
 
