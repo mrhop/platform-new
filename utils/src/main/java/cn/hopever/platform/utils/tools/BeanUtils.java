@@ -16,7 +16,7 @@ import java.util.List;
 public abstract class BeanUtils extends org.springframework.beans.BeanUtils {
 
     public static void copyNotNullProperties(Object source, Object target) throws BeansException {
-        copyNotNullProperties(source, target, null);
+        copyNotNullProperties(source, target, (String[]) null);
     }
 
     public static void copyNotNullProperties(Object source, Object target, String... ignoreProperties) throws BeansException {

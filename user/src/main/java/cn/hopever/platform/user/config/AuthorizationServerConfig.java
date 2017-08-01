@@ -1,5 +1,6 @@
 package cn.hopever.platform.user.config;
 
+import cn.hopever.platform.user.security.CustomJwtAccessTokenConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
  */
 @Configuration
 @EnableAuthorizationServer
-public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter{
+public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
     public static Logger logger = LoggerFactory.getLogger(AuthorizationServerConfig.class);
 
@@ -47,11 +48,12 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     @Bean
     public JwtAccessTokenConverter tokenEnhancer() {
         logger.info("Initializing JWT with public key:\n" + publicKey);
-        JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+        CustomJwtAccessTokenConverter converter = new CustomJwtAccessTokenConverter();
         converter.setSigningKey(privateKey);
         converter.setVerifierKey(publicKey);
         return converter;
     }
+
     @Bean
     public JwtTokenStore tokenStore() {
         return new JwtTokenStore(tokenEnhancer());
@@ -72,7 +74,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
         approvalHandler.setClientDetailsService(clientDetailsService);
         return approvalHandler;
     }
-
 
 
     @Override
@@ -101,7 +102,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.withClientDetails(clientDetailsService);
     }
-
 
 
 }

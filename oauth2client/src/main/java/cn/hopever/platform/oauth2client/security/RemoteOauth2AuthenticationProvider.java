@@ -7,7 +7,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Donghui Huo on 2017/7/25.
@@ -25,11 +30,18 @@ public class RemoteOauth2AuthenticationProvider implements AuthenticationProvide
             Object credentials = authentication.getCredentials();
             String password = credentials == null ? null : credentials.toString();
             OAuth2AccessToken oa = commonMethods.getPasswordRestTemplate(username, password).getAccessToken();
-            // 此处进行accesstoken的获取
+            // 此处进行accesstoken的获取，同时关联相关的授权信息
+            List<SimpleGrantedAuthority> list = null;
+            if (oa.getAdditionalInformation().get("authorities") != null) {
+                list = new ArrayList<>();
+                List<Map<String, String>> listAuthorities = (List<Map<String, String>>) oa.getAdditionalInformation().get("authorities");
+                for (Map<String, String> authority : listAuthorities) {
+                    list.add(new SimpleGrantedAuthority(authority.get("authority")));
+                }
+            }
             UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(
                     username, null,
-                    null);
-            //设置一个accesstoken
+                    list);
             result.setDetails(oa);
             return result;
         } catch (Exception e) {

@@ -12,7 +12,7 @@ import cn.hopever.platform.user.vo.UserVo;
 import cn.hopever.platform.user.vo.UserVoAssembler;
 import cn.hopever.platform.utils.moji.MojiUtils;
 import cn.hopever.platform.utils.properties.CommonProperties;
-import cn.hopever.platform.utils.tools.BeanUtils;
+import cn.hopever.platform.utils.test.PrincipalSample;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.modelmapper.ModelMapper;
@@ -24,7 +24,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,6 +34,7 @@ import java.util.*;
  * Created by Donghui Huo on 2016/8/29.
  */
 @RestController
+@CrossOrigin
 @RequestMapping(value = "/user", produces = "application/json")
 public class UserController {
     Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -57,12 +57,14 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
+    //@PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body, Principal principal) {
+        principal = new PrincipalSample("admin");
+        UserTable userTable = userTableService.getUserByUsername(principal.getName());
         Map<String, Object> map = new HashMap<>();
         List<HashMap<String, Object>> listReturn = new ArrayList<>();
-        String authority = ((OAuth2Authentication) principal).getAuthorities().iterator().next().getAuthority();
+        String authority = this.getTopRole(userTable).getAuthority();
         Page<UserTable> list;
         PageRequest pageRequest;
         if (body.getSorts() == null || body.getSorts().isEmpty()) {
@@ -86,10 +88,10 @@ public class UserController {
                 listTmp.add(ut.getName());
                 listTmp.add(ut.getEmail());
                 listTmp.add(ut.getPhone());
-                listTmp.add(ut.getCreateUser());
-                listTmp.add(ut.getCreatedDate() != null ? ut.getCreatedDate().getTime() : null);
                 listTmp.add(ut.isEnabled());
-                listTmp.add(ut.isAccountNonExpired());
+                listTmp.add(ut.isAccountNonExpired() ? "有效期内" : "已过期");
+                listTmp.add(ut.getCreateUser() == null ? null : ut.getCreateUser().getUsername());
+                listTmp.add(ut.getCreatedDate() != null ? ut.getCreatedDate().getTime() : null);
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);
             }
@@ -108,18 +110,19 @@ public class UserController {
         return map;
     }
 
-    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
+    // @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long key, Principal principal) {
+        principal = new PrincipalSample("admin");
         if (validateUserOperation(userTableService.getUserByUsername(principal.getName()), this.userTableService.get(key))) {
             this.userTableService.delete(key);
         }
     }
 
-    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
+    //@PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public UserVo info(@RequestParam Long key, Principal principal) {
-        //返回user是无法解析的，要使用对象解析为map 的形式
+        principal = new PrincipalSample("admin");
         UserTable ut = userTableService.get(key);
         UserVo ur = userVoAssembler.toResource(ut);
         if (validateUserOperation(userTableService.getUserByUsername(principal.getName()), ut)) {
@@ -129,31 +132,31 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("isAuthenticated()")
+    //@PreAuthorize("isAuthenticated()")
     @RequestMapping(value = {"/", ""}, method = {RequestMethod.GET})
     public UserVo info(Principal principal) {
-        //返回user是无法解析的，要使用对象解析为map 的形式
+        principal = new PrincipalSample("admin");
         UserTable ut = this.userTableService.getUserByUsername(principal.getName());
         UserVo ur = userVoAssembler.toResource(ut);
         return ur;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    //@PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/personal/update", method = {RequestMethod.POST})
     public VueResults.Result updatePersonalUser(@RequestPart(required = true) UserVo userVo, @RequestPart("photo") MultipartFile[] files, Principal principal) {
-        // 此处应该考虑form表单的file的属性，所以应该是form mate方式，update也一样
+        principal = new PrincipalSample("admin");
         UserTable user = this.userTableService.getUserByUsername(principal.getName());
         if (userVo.getEmail() != null) {
             UserTable ut = this.userTableService.getUserByEmail(userVo.getEmail());
             if (ut != null && userVo.getId() != ut.getId()) {
-                return VueResults.generateError("更新失败", "用户Email已存在");
+                return VueResults.generateError("更新失败", "Email已存在");
             }
         }
 
         if (userVo.getPhone() != null) {
             UserTable ut = this.userTableService.getUserByPhone(userVo.getPhone());
             if (ut != null && userVo.getId() != ut.getId()) {
-                return VueResults.generateError("更新失败", "用户电话号码已存在");
+                return VueResults.generateError("更新失败", "电话号码已存在");
             }
         }
         userVoAssembler.toDomain(userVo, user);
@@ -178,9 +181,10 @@ public class UserController {
     }
 
 
-    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
+    // @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public VueResults.Result updateUser(@RequestPart(required = true) UserVo userVo, @RequestPart("photo") MultipartFile[] files, Principal principal) {
+        principal = new PrincipalSample("admin");
         UserTable userController = userTableService.getUserByUsername(principal.getName());
         RoleTable rtController = getTopRole(userController);
         UserTable user = userTableService.get(userVo.getId());
@@ -200,6 +204,9 @@ public class UserController {
             }
         }
         userVoAssembler.toDomain(userVo, user);
+        if (user.getCreateUser() == null) {
+            user.setCreateUser(userController);
+        }
         if (userVo.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(userVo.getPassword()));
         }
@@ -241,42 +248,47 @@ public class UserController {
             }
             user.setClients(listPartClients);
         }
-        List<ModuleRoleTable> listPartModileRoles = user.getModulesAuthorities();
-        if (rtTop.getLevel() > 1 && rtController != null && rtController.getLevel() != 0 && userController.getClients() != null && listPartModileRoles != null && listPartModileRoles.size() > 0) {
+        List<ModuleRoleTable> listPartModuleRoles = new ArrayList<>();
+        if (rtController.getLevel() == 1) {
+            listPartModuleRoles = user.getModulesAuthorities();
+        }
+        if (rtTop.getLevel() > 1 && rtController != null && userController.getClients() != null && listPartModuleRoles != null && listPartModuleRoles.size() > 0) {
             for (ClientTable ct : userController.getClients()) {
                 List<ModuleRoleTable> moduleRoles = ct.getModuleRoles();
                 if (moduleRoles != null) {
                     for (ModuleRoleTable mr : moduleRoles) {
-                        listPartModileRoles.remove(mr);
+                        listPartModuleRoles.remove(mr);
                     }
                 }
             }
         }
         if (userVo.getModulesAuthorities() != null) {
-            listPartModileRoles.addAll(moduleRoleTableService.getByIds(userVo.getModulesAuthorities()));
+            listPartModuleRoles.addAll(moduleRoleTableService.getByIds(userVo.getModulesAuthorities()));
         }
-        user.setModulesAuthorities(listPartModileRoles);
+        user.setModulesAuthorities(listPartModuleRoles);
         userTableService.save(user);
-        return VueResults.generateError("更新成功", "用户信息更新成功");
+        return VueResults.generateError("更新成功", "更新成功");
     }
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
+    //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result saveUser(@RequestPart(required = true) UserVo userVo, @RequestPart("photo") MultipartFile[] files, Principal principal) {
+        principal = new PrincipalSample("admin");
+
         UserTable user = new UserTable();
         if (this.userTableService.getUserByUsername(userVo.getUsername()) != null) {
-            return VueResults.generateError("创建失败", "用户账号已存在");
+            return VueResults.generateError("创建失败", "账号已存在");
         }
         if (userVo.getEmail() != null) {
             UserTable ut = this.userTableService.getUserByEmail(userVo.getEmail());
             if (ut != null) {
-                return VueResults.generateError("创建失败", "用户Email已存在");
+                return VueResults.generateError("创建失败", "Email已存在");
             }
         }
         if (userVo.getEmail() != null) {
             UserTable ut = this.userTableService.getUserByPhone(userVo.getEmail());
             if (ut != null) {
-                return VueResults.generateError("创建失败", "用户电话号码已存在");
+                return VueResults.generateError("创建失败", "电话号码已存在");
             }
         }
         userVoAssembler.toDomain(userVo, user);
@@ -320,7 +332,53 @@ public class UserController {
         user.setCreatedDate(new Date());
         user.setCreateUser(this.userTableService.getUserByUsername(principal.getName()));
         userTableService.save(user);
-        return VueResults.generateSuccess("创建成功", "用户创建成功");
+        return VueResults.generateSuccess("创建成功", "创建成功");
+    }
+
+    @RequestMapping(value = "/register", method = {RequestMethod.POST})
+    public VueResults.Result registerUser(@RequestPart(required = true) UserVo userVo, @RequestPart("photo") MultipartFile[] files, Principal principal) {
+        UserTable user = new UserTable();
+        if (this.userTableService.getUserByUsername(userVo.getUsername()) != null) {
+            return VueResults.generateError("注册失败", "账号已存在");
+        }
+        if (userVo.getEmail() != null) {
+            UserTable ut = this.userTableService.getUserByEmail(userVo.getEmail());
+            if (ut != null) {
+                return VueResults.generateError("注册失败", "Email已存在");
+            }
+        }
+        if (userVo.getEmail() != null) {
+            UserTable ut = this.userTableService.getUserByPhone(userVo.getEmail());
+            if (ut != null) {
+                return VueResults.generateError("注册失败", "电话号码已存在");
+            }
+        }
+        userVoAssembler.toDomain(userVo, user);
+        if (userVo.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(userVo.getPassword()));
+        }
+        if (files != null && files.length > 0) {
+            try {
+                Map<String, List<String>> mapPhotos = mojiUtils.uploadImg("user/photo/", files);
+                mapPhotos.get("fileKeys");
+                List<String> list = mapPhotos.get("fileKeys");
+                if (list != null && list.size() > 0) {
+                    user.setPhoto(commonProperties.getImagePathPrev() + list.get(0));
+                }
+            } catch (Exception e) {
+                logger.error("save user photo failed", e);
+                user.setPhoto(commonProperties.getDefaultUserPhoto());
+            }
+        }
+        List list = new ArrayList<>();
+        list.add(roleTableService.getByAuthority("ROLE_common_user"));
+        user.setAuthorities(list);
+        List clientsUpdate = new ArrayList<>();
+        clientsUpdate.add(clientTableService.loadClientByClientId("user_admin_client"));
+        user.setClients(clientsUpdate);
+        user.setCreatedDate(new Date());
+        userTableService.save(user);
+        return VueResults.generateSuccess("注册成功", "您已成功注册本系统");
     }
 
     @PreAuthorize("hasRole('ROLE_super_admin')")
@@ -376,14 +434,5 @@ public class UserController {
             }
         }
         return null;
-    }
-
-    public static void main(String[] args) {
-        UserTable u = new UserTable();
-        u.setLimitedDate(new Date());
-        u.setName("123");
-        UserVo uv = new UserVo();
-        BeanUtils.copyNotNullProperties(u, uv);
-        System.out.print(uv);
     }
 }
