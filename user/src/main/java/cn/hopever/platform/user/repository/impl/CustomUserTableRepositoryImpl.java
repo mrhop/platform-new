@@ -49,7 +49,11 @@ public class CustomUserTableRepositoryImpl extends SimpleJpaRepository<UserTable
                 if (mapFilter != null) {
                     for (String key : mapFilter.keySet()) {
                         if (mapFilter.get(key) != null) {
-                            predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + mapFilter.get(key) + "%"));
+                            if (key.equals("enabled")) {
+                                predicateReturn = builder.and(predicateReturn, builder.equal(root.get(key), mapFilter.get(key)));
+                            } else {
+                                predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + mapFilter.get(key) + "%"));
+                            }
                         }
                     }
                 }
@@ -74,9 +78,17 @@ public class CustomUserTableRepositoryImpl extends SimpleJpaRepository<UserTable
                     for (String key : mapFilter.keySet()) {
                         if (mapFilter.get(key) != null) {
                             if (predicateReturn == null) {
-                                predicateReturn = builder.like(root.get(key), "%" + mapFilter.get(key) + "%");
+                                if (key.equals("enabled")) {
+                                    predicateReturn = builder.equal(root.get(key), mapFilter.get(key));
+                                } else {
+                                    predicateReturn = builder.like(root.get(key), "%" + mapFilter.get(key) + "%");
+                                }
                             } else {
-                                predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + mapFilter.get(key) + "%"));
+                                if (key.equals("enabled")) {
+                                    predicateReturn = builder.and(predicateReturn, builder.equal(root.get(key), mapFilter.get(key)));
+                                } else {
+                                    predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + mapFilter.get(key) + "%"));
+                                }
                             }
                         }
                     }

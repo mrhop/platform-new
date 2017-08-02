@@ -68,10 +68,10 @@ public class UserController {
         Page<UserTable> list;
         PageRequest pageRequest;
         if (body.getSorts() == null || body.getSorts().isEmpty()) {
-            pageRequest = new PageRequest(body.getPager().getCurrentPage(), body.getPager().getPageSize(), Sort.Direction.ASC, "id");
+            pageRequest = new PageRequest(body.getPager().getCurrentPage()-1, body.getPager().getPageSize(), Sort.Direction.DESC, "createdDate");
         } else {
             String key = body.getSorts().keySet().iterator().next();
-            pageRequest = new PageRequest(body.getPager().getCurrentPage(), body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
+            pageRequest = new PageRequest(body.getPager().getCurrentPage()-1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
         }
         if ("ROLE_super_admin".equals(authority)) {
             list = userTableService.getListWithOutSelf(principal.getName(), pageRequest, body.getFilters());
@@ -89,7 +89,6 @@ public class UserController {
                 listTmp.add(ut.getEmail());
                 listTmp.add(ut.getPhone());
                 listTmp.add(ut.isEnabled());
-                listTmp.add(ut.isAccountNonExpired() ? "有效期内" : "已过期");
                 listTmp.add(ut.getCreateUser() == null ? null : ut.getCreateUser().getUsername());
                 listTmp.add(ut.getCreatedDate() != null ? ut.getCreatedDate().getTime() : null);
                 mapTemp.put("value", listTmp);
@@ -105,8 +104,6 @@ public class UserController {
         map.put("pager", body.getPager());
         map.put("filters", body.getFilters());
         map.put("sorts", body.getSorts());
-        HashMap mapReturn = new HashMap();
-        mapReturn.put("data", map);
         return map;
     }
 
