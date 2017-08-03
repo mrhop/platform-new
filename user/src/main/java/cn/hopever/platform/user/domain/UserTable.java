@@ -1,11 +1,10 @@
 package cn.hopever.platform.user.domain;
 
 import cn.hopever.platform.utils.json.JacksonUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -23,9 +22,6 @@ import java.util.Map;
 @EqualsAndHashCode(of = {"id"})
 @ToString(exclude = {"authorities", "clients", "modulesAuthorities"})
 public class UserTable implements UserDetails {
-
-    @Transient
-    Logger logger = LoggerFactory.getLogger(UserTable.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,23 +58,26 @@ public class UserTable implements UserDetails {
     private String photo;
 
     @ManyToOne
-    @JoinColumn(name = "create_user", nullable = true,insertable = true,updatable = true)
+    @JoinColumn(name = "create_user", nullable = true, insertable = true, updatable = true)
     private UserTable createUser;
 
     @Column(name = "created_date", nullable = true)
     private Date createdDate;
 
-    @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "platform_user_user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    @JsonIgnore
     private List<RoleTable> authorities;
 
     //client many-to-many
-    @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "platform_user_user_client", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "client_id", referencedColumnName = "id"))
+    @JsonIgnore
     private List<ClientTable> clients;
 
-    @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "platform_user_user_module_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    @JsonIgnore
     private List<ModuleRoleTable> modulesAuthorities;
 
     @Override
@@ -103,7 +102,7 @@ public class UserTable implements UserDetails {
             try {
                 this.additionalMessage = JacksonUtil.mapper.writeValueAsString(additionalMessage);
             } catch (IOException e) {
-                logger.error("json format error", e);
+                e.printStackTrace();
             }
         }
     }
@@ -113,7 +112,7 @@ public class UserTable implements UserDetails {
             try {
                 return JacksonUtil.mapper.readValue(this.additionalMessage, Map.class);
             } catch (IOException e) {
-                logger.error("json format error", e);
+                e.printStackTrace();
             }
         }
         return null;

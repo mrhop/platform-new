@@ -11,6 +11,8 @@ import cn.hopever.platform.user.service.UserTableService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,6 +29,7 @@ import java.util.Map;
  */
 @Service("userTableService")
 @Transactional
+@CacheConfig(cacheNames = "user.user")
 public class UserTableServiceImpl implements UserTableService {
 
     Logger logger = LoggerFactory.getLogger(UserTableServiceImpl.class);
@@ -85,6 +88,7 @@ public class UserTableServiceImpl implements UserTableService {
     }
 
     @Override
+    @Cacheable(cacheNames = {"user.user"})
     public Page<UserTable> getListWithOutSelf(String username, Pageable pageable, Map<String, Object> filterMap) {
         if (filterMap == null) {
             return userTableRepository.findByUsernameNot(username, pageable);

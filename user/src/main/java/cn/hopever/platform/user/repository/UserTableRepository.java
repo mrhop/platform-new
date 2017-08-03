@@ -15,14 +15,22 @@ import java.util.List;
 /**
  * Created by Donghui Huo on 2016/8/30.
  */
+
 public interface UserTableRepository extends PagingAndSortingRepository<UserTable, Long> {
     public UserTable findOneByUsername(String username);
+
     public UserTable findOneByEmail(String email);
+
     public UserTable findOneByPhone(String phone);
+
     public List<UserTable> findByUsernameLike(String username, Pageable pageable);
+
     public Page<UserTable> findDistinctByAuthoritiesInAndClientsIn(Collection<RoleTable> authorities, Collection<ClientTable> clients, Pageable pageable);
-    public Page<UserTable> findByUsernameNot(String username,Pageable pageable);
-    public Page<UserTable> findDistinctByCreateUserAndAuthoritiesInAndClientsIn(UserTable userTable,Collection<RoleTable> authorities, Collection<ClientTable> clients, Pageable pageable);
+
+    public Page<UserTable> findByUsernameNot(String username, Pageable pageable);
+
+    public Page<UserTable> findDistinctByCreateUserAndAuthoritiesInAndClientsIn(UserTable userTable, Collection<RoleTable> authorities, Collection<ClientTable> clients, Pageable pageable);
+
     @Modifying
     @Query("update UserTable u set u.createUser = ?1 where u.createUser = ?2")
     int updateCreateUser(UserTable userTable, UserTable userTablePrev);

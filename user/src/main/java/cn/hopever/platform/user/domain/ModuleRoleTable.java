@@ -1,5 +1,6 @@
 package cn.hopever.platform.user.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -29,13 +30,16 @@ public class ModuleRoleTable implements GrantedAuthority {
     private short level;
 
     @ManyToMany(mappedBy = "authorities")
+    @JsonIgnore
     private List<ModuleTable> modules;
 
     @ManyToMany(mappedBy = "modulesAuthorities")
+    @JsonIgnore
     private List<UserTable> users;
 
     @ManyToOne(optional = true)
     @JoinColumn(name = "client_id", nullable = true)
+    @JsonIgnore
     private ClientTable client;
 
     @Column(name = "name", nullable = false, length = 50, unique = true)

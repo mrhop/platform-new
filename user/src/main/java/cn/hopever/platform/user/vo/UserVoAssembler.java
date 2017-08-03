@@ -20,27 +20,35 @@ public class UserVoAssembler {
     public UserVo toResource(UserTable userTable) {
         UserVo resource = new UserVo();
         BeanUtils.copyNotNullProperties(userTable, resource, "password");
-        if (userTable.getClients() != null) {
+        resource.setEnabledStr(userTable.isEnabled() ? "是" : "否");
+        if (userTable.getClients() != null && userTable.getClients().size() > 0) {
             List<Long> setCr = new ArrayList<>();
+            List<String> setCv = new ArrayList<>();
             for (ClientTable ct : userTable.getClients()) {
                 setCr.add(ct.getId());
+                setCv.add(ct.getClientName());
             }
             resource.setClients(setCr);
+            resource.setClientsStr(setCv.toString());
         }
-        if (userTable.getAuthorities() != null) {
+        if (userTable.getAuthorities() != null && userTable.getAuthorities().size() > 0) {
             for (RoleTable rt : userTable.getAuthorities()) {
                 if (rt.getLevel() < 3) {
                     resource.setAuthorities(rt.getId());
+                    resource.setAuthoritiesStr(rt.getName());
                     break;
                 }
             }
         }
-        if (userTable.getModulesAuthorities() != null) {
+        if (userTable.getModulesAuthorities() != null && userTable.getModulesAuthorities().size() > 0) {
             List<Long> setMrr = new ArrayList<>();
+            List<String> setMrv = new ArrayList<>();
             for (ModuleRoleTable mrt : userTable.getModulesAuthorities()) {
                 setMrr.add(mrt.getId());
+                setMrv.add(mrt.getName());
             }
             resource.setModulesAuthorities(setMrr);
+            resource.setModulesAuthoritiesStr(setMrv.toString());
         }
         if (userTable.getLimitedDate() != null) {
             resource.setLimitedDate(userTable.getLimitedDate().getTime());
@@ -49,7 +57,7 @@ public class UserVoAssembler {
     }
 
     public UserTable toDomain(UserVo userVo, UserTable userTable) {
-        BeanUtils.copyNotNullProperties(userVo, userTable, "password","photo");
+        BeanUtils.copyNotNullProperties(userVo, userTable, "password", "photo");
         if (userVo.getLimitedDate() != null) {
             userTable.setLimitedDate(new Date(userVo.getLimitedDate()));
         }

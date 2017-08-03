@@ -1,11 +1,10 @@
 package cn.hopever.platform.user.domain;
 
 import cn.hopever.platform.utils.json.JacksonUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.ClientDetails;
 
@@ -25,10 +24,6 @@ import java.util.Set;
 @EqualsAndHashCode(of = {"id"})
 @ToString(exclude = {"authorities","modules","moduleRoles", "users"})
 public class ClientTable implements ClientDetails {
-
-    @Transient
-    Logger logger = LoggerFactory.getLogger(ClientTable.class);
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -65,6 +60,7 @@ public class ClientTable implements ClientDetails {
 
     @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinTable(name = "platform_user_client_client_role", joinColumns = @JoinColumn(name = "client_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    @JsonIgnore
     private List<ClientRoleTable> authorities;
 
     @Column(name = "access_token_validity_seconds", nullable = true)
@@ -77,12 +73,15 @@ public class ClientTable implements ClientDetails {
     private String additionalInformation;
 
     @OneToMany(mappedBy = "client",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @JsonIgnore
     private List<ModuleRoleTable> moduleRoles;
 
     @OneToMany(mappedBy = "client",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @JsonIgnore
     private List<ModuleTable> modules;
 
     @ManyToMany(mappedBy = "clients")
+    @JsonIgnore
     private List<UserTable> users;
 
 
@@ -97,7 +96,6 @@ public class ClientTable implements ClientDetails {
                 this.resourceIds = JacksonUtil.mapper.writeValueAsString(resourceIds);
             } catch (IOException e) {
                 e.printStackTrace();
-                logger.error("json format error", e);
             }
         } else {
             this.resourceIds = null;
@@ -110,7 +108,7 @@ public class ClientTable implements ClientDetails {
             try {
                 return JacksonUtil.mapper.readValue(this.resourceIds, Set.class);
             } catch (IOException e) {
-                logger.error("json format error", e);
+                e.printStackTrace();
             }
         }
         return null;
@@ -125,7 +123,7 @@ public class ClientTable implements ClientDetails {
             try {
                 this.scope = JacksonUtil.mapper.writeValueAsString(scope);
             } catch (IOException e) {
-                logger.error("json format error", e);
+                e.printStackTrace();
             }
         }
     }
@@ -137,7 +135,7 @@ public class ClientTable implements ClientDetails {
             try {
                 return JacksonUtil.mapper.readValue(this.scope, Map.class).keySet();
             } catch (IOException e) {
-                logger.error("json format error", e);
+                e.printStackTrace();
             }
         }
         return null;
@@ -148,7 +146,7 @@ public class ClientTable implements ClientDetails {
             try {
                 return JacksonUtil.mapper.readValue(this.scope, Map.class);
             } catch (IOException e) {
-                logger.error("json format error", e);
+                e.printStackTrace();
             }
         }
         return null;
@@ -163,7 +161,7 @@ public class ClientTable implements ClientDetails {
             try {
                 this.authorizedGrantTypes = JacksonUtil.mapper.writeValueAsString(authorizedGrantTypes);
             } catch (IOException e) {
-                logger.error("json format error", e);
+                e.printStackTrace();
             }
         }else{
             this.authorizedGrantTypes = null;
@@ -176,7 +174,7 @@ public class ClientTable implements ClientDetails {
             try {
                 return JacksonUtil.mapper.readValue(this.authorizedGrantTypes, Set.class);
             } catch (IOException e) {
-                logger.error("json format error", e);
+                e.printStackTrace();
             }
         }
         return null;
@@ -191,7 +189,7 @@ public class ClientTable implements ClientDetails {
             try {
                 this.registeredRedirectUri = JacksonUtil.mapper.writeValueAsString(registeredRedirectUri);
             } catch (IOException e) {
-                logger.error("json format error", e);
+                e.printStackTrace();
             }
         }
     }
@@ -202,7 +200,7 @@ public class ClientTable implements ClientDetails {
             try {
                 return JacksonUtil.mapper.readValue(this.registeredRedirectUri, Set.class);
             } catch (IOException e) {
-                logger.error("json format error", e);
+                e.printStackTrace();
             }
         }
         return null;
@@ -218,7 +216,7 @@ public class ClientTable implements ClientDetails {
             try {
                 this.additionalInformation = JacksonUtil.mapper.writeValueAsString(additionalInformation);
             } catch (IOException e) {
-                logger.error("json format error", e);
+                e.printStackTrace();
             }
         }
     }
@@ -229,7 +227,7 @@ public class ClientTable implements ClientDetails {
             try {
                 return JacksonUtil.mapper.readValue(this.additionalInformation, Map.class);
             } catch (IOException e) {
-                logger.error("json format error", e);
+                e.printStackTrace();
             }
         }
         return null;

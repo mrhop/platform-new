@@ -31,13 +31,21 @@ public class UserVo {
 
     private boolean enabled;
 
+    private String enabledStr;
+
     private Long limitedDate;
 
     private String photo;
 
     private Long authorities;
 
+    private String authoritiesStr;
+
     private List<Long> clients;
 
+    private String clientsStr;
+
     private List<Long> modulesAuthorities;
+
+    private String modulesAuthoritiesStr;
 }

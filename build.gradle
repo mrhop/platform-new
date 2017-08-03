@@ -49,8 +49,8 @@ subprojects {
         //TEST
         testCompile ('org.springframework.boot:spring-boot-starter-test:'+springBootVersion)
 
-        //DEV TOOL
-        optional ('org.springframework.boot:spring-boot-devtools:'+springBootVersion)
+        // DEV TOOL
+        // optional ('org.springframework.boot:spring-boot-devtools:'+springBootVersion)
 
         //CONFIGURE PROPERTIES
         optional ('org.springframework.boot:spring-boot-configuration-processor:'+springBootVersion)
@@ -69,6 +69,7 @@ subprojects {
         compile ('org.springframework.boot:spring-boot-starter-hateoas:'+springBootVersion)
 
         //CACHE
+        compile ('org.springframework.boot:spring-boot-starter-cache:'+springBootVersion)
         compile ('org.springframework.boot:spring-boot-starter-data-redis:'+springBootVersion)
 
         //DB

@@ -1,10 +1,11 @@
 package cn.hopever.platform.utils.cache;
 
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 
 import java.net.UnknownHostException;
 
@@ -12,6 +13,7 @@ import java.net.UnknownHostException;
  * Created by Donghui Huo on 2016/10/20.
  */
 @Configuration
+@EnableCaching
 public class CacheConfig {
     @Bean(name = "redisTemplate")
     public RedisTemplate<Object, Object> redisTemplate(
@@ -19,9 +21,9 @@ public class CacheConfig {
             throws UnknownHostException {
         RedisTemplate<Object, Object> template = new RedisTemplate<Object, Object>();
         template.setConnectionFactory(redisConnectionFactory);
-        GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
-        template.setValueSerializer(genericJackson2JsonRedisSerializer);
-        template.setHashValueSerializer(genericJackson2JsonRedisSerializer);
+        JdkSerializationRedisSerializer jdkSerializationRedisSerializer = new JdkSerializationRedisSerializer();
+        template.setValueSerializer(jdkSerializationRedisSerializer);
+        template.setHashValueSerializer(jdkSerializationRedisSerializer);
         template.setEnableTransactionSupport(true);
         return template;
     }

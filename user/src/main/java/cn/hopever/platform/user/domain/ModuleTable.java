@@ -1,5 +1,6 @@
 package cn.hopever.platform.user.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -23,6 +24,7 @@ public class ModuleTable {
 
     @ManyToOne(optional = true)
     @JoinColumn(name = "client_id", nullable = true)
+    @JsonIgnore
     private ClientTable client;
 
     @Column(name = "module_name", nullable = false, length = 50)
@@ -39,10 +41,12 @@ public class ModuleTable {
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
+    @JsonIgnore
     private ModuleTable parent;
 
     @OneToMany(mappedBy = "parent", cascade = {CascadeType.ALL})
     @OrderBy("moduleOrder asc")
+    @JsonIgnore
     private List<ModuleTable> children;
 
     @Column(name = "available", nullable = false)
@@ -53,6 +57,7 @@ public class ModuleTable {
 
     @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
     @JoinTable(name = "platform_user_module_module_role", joinColumns = @JoinColumn(name = "module_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    @JsonIgnore
     private List<ModuleRoleTable> authorities;
 
 }

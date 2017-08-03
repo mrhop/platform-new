@@ -60,6 +60,7 @@ public class UserController {
     //@PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body, Principal principal) {
+        org.springframework.data.domain.PageImpl a;
         principal = new PrincipalSample("admin");
         UserTable userTable = userTableService.getUserByUsername(principal.getName());
         Map<String, Object> map = new HashMap<>();
