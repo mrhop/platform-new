@@ -1,10 +1,15 @@
 package cn.hopever.platform.user.service;
 
 import cn.hopever.platform.user.domain.UserTable;
+import cn.hopever.platform.user.vo.UserVo;
+import cn.hopever.platform.utils.web.TableParameters;
+import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -36,4 +41,16 @@ public interface UserTableService extends UserDetailsService {
 
     public UserTable get(Long id);
 
+    // 复合 service
+    public Page<UserTable> getList(TableParameters body, Principal principal);
+
+    public void delete(Long id, Principal principal);
+
+    public UserVo info(Long id, Principal principal);
+
+    public VueResults.Result updatePersonalUser(UserVo userVo, MultipartFile[] files, Principal principal);
+
+    public VueResults.Result updateUser(UserVo userVo, MultipartFile[] files, Principal principal);
+    public VueResults.Result saveUser(UserVo userVo, MultipartFile[] files, Principal principal);
+    public VueResults.Result registerUser(UserVo userVo, MultipartFile[] files);
 }

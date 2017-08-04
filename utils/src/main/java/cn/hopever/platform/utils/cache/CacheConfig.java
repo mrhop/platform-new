@@ -14,6 +14,7 @@ import java.net.UnknownHostException;
  */
 @Configuration
 @EnableCaching
+@org.springframework.cache.annotation.CacheConfig
 public class CacheConfig {
     @Bean(name = "redisTemplate")
     public RedisTemplate<Object, Object> redisTemplate(
