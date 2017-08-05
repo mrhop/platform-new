@@ -21,7 +21,6 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(of = {"id"})
 @ToString(exclude = {"authorities", "clients", "modulesAuthorities"})
-@org.springframework.cache.annotation.Cacheable(cacheNames = {"hopever.user.user"}, key = "#root.target.username")
 public class UserTable implements UserDetails {
 
     @Id

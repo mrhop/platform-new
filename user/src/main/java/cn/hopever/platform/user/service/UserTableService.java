@@ -4,6 +4,9 @@ import cn.hopever.platform.user.domain.UserTable;
 import cn.hopever.platform.user.vo.UserVo;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -44,13 +47,19 @@ public interface UserTableService extends UserDetailsService {
     // 复合 service
     public Page<UserTable> getList(TableParameters body, Principal principal);
 
+    @CacheEvict(cacheNames = {"hopever.user.user"}, key = "#id")
     public void delete(Long id, Principal principal);
 
+    @Cacheable(cacheNames = {"hopever.user.user"}, key = "#id", condition = "#id!=null")
     public UserVo info(Long id, Principal principal);
 
+    @CachePut(cacheNames = {"hopever.user.user"}, key = "#userVo.id")
     public VueResults.Result updatePersonalUser(UserVo userVo, MultipartFile[] files, Principal principal);
 
+    @CachePut(cacheNames = {"hopever.user.user"}, key = "#userVo.id")
     public VueResults.Result updateUser(UserVo userVo, MultipartFile[] files, Principal principal);
+
     public VueResults.Result saveUser(UserVo userVo, MultipartFile[] files, Principal principal);
+
     public VueResults.Result registerUser(UserVo userVo, MultipartFile[] files);
 }

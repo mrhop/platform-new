@@ -455,7 +455,6 @@ public class UserTableServiceImpl implements UserTableService {
     }
 
     private boolean validateUserOperation(UserTable ut1, UserTable ut2) {
-        // 此处应该判断user是否有相同的role，以及是否包含有相同的role
         RoleTable rt1 = getTopRole(ut1);
         RoleTable rt2 = getTopRole(ut2);
         if (rt1.getAuthority().equals("ROLE_super_admin")) {

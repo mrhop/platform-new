@@ -17,7 +17,6 @@ import java.util.List;
 /**
  * Created by Donghui Huo on 2016/8/30.
  */
-@CacheConfig
 public interface UserTableRepository extends PagingAndSortingRepository<UserTable, Long> {
 
 
