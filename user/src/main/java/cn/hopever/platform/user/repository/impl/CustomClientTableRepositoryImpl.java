@@ -32,7 +32,7 @@ public class CustomClientTableRepositoryImpl extends SimpleJpaRepository<ClientT
 
     @Override
     public Page<ClientTable> findByFilters(Map<String, Object> mapFilter, Pageable pageable) {
-            return super.findAll(filterConditions1(mapFilter), pageable);
+        return super.findAll(filterConditions1(mapFilter), pageable);
     }
 
     private Specification<ClientTable> filterConditions1(Map<String, Object> mapFilter) {
@@ -41,7 +41,7 @@ public class CustomClientTableRepositoryImpl extends SimpleJpaRepository<ClientT
                                          CriteriaBuilder builder) {
                 Predicate predicateReturn = builder.notEqual(root.get("clientId"), "user_admin_client");
                 query.distinct(true);
-                if(mapFilter!=null&&mapFilter.size()>0){
+                if (mapFilter != null && mapFilter.size() > 0) {
                     for (String key : mapFilter.keySet()) {
                         if (mapFilter.get(key) != null) {
                             predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + mapFilter.get(key) + "%"));

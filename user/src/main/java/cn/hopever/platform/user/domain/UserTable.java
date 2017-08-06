@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -21,6 +22,8 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(of = {"id"})
 @ToString(exclude = {"authorities", "clients", "modulesAuthorities"})
+
+@Cacheable(cacheNames = {"hopever.user"}, key = "'user_'.concat(#root.target.id)")
 public class UserTable implements UserDetails {
 
     @Id

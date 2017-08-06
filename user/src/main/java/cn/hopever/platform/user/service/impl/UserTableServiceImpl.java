@@ -204,6 +204,7 @@ public class UserTableServiceImpl implements UserTableService {
             ur = userVoAssembler.toResource(ut);
         } else {
             UserTable ut = userTableRepository.findOne(id);
+            // cache
             if (validateUserOperation(userTableRepository.findOneByUsername(principal.getName()), ut)) {
                 ur = userVoAssembler.toResource(ut);
             }

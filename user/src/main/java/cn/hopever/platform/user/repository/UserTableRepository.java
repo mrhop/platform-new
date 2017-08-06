@@ -4,6 +4,8 @@ import cn.hopever.platform.user.domain.ClientTable;
 import cn.hopever.platform.user.domain.RoleTable;
 import cn.hopever.platform.user.domain.UserTable;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,8 +28,13 @@ public interface UserTableRepository extends PagingAndSortingRepository<UserTabl
 
     public UserTable findOneByPhone(String phone);
 
+    @CachePut(cacheNames = {"hopever.user"}, key = "'user_'.concat(#p0.id)", condition = "#p0.id!=null")
     public UserTable save(UserTable userTable);
 
+    @CacheEvict(cacheNames = {"hopever.user"}, key = "'user_'.concat(#p0)")
+    public void delete(Long id);
+
+//    @Cacheable(cacheNames = {"hopever.user"}, key = "'user_'.concat(#p0)")
     public UserTable findOne(Long id);
 
     public List<UserTable> findByUsernameLike(String username, Pageable pageable);
