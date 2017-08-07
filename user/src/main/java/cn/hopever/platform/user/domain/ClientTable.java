@@ -1,10 +1,10 @@
 package cn.hopever.platform.user.domain;
 
 import cn.hopever.platform.utils.json.JacksonUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.provider.ClientDetails;
 
@@ -23,6 +23,8 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(of = {"id"})
 @ToString(exclude = {"authorities","modules","moduleRoles", "users"})
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "hopever.user.client")
 public class ClientTable implements ClientDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,7 +62,7 @@ public class ClientTable implements ClientDetails {
 
     @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinTable(name = "platform_user_client_client_role", joinColumns = @JoinColumn(name = "client_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-    @JsonIgnore
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private List<ClientRoleTable> authorities;
 
     @Column(name = "access_token_validity_seconds", nullable = true)
@@ -72,16 +74,13 @@ public class ClientTable implements ClientDetails {
     @Column(name = "additional_information", nullable = true, length = 2000)
     private String additionalInformation;
 
-    @OneToMany(mappedBy = "client",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
-    @JsonIgnore
+    @OneToMany(mappedBy = "client")
     private List<ModuleRoleTable> moduleRoles;
 
-    @OneToMany(mappedBy = "client",cascade = {CascadeType.MERGE,CascadeType.PERSIST})
-    @JsonIgnore
+    @OneToMany(mappedBy = "client")
     private List<ModuleTable> modules;
 
     @ManyToMany(mappedBy = "clients")
-    @JsonIgnore
     private List<UserTable> users;
 
 

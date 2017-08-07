@@ -1,11 +1,10 @@
 package cn.hopever.platform.user.domain;
 
 import cn.hopever.platform.utils.json.JacksonUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.springframework.cache.annotation.Cacheable;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -22,8 +21,8 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(of = {"id"})
 @ToString(exclude = {"authorities", "clients", "modulesAuthorities"})
-
-@Cacheable(cacheNames = {"hopever.user"}, key = "'user_'.concat(#root.target.id)")
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "hopever.user.user")
 public class UserTable implements UserDetails {
 
     @Id
@@ -67,20 +66,20 @@ public class UserTable implements UserDetails {
     @Column(name = "created_date", nullable = true)
     private Date createdDate;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "platform_user_user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-    @JsonIgnore
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private List<RoleTable> authorities;
 
     //client many-to-many
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "platform_user_user_client", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "client_id", referencedColumnName = "id"))
-    @JsonIgnore
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private List<ClientTable> clients;
 
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "platform_user_user_module_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-    @JsonIgnore
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private List<ModuleRoleTable> modulesAuthorities;
 
     @Override

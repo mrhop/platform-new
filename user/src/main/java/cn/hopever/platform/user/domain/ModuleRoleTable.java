@@ -1,9 +1,9 @@
 package cn.hopever.platform.user.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
@@ -17,6 +17,8 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(of = {"id"})
 @ToString(exclude = {"modules", "users", "client"})
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "hopever.user.modulerole")
 public class ModuleRoleTable implements GrantedAuthority {
 
     @Id
@@ -30,16 +32,14 @@ public class ModuleRoleTable implements GrantedAuthority {
     private short level;
 
     @ManyToMany(mappedBy = "authorities")
-    @JsonIgnore
     private List<ModuleTable> modules;
 
     @ManyToMany(mappedBy = "modulesAuthorities")
-    @JsonIgnore
     private List<UserTable> users;
 
-    @ManyToOne(optional = true)
+    @ManyToOne
     @JoinColumn(name = "client_id", nullable = true)
-    @JsonIgnore
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private ClientTable client;
 
     @Column(name = "name", nullable = false, length = 50, unique = true)

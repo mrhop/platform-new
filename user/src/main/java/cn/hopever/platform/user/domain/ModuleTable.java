@@ -1,11 +1,15 @@
 package cn.hopever.platform.user.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 import java.util.List;
 
 /**
@@ -16,6 +20,8 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(of = {"id"})
 @ToString(exclude = {"client", "parent", "children", "authorities"})
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "hopever.user.module")
 public class ModuleTable {
 
     @Id
@@ -24,7 +30,6 @@ public class ModuleTable {
 
     @ManyToOne(optional = true)
     @JoinColumn(name = "client_id", nullable = true)
-    @JsonIgnore
     private ClientTable client;
 
     @Column(name = "module_name", nullable = false, length = 50)
@@ -41,12 +46,11 @@ public class ModuleTable {
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
-    @JsonIgnore
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private ModuleTable parent;
 
     @OneToMany(mappedBy = "parent", cascade = {CascadeType.ALL})
     @OrderBy("moduleOrder asc")
-    @JsonIgnore
     private List<ModuleTable> children;
 
     @Column(name = "available", nullable = false)
@@ -55,9 +59,9 @@ public class ModuleTable {
     @Column(name = "activated", nullable = false)
     private boolean activated = true;
 
-    @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "platform_user_module_module_role", joinColumns = @JoinColumn(name = "module_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-    @JsonIgnore
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private List<ModuleRoleTable> authorities;
 
 }
