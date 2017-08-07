@@ -1,4 +1,1 @@
-自行实现一个redis 对hibernate 的二级缓存，以便方便的共享缓存
-http://docs.jboss.org/hibernate/orm/5.0/userguide/html_single/Hibernate_User_Guide.html
-看至13.9. Ehcache，将redis实现，或者考虑就使用ehcache【不考虑分布式的情况】
-目前考虑使用ehcache就好，考虑到需要自行实现redis，且时间吃紧，所以使用ehcache，且不使用单例方式
+开始新增用户和更新用户的实现，

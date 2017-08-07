@@ -10,6 +10,7 @@ import cn.hopever.platform.user.vo.UserVo;
 import cn.hopever.platform.user.vo.UserVoAssembler;
 import cn.hopever.platform.utils.moji.MojiUtils;
 import cn.hopever.platform.utils.properties.CommonProperties;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
@@ -453,6 +454,43 @@ public class UserTableServiceImpl implements UserTableService {
         user.setCreatedDate(new Date());
         userTableRepository.save(user);
         return VueResults.generateSuccess("注册成功", "您已成功注册本系统");
+    }
+
+    @Override
+    public List<SelectOption> getRoleOptions(Principal principal) {
+        UserTable ut = userTableRepository.findOneByUsername(principal.getName());
+        RoleTable roleTable = getTopRole(ut);
+        List<SelectOption> listReturn = new ArrayList<>();
+        RoleTable roleTableTmp = roleTableRepository.findOneByAuthority("ROLE_super_admin");
+        SelectOption selectOption1 = new SelectOption(roleTableTmp.getName(),roleTableTmp.getId());
+        roleTableTmp = roleTableRepository.findOneByAuthority("ROLE_admin");
+        SelectOption selectOption2 = new SelectOption(roleTableTmp.getName(),roleTableTmp.getId());
+        roleTableTmp = roleTableRepository.findOneByAuthority("ROLE_common_user");
+        SelectOption selectOption3 = new SelectOption(roleTableTmp.getName(),roleTableTmp.getId());
+        listReturn.add(selectOption1);
+        listReturn.add(selectOption2);
+        listReturn.add(selectOption3);
+        if (roleTable.getLevel() == 1) {
+            listReturn.remove(selectOption1);
+        } else if (roleTable.getLevel() == 2) {
+            listReturn = null;
+        }
+        return listReturn;
+    }
+
+    @Override
+    public List<SelectOption> getClientOptions(Principal principal) {
+        UserTable ut = userTableRepository.findOneByUsername(principal.getName());
+        RoleTable roleTable = getTopRole(ut);
+        if (roleTable.getLevel() == 1 && ut.getClients() != null && ut.getClients().size() > 0) {
+            List<SelectOption> listReturn = new ArrayList<>();
+            for (ClientTable clientTable : ut.getClients()) {
+                SelectOption selectOption = new SelectOption(clientTable.getClientName(), clientTable.getId());
+                listReturn.add(selectOption);
+            }
+            return listReturn;
+        }
+        return null;
     }
 
     private boolean validateUserOperation(UserTable ut1, UserTable ut2) {

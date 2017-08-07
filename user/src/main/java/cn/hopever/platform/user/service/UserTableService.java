@@ -2,6 +2,7 @@ package cn.hopever.platform.user.service;
 
 import cn.hopever.platform.user.domain.UserTable;
 import cn.hopever.platform.user.vo.UserVo;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.data.domain.Page;
@@ -55,4 +56,7 @@ public interface UserTableService extends UserDetailsService {
     public VueResults.Result saveUser(UserVo userVo, MultipartFile[] files, Principal principal);
 
     public VueResults.Result registerUser(UserVo userVo, MultipartFile[] files);
+
+    public List<SelectOption> getRoleOptions(Principal principal);
+    public List<SelectOption> getClientOptions(Principal principal);
 }

@@ -135,6 +135,30 @@ public class UserController {
         return userTableService.registerUser(userVo, files);
     }
 
+
+    @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET,RequestMethod.POST})
+    public Map rulechange(@RequestParam(required = false) Long key,@RequestBody(required = false) Map<String,Object> body, Principal principal) {
+        principal = new PrincipalSample("admin");
+        Map mapReturn = new HashMap<>();
+        if(body==null){
+            if(key==null){
+                // 新增
+                mapReturn.put("authorities",userTableService.getRoleOptions(principal));
+                mapReturn.put("clients",userTableService.getRoleOptions(principal));
+            }else{
+                // 更新 - 考虑principal对其显示的限制
+            }
+        }else{
+            if(body.get("authorities")!=null){
+                // 根据 authorities  =0 则hide client以及 moduleA 这个考虑放在前端
+                // 根据 authorities = 1 则hide moduleA 这个考虑放在前端
+                // 如果 authorities = 2 而且  client 有选中，且和之前选中的不同，则考虑从后台取moduleA
+            }
+        }
+        return mapReturn;
+    }
+
+
     @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list/relatedusers/options", method = {RequestMethod.GET})
     public List getListOptionsByClients(@RequestParam String clientId) {
