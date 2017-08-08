@@ -57,6 +57,9 @@ public interface UserTableService extends UserDetailsService {
 
     public VueResults.Result registerUser(UserVo userVo, MultipartFile[] files);
 
-    public List<SelectOption> getRoleOptions(Principal principal);
-    public List<SelectOption> getClientOptions(Principal principal);
+    public List<SelectOption> getRoleOptions(Long id, Principal principal);
+
+    public List<SelectOption> getClientOptions(Long id, Principal principal);
+
+    public List<SelectOption> getModulesAuthoritiesOptions(Long id, Principal principal, List<SelectOption> clientOptions, List<Long> clientIds);
 }

@@ -10,6 +10,7 @@ import cn.hopever.platform.user.vo.UserVoAssembler;
 import cn.hopever.platform.utils.moji.MojiUtils;
 import cn.hopever.platform.utils.properties.CommonProperties;
 import cn.hopever.platform.utils.test.PrincipalSample;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
@@ -136,23 +137,27 @@ public class UserController {
     }
 
 
-    @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET,RequestMethod.POST})
-    public Map rulechange(@RequestParam(required = false) Long key,@RequestBody(required = false) Map<String,Object> body, Principal principal) {
+    @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
+    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal) {
         principal = new PrincipalSample("admin");
         Map mapReturn = new HashMap<>();
-        if(body==null){
-            if(key==null){
+        if (body == null) {
+            if (key == null) {
                 // 新增
-                mapReturn.put("authorities",userTableService.getRoleOptions(principal));
-                mapReturn.put("clients",userTableService.getRoleOptions(principal));
-            }else{
+                mapReturn.put("authorities", userTableService.getRoleOptions(null, principal));
+                mapReturn.put("clients", userTableService.getClientOptions(null, principal));
+            } else {
                 // 更新 - 考虑principal对其显示的限制
+                mapReturn.put("authorities", userTableService.getRoleOptions(null, principal));
+                List<SelectOption> clientsOptions = userTableService.getClientOptions(null, principal);
+                mapReturn.put("clients", clientsOptions);
+                mapReturn.put("modulesAuthorities", userTableService.getModulesAuthoritiesOptions(null, principal, clientsOptions, null));
             }
-        }else{
-            if(body.get("authorities")!=null){
-                // 根据 authorities  =0 则hide client以及 moduleA 这个考虑放在前端
-                // 根据 authorities = 1 则hide moduleA 这个考虑放在前端
-                // 如果 authorities = 2 而且  client 有选中，且和之前选中的不同，则考虑从后台取moduleA
+        } else {
+            if (body.get("authorities") != null) {
+                if (body.get("authorities").equals(2) && body.get("clients") != null) {
+                    mapReturn.put("modulesAuthorities", userTableService.getModulesAuthoritiesOptions(key, principal, null, (List) body.get("clients")));
+                }
             }
         }
         return mapReturn;
@@ -176,6 +181,4 @@ public class UserController {
         }
         return listOptions;
     }
-
-
 }

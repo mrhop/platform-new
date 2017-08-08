@@ -457,16 +457,29 @@ public class UserTableServiceImpl implements UserTableService {
     }
 
     @Override
-    public List<SelectOption> getRoleOptions(Principal principal) {
-        UserTable ut = userTableRepository.findOneByUsername(principal.getName());
-        RoleTable roleTable = getTopRole(ut);
+    public List<SelectOption> getRoleOptions(Long id, Principal principal) {
+        UserTable utAdmin = userTableRepository.findOneByUsername(principal.getName());
+        UserTable ut = null;
+        if (id != null) {
+            ut = userTableRepository.findOne(id);
+        }
+        RoleTable roleTable = getTopRole(utAdmin);
         List<SelectOption> listReturn = new ArrayList<>();
         RoleTable roleTableTmp = roleTableRepository.findOneByAuthority("ROLE_super_admin");
-        SelectOption selectOption1 = new SelectOption(roleTableTmp.getName(),roleTableTmp.getId());
+        SelectOption selectOption1 = new SelectOption(roleTableTmp.getName(), roleTableTmp.getId());
+        if (ut != null && ut.getAuthorities().contains(roleTableTmp)) {
+            selectOption1.setSelected(true);
+        }
         roleTableTmp = roleTableRepository.findOneByAuthority("ROLE_admin");
-        SelectOption selectOption2 = new SelectOption(roleTableTmp.getName(),roleTableTmp.getId());
+        SelectOption selectOption2 = new SelectOption(roleTableTmp.getName(), roleTableTmp.getId());
+        if (ut != null && ut.getAuthorities().contains(roleTableTmp)) {
+            selectOption2.setSelected(true);
+        }
         roleTableTmp = roleTableRepository.findOneByAuthority("ROLE_common_user");
-        SelectOption selectOption3 = new SelectOption(roleTableTmp.getName(),roleTableTmp.getId());
+        SelectOption selectOption3 = new SelectOption(roleTableTmp.getName(), roleTableTmp.getId());
+        if (ut != null && ut.getAuthorities().contains(roleTableTmp)) {
+            selectOption3.setSelected(true);
+        }
         listReturn.add(selectOption1);
         listReturn.add(selectOption2);
         listReturn.add(selectOption3);
@@ -479,16 +492,79 @@ public class UserTableServiceImpl implements UserTableService {
     }
 
     @Override
-    public List<SelectOption> getClientOptions(Principal principal) {
-        UserTable ut = userTableRepository.findOneByUsername(principal.getName());
-        RoleTable roleTable = getTopRole(ut);
-        if (roleTable.getLevel() == 1 && ut.getClients() != null && ut.getClients().size() > 0) {
-            List<SelectOption> listReturn = new ArrayList<>();
-            for (ClientTable clientTable : ut.getClients()) {
-                SelectOption selectOption = new SelectOption(clientTable.getClientName(), clientTable.getId());
-                listReturn.add(selectOption);
+    public List<SelectOption> getClientOptions(Long id, Principal principal) {
+        if (id == null) {
+            UserTable ut = userTableRepository.findOneByUsername(principal.getName());
+            RoleTable roleTable = getTopRole(ut);
+            if (roleTable.getLevel() == 1 && ut.getClients() != null && ut.getClients().size() > 0) {
+                List<SelectOption> listReturn = new ArrayList<>();
+                for (ClientTable clientTable : ut.getClients()) {
+                    SelectOption selectOption = new SelectOption(clientTable.getClientName(), clientTable.getId());
+                    listReturn.add(selectOption);
+                }
+                return listReturn;
             }
-            return listReturn;
+        } else {
+            UserTable utAdmin = userTableRepository.findOneByUsername(principal.getName());
+            UserTable ut = userTableRepository.findOne(id);
+            if (validateUserOperation(utAdmin, ut)) {
+                RoleTable roleTable = getTopRole(ut);
+                if (roleTable.getLevel() > 0 && utAdmin.getClients() != null && utAdmin.getClients().size() > 0) {
+                    List<SelectOption> listReturn = new ArrayList<>();
+                    for (ClientTable clientTable : utAdmin.getClients()) {
+                        SelectOption selectOption = new SelectOption(clientTable.getClientName(), clientTable.getId());
+                        if (ut.getClients().contains(clientTable)) {
+                            selectOption.setSelected(true);
+                        }
+                        listReturn.add(selectOption);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public List<SelectOption> getModulesAuthoritiesOptions(Long id, Principal principal, List<SelectOption> clientOptions, List<Long> clientIds) {
+        UserTable utAdmin = userTableRepository.findOneByUsername(principal.getName());
+        UserTable ut = null;
+        if ((clientOptions != null || clientIds != null)) {
+            if (id != null) {
+                ut = userTableRepository.findOne(id);
+            }
+            if (validateUserOperation(utAdmin, ut)) {
+                List<SelectOption> listReturn = new ArrayList<>();
+                if (clientOptions != null) {
+                    for (SelectOption selectOption : clientOptions) {
+                        if (selectOption.isSelected()) {
+                            ClientTable clientTable = clientTableRepository.findOne((long) selectOption.getValue());
+                            if (clientTable.getModuleRoles() != null && clientTable.getModuleRoles().size() > 0) {
+                                for (ModuleRoleTable moduleRoleTable : clientTable.getModuleRoles()) {
+                                    SelectOption selectOptionTemp = new SelectOption(moduleRoleTable.getName(), moduleRoleTable.getId());
+                                    if (ut.getModulesAuthorities().contains(moduleRoleTable)) {
+                                        selectOptionTemp.setSelected(true);
+                                    }
+                                    listReturn.add(selectOptionTemp);
+                                }
+                            }
+                        }
+                    }
+                } else if (clientIds != null) {
+                    for (Long selectOption : clientIds) {
+                        ClientTable clientTable = clientTableRepository.findOne(selectOption);
+                        if (clientTable.getModuleRoles() != null && clientTable.getModuleRoles().size() > 0) {
+                            for (ModuleRoleTable moduleRoleTable : clientTable.getModuleRoles()) {
+                                SelectOption selectOptionTemp = new SelectOption(moduleRoleTable.getName(), moduleRoleTable.getId());
+                                if (ut.getModulesAuthorities().contains(moduleRoleTable)) {
+                                    selectOptionTemp.setSelected(true);
+                                }
+                                listReturn.add(selectOptionTemp);
+                            }
+                        }
+                    }
+                }
+                return listReturn;
+            }
         }
         return null;
     }

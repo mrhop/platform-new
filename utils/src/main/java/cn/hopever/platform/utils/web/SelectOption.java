@@ -11,6 +11,7 @@ import java.io.Serializable;
 public class SelectOption implements Serializable {
     private String label;
     private Object value;
+    private boolean selected = false;
 
     public SelectOption() {
     }
@@ -18,5 +19,11 @@ public class SelectOption implements Serializable {
     public SelectOption(String label, Object value) {
         this.label = label;
         this.value = value;
+    }
+
+    public SelectOption(String label, Object value, boolean selected) {
+        this.label = label;
+        this.value = value;
+        this.selected = selected;
     }
 }
