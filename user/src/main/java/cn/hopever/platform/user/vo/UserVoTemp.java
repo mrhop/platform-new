@@ -11,8 +11,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class UserVo implements Serializable {
-
+public class UserVoTemp implements Serializable {
     private long id;
 
     private String username;
@@ -29,21 +28,4 @@ public class UserVo implements Serializable {
 
     private boolean enabled;
 
-    private String enabledStr;
-
-    private Long limitedDate;
-
-    private String photo;
-
-    private Long authorities;
-
-    private String authoritiesStr;
-
-    private List<Long> clients;
-
-    private String clientsStr;
-
-    private List<Long> modulesAuthorities;
-
-    private String modulesAuthoritiesStr;
 }

@@ -7,6 +7,7 @@ import cn.hopever.platform.user.service.RoleTableService;
 import cn.hopever.platform.user.service.UserTableService;
 import cn.hopever.platform.user.vo.UserVo;
 import cn.hopever.platform.user.vo.UserVoAssembler;
+import cn.hopever.platform.user.vo.UserVoTemp;
 import cn.hopever.platform.utils.moji.MojiUtils;
 import cn.hopever.platform.utils.properties.CommonProperties;
 import cn.hopever.platform.utils.test.PrincipalSample;
@@ -23,7 +24,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Donghui Huo on 2016/8/29.
@@ -125,10 +129,10 @@ public class UserController {
 
     //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result saveUser(@RequestPart(required = true) UserVo userVo, @RequestPart("photo") MultipartFile[] files, Principal principal) {
+    public VueResults.Result saveUser(@RequestParam(name = "photo", required = false) MultipartFile[] files, UserVoTemp userVo, Principal principal) {
         principal = new PrincipalSample("admin");
 
-        return userTableService.saveUser(userVo, files, principal);
+        return userTableService.saveUser(new UserVo(), files, principal);
     }
 
     @RequestMapping(value = "/register", method = {RequestMethod.POST})
@@ -154,10 +158,8 @@ public class UserController {
                 mapReturn.put("modulesAuthorities", userTableService.getModulesAuthoritiesOptions(null, principal, clientsOptions, null));
             }
         } else {
-            if (body.get("authorities") != null) {
-                if (body.get("authorities").equals(2) && body.get("clients") != null) {
-                    mapReturn.put("modulesAuthorities", userTableService.getModulesAuthoritiesOptions(key, principal, null, (List) body.get("clients")));
-                }
+            if (body.get("clients") != null) {
+                mapReturn.put("modulesAuthorities", userTableService.getModulesAuthoritiesOptions(key, principal, null, (List) body.get("clients")));
             }
         }
         return mapReturn;

@@ -61,5 +61,5 @@ public interface UserTableService extends UserDetailsService {
 
     public List<SelectOption> getClientOptions(Long id, Principal principal);
 
-    public List<SelectOption> getModulesAuthoritiesOptions(Long id, Principal principal, List<SelectOption> clientOptions, List<Long> clientIds);
+    public List<SelectOption> getModulesAuthoritiesOptions(Long id, Principal principal, List<SelectOption> clientOptions, List<Integer> clientIds);
 }
