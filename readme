@@ -1,3 +1,4 @@
+需要将userVo进行调整
 后续调整：
 1>保存更新用户时，当有client的更新时，考虑将role进行相应的处理--处理中
 2>将hibernate的ehcache替换为redis，保证集群可用，并使用jta事务
