@@ -236,7 +236,7 @@ public class UserTableServiceImpl implements UserTableService {
                 mapPhotos.get("fileKeys");
                 List<String> list = mapPhotos.get("fileKeys");
                 if (list != null && list.size() > 0) {
-                    user.setPhoto(commonProperties.getImagePathPrev() + list.get(0));
+                    user.setPhoto(list.get(0));
                 }
             } catch (Exception e) {
                 logger.error("save user photo failed", e);
@@ -282,7 +282,7 @@ public class UserTableServiceImpl implements UserTableService {
                 mapPhotos.get("fileKeys");
                 List<String> list = mapPhotos.get("fileKeys");
                 if (list != null && list.size() > 0) {
-                    user.setPhoto(commonProperties.getImagePathPrev() + list.get(0));
+                    user.setPhoto(list.get(0));
                 }
             } catch (Exception e) {
                 logger.error("save user photo failed", e);
@@ -354,8 +354,8 @@ public class UserTableServiceImpl implements UserTableService {
                 return VueResults.generateError("创建失败", "Email已存在");
             }
         }
-        if (userVo.getEmail() != null) {
-            UserTable ut = userTableRepository.findOneByPhone(userVo.getEmail());
+        if (userVo.getPhone() != null) {
+            UserTable ut = userTableRepository.findOneByPhone(userVo.getPhone());
             if (ut != null) {
                 return VueResults.generateError("创建失败", "电话号码已存在");
             }
@@ -370,16 +370,16 @@ public class UserTableServiceImpl implements UserTableService {
                 mapPhotos.get("fileKeys");
                 List<String> list = mapPhotos.get("fileKeys");
                 if (list != null && list.size() > 0) {
-                    user.setPhoto(commonProperties.getImagePathPrev() + list.get(0));
+                    user.setPhoto(list.get(0));
                 }
             } catch (Exception e) {
                 logger.error("save user photo failed", e);
                 user.setPhoto(commonProperties.getDefaultUserPhoto());
             }
         }
-        if (userVo.getAuthorities() != null) {
+        if (userVo.getAuthoritiesKey() != null) {
             List list = new ArrayList<>();
-            list.add(roleTableRepository.findOne(userVo.getAuthorities()));
+            list.add(roleTableRepository.findOneByAuthority(userVo.getAuthoritiesKey()));
             user.setAuthorities(list);
         } else {
             List list = new ArrayList<>();
@@ -438,7 +438,7 @@ public class UserTableServiceImpl implements UserTableService {
                 mapPhotos.get("fileKeys");
                 List<String> list = mapPhotos.get("fileKeys");
                 if (list != null && list.size() > 0) {
-                    user.setPhoto(commonProperties.getImagePathPrev() + list.get(0));
+                    user.setPhoto(list.get(0));
                 }
             } catch (Exception e) {
                 logger.error("save user photo failed", e);

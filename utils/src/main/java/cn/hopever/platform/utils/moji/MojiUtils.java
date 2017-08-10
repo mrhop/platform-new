@@ -1,5 +1,6 @@
 package cn.hopever.platform.utils.moji;
 
+import cn.hopever.platform.utils.properties.CommonProperties;
 import fm.last.moji.MojiFile;
 import fm.last.moji.spring.SpringMojiBean;
 import org.slf4j.Logger;
@@ -11,10 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Donghui Huo on 2017/7/31.
@@ -32,17 +30,19 @@ public class MojiUtils {
     @Autowired
     @Qualifier("mojiDocs")
     private SpringMojiBean mojiDocs;
+    @Autowired
+    private CommonProperties commonProperties;
 
     public Map<String, List<String>> uploadImg(String filePath, MultipartFile[] files) throws Exception {
-        return upload(filePath, files, mojiImages);
+        return upload(filePath, files, mojiImages, "image");
     }
 
     public Map<String, List<String>> uploadDoc(String filePath, MultipartFile[] files) throws Exception {
-        return upload(filePath, files, mojiDocs);
+        return upload(filePath, files, mojiDocs, "doc");
     }
 
     public Map<String, List<String>> uploadFile(String filePath, MultipartFile[] files) throws Exception {
-        return upload(filePath, files, mojiFiles);
+        return upload(filePath, files, mojiFiles, "file");
     }
 
     public void deleteImg(String fileUrl) throws Exception {
@@ -57,18 +57,27 @@ public class MojiUtils {
         mojiFiles.getFile(fileUrl).delete();
     }
 
-    private Map<String, List<String>> upload(String filePath, MultipartFile[] files, SpringMojiBean mojiBean) throws IOException {
+    private Map<String, List<String>> upload(String filePath, MultipartFile[] files, SpringMojiBean mojiBean, String type) throws IOException {
         HashMap<String, List<String>> responseData = new HashMap<>();
         List<String> list = new ArrayList<>();
         for (MultipartFile file : files) {
             String[] fileName = file.getOriginalFilename().split("\\.");
-            String filePrefix = fileName[0];
+            String filePrefix = fileName[0] + "-" + UUID.randomUUID();
             String fileSuffix = fileName[fileName.length - 1];
             File fileTmp = File.createTempFile(filePrefix, "." + fileSuffix);
-            MojiFile mojiFile = mojiBean.getFile(filePath + file.getOriginalFilename());
+            String fileToSavePath = filePath + filePrefix + "." + fileSuffix;
+            MojiFile mojiFile = mojiBean.getFile(fileToSavePath);
             file.transferTo(fileTmp);
             mojiBean.copyToMogile(fileTmp, mojiFile);
-            list.add(filePath + file.getOriginalFilename());
+            String pathPrev = "";
+            if ("image".equals(type)) {
+                pathPrev = commonProperties.getImagePathPrev();
+            } else if ("file".equals(type)) {
+                pathPrev = commonProperties.getFilePathPrev();
+            } else if ("doc".equals(type)) {
+                pathPrev = commonProperties.getDocPathPrev();
+            }
+            list.add(pathPrev + fileToSavePath);
         }
         responseData.put("fileKeys", list);
         return responseData;

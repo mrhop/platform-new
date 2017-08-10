@@ -37,6 +37,8 @@ public class UserVo implements Serializable {
 
     private Long authorities;
 
+    private String authoritiesKey;
+
     private String authoritiesStr;
 
     private List<Long> clients;

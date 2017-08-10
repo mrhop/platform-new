@@ -7,7 +7,6 @@ import cn.hopever.platform.user.service.RoleTableService;
 import cn.hopever.platform.user.service.UserTableService;
 import cn.hopever.platform.user.vo.UserVo;
 import cn.hopever.platform.user.vo.UserVoAssembler;
-import cn.hopever.platform.user.vo.UserVoTemp;
 import cn.hopever.platform.utils.moji.MojiUtils;
 import cn.hopever.platform.utils.properties.CommonProperties;
 import cn.hopever.platform.utils.test.PrincipalSample;
@@ -129,10 +128,9 @@ public class UserController {
 
     //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result saveUser(@RequestParam(name = "photo", required = false) MultipartFile[] files, UserVoTemp userVo, Principal principal) {
+    public VueResults.Result saveUser(@RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
         principal = new PrincipalSample("admin");
-
-        return userTableService.saveUser(new UserVo(), files, principal);
+        return userTableService.saveUser(userVo, files, principal);
     }
 
     @RequestMapping(value = "/register", method = {RequestMethod.POST})
