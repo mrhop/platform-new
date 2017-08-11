@@ -377,25 +377,27 @@ public class UserTableServiceImpl implements UserTableService {
                 user.setPhoto(commonProperties.getDefaultUserPhoto());
             }
         }
-        if (userVo.getAuthoritiesKey() != null) {
-            List list = new ArrayList<>();
-            list.add(roleTableRepository.findOneByAuthority(userVo.getAuthoritiesKey()));
-            user.setAuthorities(list);
-        } else {
-            List list = new ArrayList<>();
-            list.add(roleTableRepository.findOneByAuthority("ROLE_common_user"));
-            user.setAuthorities(list);
-        }
-        List clientsUpdate = new ArrayList<>();
-        clientsUpdate.add(clientTableRepository.findOneByClientId("user_admin_client"));
-        if (userVo.getClients() != null) {
-            Iterable<ClientTable> iterable = clientTableRepository.findAll(userVo.getClients());
-            for (ClientTable clientTable : iterable) {
-                clientsUpdate.add(clientTable);
+        List<RoleTable> listAuthorities = new ArrayList<>();
+        if (userVo.getAuthoritiesKey() == null || !userVo.getAuthoritiesKey().equals("ROLE_super_admin")) {
+            List<ClientTable> clientsUpdate = new ArrayList<>();
+            clientsUpdate.add(clientTableRepository.findOneByClientId("user_admin_client"));
+            if (userVo.getClients() != null) {
+                Iterable<ClientTable> iterable = clientTableRepository.findAll(userVo.getClients());
+                for (ClientTable clientTable : iterable) {
+                    clientsUpdate.add(clientTable);
+                }
+            }
+            user.setClients(clientsUpdate);
+            for (ClientTable clientTable : clientsUpdate) {
+                listAuthorities.add(roleTableRepository.findOneByAuthority("ROLE_" + clientTable.getClientId()));
             }
         }
-        user.setClients(clientsUpdate);
-
+        if (userVo.getAuthoritiesKey() != null) {
+            listAuthorities.add(roleTableRepository.findOneByAuthority(userVo.getAuthoritiesKey()));
+        } else {
+            listAuthorities.add(roleTableRepository.findOneByAuthority("ROLE_common_user"));
+        }
+        user.setAuthorities(listAuthorities);
         if (userVo.getModulesAuthorities() != null) {
             List<ModuleRoleTable> moduleRoleTableList = new ArrayList<>();
             Iterable<ModuleRoleTable> iterable = moduleRoleTableRepository.findAll(userVo.getModulesAuthorities());
@@ -447,6 +449,7 @@ public class UserTableServiceImpl implements UserTableService {
         }
         List list = new ArrayList<>();
         list.add(roleTableRepository.findOneByAuthority("ROLE_common_user"));
+        list.add(roleTableRepository.findOneByAuthority("ROLE_user_admin_client"));
         user.setAuthorities(list);
         List clientsUpdate = new ArrayList<>();
         clientsUpdate.add(clientTableRepository.findOneByClientId("user_admin_client"));

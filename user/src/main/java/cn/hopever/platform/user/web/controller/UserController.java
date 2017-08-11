@@ -113,7 +113,7 @@ public class UserController {
 
     //@PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/personal/update", method = {RequestMethod.POST})
-    public VueResults.Result updatePersonalUser(@RequestPart(required = true) UserVo userVo, @RequestPart("photo") MultipartFile[] files, Principal principal) {
+    public VueResults.Result updatePersonalUser(@RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
         principal = new PrincipalSample("admin");
         return userTableService.updatePersonalUser(userVo, files, principal);
     }
@@ -121,12 +121,12 @@ public class UserController {
 
     // @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result updateUser(@RequestPart(required = true) UserVo userVo, @RequestPart("photo") MultipartFile[] files, Principal principal) {
+    public VueResults.Result updateUser(@RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
         principal = new PrincipalSample("admin");
         return userTableService.updateUser(userVo, files, principal);
     }
 
-    //@PreAuthorize("hasRole('ROLE_super_admin')")
+    //@PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result saveUser(@RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
         principal = new PrincipalSample("admin");
@@ -134,7 +134,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/register", method = {RequestMethod.POST})
-    public VueResults.Result registerUser(@RequestPart(required = true) UserVo userVo, @RequestPart("photo") MultipartFile[] files, Principal principal) {
+    public VueResults.Result registerUser(@RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
         return userTableService.registerUser(userVo, files);
     }
 
