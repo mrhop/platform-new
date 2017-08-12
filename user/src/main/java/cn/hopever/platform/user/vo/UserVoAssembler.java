@@ -35,6 +35,7 @@ public class UserVoAssembler {
             for (RoleTable rt : userTable.getAuthorities()) {
                 if (rt.getLevel() < 3) {
                     resource.setAuthorities(rt.getId());
+                    resource.setAuthoritiesKey(rt.getAuthority());
                     resource.setAuthoritiesStr(rt.getName());
                     break;
                 }

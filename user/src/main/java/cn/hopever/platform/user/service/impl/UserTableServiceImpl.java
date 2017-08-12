@@ -497,14 +497,18 @@ public class UserTableServiceImpl implements UserTableService {
     @Override
     // 注意将user_admin_client去除在外，因为应都有此子应用权限，只是权限大小不同
     public List<SelectOption> getClientOptions(Long id, Principal principal) {
-        if (id == null) {
-            UserTable ut = userTableRepository.findOneByUsername(principal.getName());
-            RoleTable roleTable = getTopRole(ut);
-            if (roleTable.getLevel() == 1 && ut.getClients() != null && ut.getClients().size() > 0) {
+        UserTable utAdmin = userTableRepository.findOneByUsername(principal.getName());
+        UserTable ut = id == null ? null : userTableRepository.findOne(id);
+        RoleTable roleTable = getTopRole(utAdmin);
+        if (ut == null || validateUserOperation(utAdmin, ut)) {
+            if (roleTable.getLevel() == 1 && utAdmin.getClients() != null && utAdmin.getClients().size() > 0) {
                 List<SelectOption> listReturn = new ArrayList<>();
-                for (ClientTable clientTable : ut.getClients()) {
+                for (ClientTable clientTable : utAdmin.getClients()) {
                     if (!clientTable.getClientId().equals("user_admin_client")) {
                         SelectOption selectOption = new SelectOption(clientTable.getClientName(), clientTable.getId());
+                        if (ut != null && ut.getClients().contains(clientTable)) {
+                            selectOption.setSelected(true);
+                        }
                         listReturn.add(selectOption);
                     }
                 }
@@ -515,28 +519,13 @@ public class UserTableServiceImpl implements UserTableService {
                 for (ClientTable clientTable : list) {
                     if (!clientTable.getClientId().equals("user_admin_client")) {
                         SelectOption selectOption = new SelectOption(clientTable.getClientName(), clientTable.getId());
+                        if (ut != null && ut.getClients().contains(clientTable)) {
+                            selectOption.setSelected(true);
+                        }
                         listReturn.add(selectOption);
                     }
                 }
                 return listReturn;
-            }
-        } else {
-            UserTable utAdmin = userTableRepository.findOneByUsername(principal.getName());
-            UserTable ut = userTableRepository.findOne(id);
-            if (validateUserOperation(utAdmin, ut)) {
-                RoleTable roleTable = getTopRole(ut);
-                if (roleTable.getLevel() > 0 && utAdmin.getClients() != null && utAdmin.getClients().size() > 0) {
-                    List<SelectOption> listReturn = new ArrayList<>();
-                    for (ClientTable clientTable : utAdmin.getClients()) {
-                        if (!clientTable.getClientId().equals("user_admin_client")) {
-                            SelectOption selectOption = new SelectOption(clientTable.getClientName(), clientTable.getId());
-                            if (ut.getClients().contains(clientTable)) {
-                                selectOption.setSelected(true);
-                            }
-                            listReturn.add(selectOption);
-                        }
-                    }
-                }
             }
         }
         return null;
@@ -550,7 +539,7 @@ public class UserTableServiceImpl implements UserTableService {
             if (id != null) {
                 ut = userTableRepository.findOne(id);
             }
-            if (ut == null || (ut != null && validateUserOperation(utAdmin, ut))) {
+            if (ut == null || (clientIds != null || clientOptions != null && this.getTopRole(ut).getAuthority().equals("ROLE_common_user")) && validateUserOperation(utAdmin, ut)) {
                 List<SelectOption> listReturn = new ArrayList<>();
                 if (clientOptions != null) {
                     for (SelectOption selectOption : clientOptions) {

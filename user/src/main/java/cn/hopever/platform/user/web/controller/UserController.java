@@ -150,10 +150,10 @@ public class UserController {
                 mapReturn.put("clients", userTableService.getClientOptions(null, principal));
             } else {
                 // 更新 - 考虑principal对其显示的限制
-                mapReturn.put("authorities", userTableService.getRoleOptions(null, principal));
-                List<SelectOption> clientsOptions = userTableService.getClientOptions(null, principal);
+                mapReturn.put("authorities", userTableService.getRoleOptions(key, principal));
+                List<SelectOption> clientsOptions = userTableService.getClientOptions(key, principal);
                 mapReturn.put("clients", clientsOptions);
-                mapReturn.put("modulesAuthorities", userTableService.getModulesAuthoritiesOptions(null, principal, clientsOptions, null));
+                mapReturn.put("modulesAuthorities", userTableService.getModulesAuthoritiesOptions(key, principal, clientsOptions, null));
             }
         } else {
             if (body.get("clients") != null) {
