@@ -121,8 +121,9 @@ public class UserController {
 
     // @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result updateUser(@RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
+    public VueResults.Result updateUser(@RequestParam(name = "key") Long key, @RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
         principal = new PrincipalSample("admin");
+        userVo.setId(key);
         return userTableService.updateUser(userVo, files, principal);
     }
 

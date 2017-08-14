@@ -29,7 +29,7 @@ public abstract class BeanUtils extends org.springframework.beans.BeanUtils {
         for (PropertyDescriptor targetPd : targetPds) {
             Method writeMethod = targetPd.getWriteMethod();
             PropertyDescriptor sourcePd = getPropertyDescriptor(source.getClass(), targetPd.getName());
-            if (writeMethod != null && sourcePd != null && sourcePd.getPropertyType().equals(targetPd.getPropertyType()) && (ignoreList == null || !ignoreList.contains(targetPd.getName()))) {
+            if (writeMethod != null && sourcePd != null && sourcePd.getReadMethod() != null && sourcePd.getReadMethod().getGenericReturnType().equals(targetPd.getWriteMethod().getGenericParameterTypes()[0]) && (ignoreList == null || !ignoreList.contains(targetPd.getName()))) {
                 try {
                     Method readMethod = sourcePd.getReadMethod();
                     if (!Modifier.isPublic(readMethod.getDeclaringClass().getModifiers())) {

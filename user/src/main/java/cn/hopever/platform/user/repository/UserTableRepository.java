@@ -24,11 +24,17 @@ public interface UserTableRepository extends PagingAndSortingRepository<UserTabl
     // 需要在测试后判断是否
     @QueryHints({
             @QueryHint(name = "org.hibernate.cacheable", value = "true")})
-    @Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = "hoperver.user.user.findOneByUsername")
+    @Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = "hoperver.user.user", include = "non-lazy")
     public UserTable findOneByUsername(String username);
 
+    @QueryHints({
+            @QueryHint(name = "org.hibernate.cacheable", value = "true")})
+    @Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = "hoperver.user.user", include = "non-lazy")
     public UserTable findOneByEmail(String email);
 
+    @QueryHints({
+            @QueryHint(name = "org.hibernate.cacheable", value = "true")})
+    @Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = "hoperver.user.user", include = "non-lazy")
     public UserTable findOneByPhone(String phone);
 
     public List<UserTable> findByUsernameLike(String username, Pageable pageable);

@@ -32,14 +32,16 @@ public class ModuleRoleTable implements GrantedAuthority {
     private short level;
 
     @ManyToMany(mappedBy = "authorities")
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ModuleTable> modules;
 
     @ManyToMany(mappedBy = "modulesAuthorities")
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<UserTable> users;
 
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = true)
-    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private ClientTable client;
 
     @Column(name = "name", nullable = false, length = 50, unique = true)

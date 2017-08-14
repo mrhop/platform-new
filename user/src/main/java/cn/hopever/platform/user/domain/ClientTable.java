@@ -62,7 +62,7 @@ public class ClientTable implements ClientDetails {
 
     @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinTable(name = "platform_user_client_client_role", joinColumns = @JoinColumn(name = "client_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ClientRoleTable> authorities;
 
     @Column(name = "access_token_validity_seconds", nullable = true)
@@ -75,12 +75,15 @@ public class ClientTable implements ClientDetails {
     private String additionalInformation;
 
     @OneToMany(mappedBy = "client")
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ModuleRoleTable> moduleRoles;
 
     @OneToMany(mappedBy = "client")
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ModuleTable> modules;
 
     @ManyToMany(mappedBy = "clients")
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<UserTable> users;
 
 

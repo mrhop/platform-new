@@ -18,7 +18,7 @@ public interface RoleTableRepository extends PagingAndSortingRepository<RoleTabl
     // 需要测试权限增加的情况如何处理
     @QueryHints({
             @QueryHint(name = "org.hibernate.cacheable", value = "true")})
-    @Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = "hoperver.user.role.findOneByAuthority")
+    @Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = "hoperver.user.role", include = "non-lazy")
     public RoleTable findOneByAuthority(String authority);
 
     public List<RoleTable> findByAuthorityLike(String authority, Pageable pageable);

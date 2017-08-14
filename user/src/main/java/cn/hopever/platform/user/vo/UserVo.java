@@ -21,7 +21,7 @@ public class UserVo implements Serializable {
 
     private String password;
 
-    private boolean accountNonLocked = false;
+    private boolean accountNonLocked = true;
 
     private String email;
 

@@ -288,10 +288,11 @@ public class UserTableServiceImpl implements UserTableService {
                 logger.error("save user photo failed", e);
             }
         }
-        RoleTable rtTop = roleTableRepository.findOne(userVo.getAuthorities());
-        if (userVo.getAuthorities() != null) {
+        RoleTable rtTop = roleTableRepository.findOneByAuthority(userVo.getAuthoritiesKey());
+        if (userVo.getAuthoritiesKey() != null) {
             List<RoleTable> list = user.getAuthorities();
-            for (RoleTable rt : list) {
+            while (list.iterator().hasNext()) {
+                RoleTable rt = list.iterator().next();
                 if (rt.getLevel() < 3) {
                     list.remove(rt);
                 }
@@ -317,29 +318,31 @@ public class UserTableServiceImpl implements UserTableService {
             }
             user.setClients(listPartClients);
         }
-        List<ModuleRoleTable> listPartModuleRoles = new ArrayList<>();
-        if (rtController.getLevel() == 1) {
-            listPartModuleRoles = user.getModulesAuthorities();
-        }
-        if (rtTop.getLevel() > 1 && rtController != null && userController.getClients() != null && listPartModuleRoles != null && listPartModuleRoles.size() > 0) {
-            for (ClientTable ct : userController.getClients()) {
-                List<ModuleRoleTable> moduleRoles = ct.getModuleRoles();
-                if (moduleRoles != null) {
-                    for (ModuleRoleTable mr : moduleRoles) {
-                        listPartModuleRoles.remove(mr);
+        if (rtTop.getLevel() == 2) {
+            List<ModuleRoleTable> listPartModuleRoles = new ArrayList<>();
+            if (rtController.getLevel() == 1) {
+                listPartModuleRoles = user.getModulesAuthorities();
+            }
+            if (rtController != null && userController.getClients() != null && listPartModuleRoles != null && listPartModuleRoles.size() > 0) {
+                for (ClientTable ct : userController.getClients()) {
+                    List<ModuleRoleTable> moduleRoles = ct.getModuleRoles();
+                    if (moduleRoles != null) {
+                        for (ModuleRoleTable mr : moduleRoles) {
+                            listPartModuleRoles.remove(mr);
+                        }
                     }
                 }
             }
-        }
-        if (userVo.getModulesAuthorities() != null) {
-            Iterable<ModuleRoleTable> iterable = moduleRoleTableRepository.findAll(userVo.getModulesAuthorities());
-            for (ModuleRoleTable mr : iterable) {
-                listPartModuleRoles.add(mr);
+            if (userVo.getModulesAuthorities() != null && userVo.getModulesAuthorities().size() > 0) {
+                Iterable<ModuleRoleTable> iterable = moduleRoleTableRepository.findAll(userVo.getModulesAuthorities());
+                for (ModuleRoleTable mr : iterable) {
+                    listPartModuleRoles.add(mr);
+                }
             }
+            user.setModulesAuthorities(listPartModuleRoles);
         }
-        user.setModulesAuthorities(listPartModuleRoles);
         userTableRepository.save(user);
-        return VueResults.generateError("更新成功", "更新成功");
+        return VueResults.generateSuccess("更新成功", "更新成功");
     }
 
     @Override
@@ -389,7 +392,8 @@ public class UserTableServiceImpl implements UserTableService {
             }
             user.setClients(clientsUpdate);
             for (ClientTable clientTable : clientsUpdate) {
-                listAuthorities.add(roleTableRepository.findOneByAuthority("ROLE_" + clientTable.getClientId()));
+                String authority = "ROLE_" + clientTable.getClientId();
+                listAuthorities.add(roleTableRepository.findOneByAuthority(authority));
             }
         }
         if (userVo.getAuthoritiesKey() != null) {
