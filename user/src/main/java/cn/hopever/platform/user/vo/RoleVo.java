@@ -21,8 +21,6 @@ public class RoleVo {
 
     private String name;
 
-    private short level;
-
     private List<UserVo> users;
 
 }

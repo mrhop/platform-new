@@ -4,7 +4,9 @@ import cn.hopever.platform.user.domain.ClientTable;
 import cn.hopever.platform.user.domain.ModuleRoleTable;
 import cn.hopever.platform.user.domain.RoleTable;
 import cn.hopever.platform.user.domain.UserTable;
+import cn.hopever.platform.utils.properties.CommonProperties;
 import cn.hopever.platform.utils.tools.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ import java.util.List;
  */
 @Component
 public class UserVoAssembler {
+    @Autowired
+    private CommonProperties commonProperties;
 
     public UserVo toResource(UserTable userTable) {
         UserVo resource = new UserVo();
@@ -61,6 +65,9 @@ public class UserVoAssembler {
         BeanUtils.copyNotNullProperties(userVo, userTable, "password", "photo");
         if (userVo.getLimitedDate() != null) {
             userTable.setLimitedDate(new Date(userVo.getLimitedDate()));
+        }
+        if (userTable.getPhoto() == null) {
+            userTable.setPhoto(commonProperties.getDefaultUserPhoto());
         }
         return userTable;
     }

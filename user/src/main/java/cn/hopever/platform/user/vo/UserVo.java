@@ -27,7 +27,7 @@ public class UserVo implements Serializable {
 
     private String phone;
 
-    private boolean enabled;
+    private boolean enabled = true;
 
     private String enabledStr;
 

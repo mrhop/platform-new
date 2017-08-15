@@ -22,8 +22,6 @@ public class ModuleRoleVo {
 
     private String name;
 
-    private short level;
-
     private List<ModuleVo> modules;
 
     private ClientVo client;

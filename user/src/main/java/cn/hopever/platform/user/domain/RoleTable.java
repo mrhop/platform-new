@@ -32,7 +32,7 @@ public class RoleTable implements GrantedAuthority {
     private String name;
 
     @Column(name = "level", nullable = false)
-    private short level;
+    private short level = 3;
 
     @ManyToMany(mappedBy = "authorities")
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)

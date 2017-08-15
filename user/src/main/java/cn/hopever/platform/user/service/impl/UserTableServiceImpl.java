@@ -9,7 +9,6 @@ import cn.hopever.platform.user.service.UserTableService;
 import cn.hopever.platform.user.vo.UserVo;
 import cn.hopever.platform.user.vo.UserVoAssembler;
 import cn.hopever.platform.utils.moji.MojiUtils;
-import cn.hopever.platform.utils.properties.CommonProperties;
 import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
@@ -63,8 +62,6 @@ public class UserTableServiceImpl implements UserTableService {
     @Autowired
     private MojiUtils mojiUtils;
 
-    @Autowired
-    private CommonProperties commonProperties;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -216,13 +213,13 @@ public class UserTableServiceImpl implements UserTableService {
     @Override
     public VueResults.Result updatePersonalUser(UserVo userVo, MultipartFile[] files, Principal principal) {
         UserTable user = userTableRepository.findOneByUsername(principal.getName());
+        userVo.setId(user.getId());
         if (userVo.getEmail() != null) {
             UserTable ut = userTableRepository.findOneByEmail(userVo.getEmail());
             if (ut != null && userVo.getId() != ut.getId()) {
                 return VueResults.generateError("更新失败", "Email已存在");
             }
         }
-
         if (userVo.getPhone() != null) {
             UserTable ut = userTableRepository.findOneByPhone(userVo.getPhone());
             if (ut != null && userVo.getId() != ut.getId()) {
@@ -377,7 +374,6 @@ public class UserTableServiceImpl implements UserTableService {
                 }
             } catch (Exception e) {
                 logger.error("save user photo failed", e);
-                user.setPhoto(commonProperties.getDefaultUserPhoto());
             }
         }
         List<RoleTable> listAuthorities = new ArrayList<>();
@@ -448,7 +444,6 @@ public class UserTableServiceImpl implements UserTableService {
                 }
             } catch (Exception e) {
                 logger.error("save user photo failed", e);
-                user.setPhoto(commonProperties.getDefaultUserPhoto());
             }
         }
         List list = new ArrayList<>();

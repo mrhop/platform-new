@@ -31,8 +31,8 @@ public class ModuleVo {
 
     private List<ModuleVo> children;
 
-    private boolean available;
-    private boolean activated;
+    private boolean available = true;
+    private boolean activated = true;
 
     private List<ModuleRoleVo> authorities;
 

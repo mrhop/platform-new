@@ -21,8 +21,6 @@ public class ClientRoleVo {
 
     private String name;
 
-    private short level;
-
     private List<ClientVo> clients;
 
 }
