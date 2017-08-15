@@ -164,6 +164,12 @@ public class UserController {
         return mapReturn;
     }
 
+    // @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
+    @RequestMapping(value = "/setEnabled", method = {RequestMethod.GET})
+    public VueResults.Result updateEnabled(@RequestParam Long key, @RequestParam Boolean enabled) {
+        return userTableService.updateEnabled(key, enabled);
+    }
+
 
     @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list/relatedusers/options", method = {RequestMethod.GET})

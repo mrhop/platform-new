@@ -575,6 +575,14 @@ public class UserTableServiceImpl implements UserTableService {
         return null;
     }
 
+    @Override
+    public VueResults.Result updateEnabled(Long id, boolean enabled) {
+        if (userTableRepository.updateUserEnabled(enabled, id) > 0) {
+            return VueResults.generateSuccess("更新成功", "更新成功");
+        }
+        return VueResults.generateError("更新失败", "更新失败");
+    }
+
     private boolean validateUserOperation(UserTable ut1, UserTable ut2) {
         RoleTable rt1 = getTopRole(ut1);
         RoleTable rt2 = getTopRole(ut2);

@@ -62,4 +62,6 @@ public interface UserTableService extends UserDetailsService {
     public List<SelectOption> getClientOptions(Long id, Principal principal);
 
     public List<SelectOption> getModulesAuthoritiesOptions(Long id, Principal principal, List<SelectOption> clientOptions, List<Integer> clientIds);
+
+    public VueResults.Result updateEnabled(Long id, boolean enabled);
 }

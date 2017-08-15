@@ -27,6 +27,7 @@ import java.util.*;
  * Created by Donghui Huo on 2016/8/29.
  */
 @RestController
+@CrossOrigin
 @RequestMapping(value = "/client", produces = "application/json")
 public class ClientController {
     Logger logger = LoggerFactory.getLogger(ClientController.class);
