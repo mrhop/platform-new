@@ -1,11 +1,15 @@
 package cn.hopever.platform.user.service.impl;
 
 import cn.hopever.platform.user.domain.RoleTable;
+import cn.hopever.platform.user.repository.CustomRoleTableRepository;
 import cn.hopever.platform.user.repository.RoleTableRepository;
 import cn.hopever.platform.user.service.RoleTableService;
+import cn.hopever.platform.utils.web.TableParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +29,9 @@ public class RoleTableServiceImpl implements RoleTableService {
     @Autowired
     private RoleTableRepository roleTableRepository;
 
+    @Autowired
+    private CustomRoleTableRepository customRoleTableRepository;
+
     @Override
     public RoleTable save(RoleTable role) {
         return null;
@@ -38,10 +45,10 @@ public class RoleTableServiceImpl implements RoleTableService {
     @Override
     public List<RoleTable> getList(String authority) {
         List<RoleTable> listReturn = new ArrayList<>();
-        if( authority.equals("ROLE_admin")){
+        if (authority.equals("ROLE_admin")) {
             listReturn.add(roleTableRepository.findOneByAuthority("ROLE_admin"));
             listReturn.add(roleTableRepository.findOneByAuthority("ROLE_common_user"));
-        }else{
+        } else {
             listReturn.add(roleTableRepository.findOneByAuthority("ROLE_super_admin"));
             listReturn.add(roleTableRepository.findOneByAuthority("ROLE_admin"));
             listReturn.add(roleTableRepository.findOneByAuthority("ROLE_common_user"));
@@ -50,9 +57,15 @@ public class RoleTableServiceImpl implements RoleTableService {
     }
 
     @Override
-    public Iterable<RoleTable> getList() {
-         Iterable<RoleTable> rt =  roleTableRepository.findAll(new Sort(Sort.Direction.ASC, "id"));
-        return rt;
+    public Page<RoleTable> getList(TableParameters body) {
+        PageRequest pageRequest;
+        if (body.getSorts() == null || body.getSorts().isEmpty()) {
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "level");
+        } else {
+            String key = body.getSorts().keySet().iterator().next();
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
+        }
+        return customRoleTableRepository.findByFilters(body.getFilters(), pageRequest);
     }
 
     @Override

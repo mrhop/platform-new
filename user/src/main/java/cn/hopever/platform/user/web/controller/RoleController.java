@@ -2,24 +2,23 @@ package cn.hopever.platform.user.web.controller;
 
 import cn.hopever.platform.user.domain.RoleTable;
 import cn.hopever.platform.user.service.RoleTableService;
+import cn.hopever.platform.utils.web.TableParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Donghui Huo on 2016/8/29.
  */
 @RestController
+@CrossOrigin
 @RequestMapping(value = "/role", produces = "application/json")
 public class RoleController {
     Logger logger = LoggerFactory.getLogger(RoleController.class);
@@ -27,44 +26,33 @@ public class RoleController {
     private RoleTableService roleTableService;
 
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
-    @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public List getList() {
+    //@PreAuthorize("hasRole('ROLE_super_admin')")
+    @RequestMapping(value = "/list", method = RequestMethod.POST)
+    public Map getList(@RequestBody TableParameters body) {
+        Page<RoleTable> list = roleTableService.getList(body);
+        Map<String, Object> map = new HashMap<>();
         List<HashMap<String, Object>> listReturn = null;
-        Iterable<RoleTable> list = roleTableService.getList();
-        if (list.iterator().hasNext()) {
+        if (list != null && list.iterator().hasNext()) {
             listReturn = new ArrayList<>();
             for (RoleTable rt : list) {
                 HashMap<String, Object> mapTemp = new HashMap<>();
                 mapTemp.put("key", rt.getId());
                 List<Object> listTmp = new ArrayList<>();
-                listTmp.add("");
-                listTmp.add(rt.getAuthority());
                 listTmp.add(rt.getName());
+                listTmp.add(rt.getAuthority());
                 listTmp.add(rt.getLevel());
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);
             }
+            map.put("rows", listReturn);
+            map.put("totalCount", list.getTotalElements());
+        } else {
+            map.put("rows", null);
+            map.put("totalCount", 0);
         }
-        return listReturn;
-    }
-
-    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
-    @RequestMapping(value = "/options", method = RequestMethod.GET)
-    public List getOptionsList(Principal principal) {
-        String authority = ((OAuth2Authentication) principal).getAuthorities().iterator().next().getAuthority();
-
-        List<HashMap<String, Object>> listReturn = null;
-        Iterable<RoleTable> list = roleTableService.getList(authority);
-        if (list.iterator().hasNext()) {
-            listReturn = new ArrayList<>();
-            for (RoleTable rt : list) {
-                HashMap<String, Object> mapTemp = new HashMap<>();
-                mapTemp.put("value", rt.getId());
-                mapTemp.put("label", rt.getName());
-                listReturn.add(mapTemp);
-            }
-        }
-        return listReturn;
+        map.put("pager", body.getPager());
+        map.put("filters", body.getFilters());
+        map.put("sorts", body.getSorts());
+        return map;
     }
 }

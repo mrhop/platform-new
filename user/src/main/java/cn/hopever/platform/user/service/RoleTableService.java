@@ -1,6 +1,8 @@
 package cn.hopever.platform.user.service;
 
 import cn.hopever.platform.user.domain.RoleTable;
+import cn.hopever.platform.utils.web.TableParameters;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -18,7 +20,7 @@ public interface RoleTableService {
 
     public List<RoleTable> getList(String authority);
 
-    public Iterable<RoleTable> getList();
+    public Page<RoleTable> getList(TableParameters body);
 
     public RoleTable get(Long id);
 
