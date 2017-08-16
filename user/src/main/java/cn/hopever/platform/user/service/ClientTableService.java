@@ -1,7 +1,10 @@
 package cn.hopever.platform.user.service;
 
 import cn.hopever.platform.user.domain.ClientTable;
+import cn.hopever.platform.user.vo.ClientVo;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
+import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.provider.ClientDetails;
@@ -21,16 +24,30 @@ public interface ClientTableService extends ClientDetailsService {
 
     public ClientDetails loadClientByClientId(String clientId);
 
-    public ClientTable save(ClientTable client);
+    public VueResults.Result save(ClientVo client);
+
     public void delete(ClientTable client);
+
+    public void delete(long id);
+
+    public ClientVo getVoById(Long id);
+
     public ClientTable getById(Long id);
+
     public Iterable<ClientTable> getAll();
+
     public List<ClientTable> getByUserName(String userName);
+
     public List<ClientTable> getByUserId(Long userId);
 
     public ClientTable getByClientId(String clientId);
+
     public List<ClientTable> getByIds(List<Long> ids);
+
     public Page<ClientTable> getList(Pageable pageable, Map<String, Object> filterMap);
-    public Page<ClientTable> getList(TableParameters body);
+
+    public Page<ClientVo> getList(TableParameters body);
+
+    public List<SelectOption> getResouceScopeOptions(Long id);
 
 }

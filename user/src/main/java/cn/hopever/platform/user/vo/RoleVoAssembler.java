@@ -1,8 +1,6 @@
 package cn.hopever.platform.user.vo;
 
 import cn.hopever.platform.user.domain.RoleTable;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
 import org.springframework.stereotype.Component;
 
 /**
@@ -10,19 +8,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RoleVoAssembler  {
-
-    private ModelMapper modelMapper;
-
-    public RoleVoAssembler() {
-        modelMapper = new ModelMapper();
-        PropertyMap<RoleTable, RoleVo> map = new PropertyMap<RoleTable, RoleVo>() {
-            protected void configure() {
-                skip().setUsers(null);
-            }
-        };
-        modelMapper.addMappings(map);
-    }
-
 
     public RoleVo toResource(RoleTable roleTable) {
         RoleVo resource = createResource(roleTable);
@@ -32,9 +17,6 @@ public class RoleVoAssembler  {
 
     private RoleVo createResource(RoleTable roleTable) {
         RoleVo RoleVo = null;
-        if (roleTable != null) {
-            RoleVo = modelMapper.map(roleTable,RoleVo.class);
-        }
         return RoleVo;
     }
 }

@@ -24,8 +24,6 @@ public class ClientVo {
 
     private String clientSecret;
 
-    private boolean internalClient;
-
     private String scopesStr;
 
     private List<Long> scopeIds;
@@ -35,4 +33,6 @@ public class ClientVo {
     private Set<String> authorizedGrantTypes;
 
     private String authorizedGrantTypesStr;
+
+    private List<Long> authorities;
 }

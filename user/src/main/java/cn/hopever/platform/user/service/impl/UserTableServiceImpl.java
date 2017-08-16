@@ -286,10 +286,10 @@ public class UserTableServiceImpl implements UserTableService {
         RoleTable rtTop = roleTableRepository.findOneByAuthority(userVo.getAuthoritiesKey());
         if (userVo.getAuthoritiesKey() != null) {
             List<RoleTable> list = user.getAuthorities();
-            while (list.iterator().hasNext()) {
-                RoleTable rt = list.iterator().next();
+            for (RoleTable rt : list) {
                 if (rt.getLevel() < 3) {
                     list.remove(rt);
+                    break;
                 }
             }
             list.add(rtTop);

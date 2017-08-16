@@ -45,7 +45,7 @@ public class ClientTable implements ClientDetails {
     @Column(name = "scoped")
     private boolean scoped = true;
 
-    @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "client", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ClientResouceScopeTable> clientResouceScopeTables;
 
@@ -77,7 +77,7 @@ public class ClientTable implements ClientDetails {
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ModuleTable> modules;
 
-    @ManyToMany(mappedBy = "clients")
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, mappedBy = "clients")
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<UserTable> users;
 
@@ -120,11 +120,6 @@ public class ClientTable implements ClientDetails {
             return scopes;
         }
         return null;
-    }
-
-
-    public void setAuthorizedGrantTypes(String authorizedGrantTypes) {
-        this.authorizedGrantTypes = authorizedGrantTypes;
     }
 
     public void setAuthorizedGrantTypes(Set<String> authorizedGrantTypes) {

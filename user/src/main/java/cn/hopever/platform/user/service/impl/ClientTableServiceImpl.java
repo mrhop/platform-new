@@ -1,22 +1,18 @@
 package cn.hopever.platform.user.service.impl;
 
-import cn.hopever.platform.user.domain.ClientTable;
-import cn.hopever.platform.user.domain.ModuleRoleTable;
-import cn.hopever.platform.user.domain.ModuleTable;
-import cn.hopever.platform.user.domain.UserTable;
-import cn.hopever.platform.user.repository.ClientRoleTableRepository;
-import cn.hopever.platform.user.repository.ClientTableRepository;
-import cn.hopever.platform.user.repository.CustomClientTableRepository;
-import cn.hopever.platform.user.repository.UserTableRepository;
+import cn.hopever.platform.user.domain.*;
+import cn.hopever.platform.user.repository.*;
 import cn.hopever.platform.user.service.ClientTableService;
+import cn.hopever.platform.user.vo.ClientVo;
+import cn.hopever.platform.user.vo.ClientVoAssembler;
+import cn.hopever.platform.utils.tools.BeanUtils;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
+import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 import org.springframework.stereotype.Service;
@@ -36,7 +32,12 @@ public class ClientTableServiceImpl implements ClientTableService {
     Logger logger = LoggerFactory.getLogger(ClientTableServiceImpl.class);
 
     @Autowired
+    private ClientVoAssembler clientVoAssembler;
+    @Autowired
     private ClientTableRepository clientTableRepository;
+
+    @Autowired
+    private RoleTableRepository roleTableRepository;
 
     @Autowired
     private CustomClientTableRepository customClientTableRepository;
@@ -47,35 +48,61 @@ public class ClientTableServiceImpl implements ClientTableService {
     @Autowired
     private ClientRoleTableRepository clientRoleTableRepository;
 
+    @Autowired
+    private ResouceScopeTableRepository resouceScopeTableRepository;
+
     @Override
-    public ClientTable save(ClientTable client) {
-        return clientTableRepository.save(client);
+    public VueResults.Result save(ClientVo client) {
+        if (clientTableRepository.findOneByClientId(client.getClientId()) != null) {
+            return VueResults.generateError("创建失败", "应用账户已存在");
+        }
+        ClientTable clientTable = new ClientTable();
+        BeanUtils.copyNotNullProperties(client, clientTable);
+        if (client.getScopeIds() != null) {
+            List<ClientResouceScopeTable> list = new ArrayList<>();
+            for (long id : client.getScopeIds()) {
+                ResouceScopeTable resouceScopeTable = resouceScopeTableRepository.findOne(id);
+                ClientResouceScopeTable clientResouceScopeTable = new ClientResouceScopeTable();
+                clientResouceScopeTable.setClient(clientTable);
+                clientResouceScopeTable.setScope(resouceScopeTable);
+                if (client.getAutoApprovaledScopeIds() != null && client.getAutoApprovaledScopeIds().contains(id)) {
+                    clientResouceScopeTable.setAutoApprove(true);
+                }
+                list.add(clientResouceScopeTable);
+            }
+            clientTable.setClientResouceScopeTables(list);
+        }
+        clientTableRepository.save(clientTable);
+        RoleTable roleTable = new RoleTable();
+        roleTable.setAuthority("ROLE_" + clientTable.getClientId());
+        roleTable.setLevel((short) 3);
+        roleTable.setName(clientTable.getClientName());
+        roleTableRepository.save(roleTable);
+        return VueResults.generateSuccess("创建成功", "应用创建成功");
     }
 
     @Override
     public void delete(ClientTable client) {
-        clientRoleTableRepository.delete(clientRoleTableRepository.findOneByAuthority(client.getClientId()));
-        if (client.getModuleRoles() != null) {
-            for (ModuleRoleTable mrt : client.getModuleRoles()) {
-                mrt.setClient(null);
-            }
-        }
-        if (client.getModules() != null) {
-            for (ModuleTable mt : client.getModules()) {
-                mt.setClient(null);
-            }
-        }
-        if (client.getUsers() != null) {
-            for (UserTable ut : client.getUsers()) {
-                ut.getClients().remove(client);
-            }
-        }
         clientTableRepository.delete(client);
+    }
+
+    @Override
+    public void delete(long id) {
+        ClientTable clientTable = clientTableRepository.findOne(id);
+        if (clientTable != null && !clientTable.getClientId().equals("user_admin_client")) {
+            clientTableRepository.delete(id);
+            roleTableRepository.delete(roleTableRepository.findOneByAuthority("ROLE_" + clientTable.getClientId()));
+        }
     }
 
     @Override
     public ClientTable getById(Long id) {
         return clientTableRepository.findOne(id);
+    }
+
+    @Override
+    public ClientVo getVoById(Long id) {
+        return clientVoAssembler.toResource(clientTableRepository.findOne(id));
     }
 
     @Override
@@ -115,8 +142,7 @@ public class ClientTableServiceImpl implements ClientTableService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ClientTable> getList(TableParameters body) {
-        Page<ClientTable> list;
+    public Page<ClientVo> getList(TableParameters body) {
         PageRequest pageRequest;
         if (body.getSorts() == null || body.getSorts().isEmpty()) {
             pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "id");
@@ -124,7 +150,35 @@ public class ClientTableServiceImpl implements ClientTableService {
             String key = body.getSorts().keySet().iterator().next();
             pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
         }
-        return customClientTableRepository.findByFilters( body.getFilters(), pageRequest);
+        Page<ClientTable> page = customClientTableRepository.findByFilters(body.getFilters(), pageRequest);
+        List<ClientVo> list = new ArrayList<>();
+        for (ClientTable clientTable : page) {
+            list.add(clientVoAssembler.toResource(clientTable));
+        }
+        return new PageImpl<ClientVo>(list, pageRequest, page.getTotalElements());
+    }
+
+    @Override
+    public List<SelectOption> getResouceScopeOptions(Long id) {
+        List<SelectOption> listReturn = new ArrayList<>();
+        ClientTable clientTable = null;
+        if (id != null) {
+            clientTable = clientTableRepository.findOne(id);
+        }
+        Iterable<ResouceScopeTable> list = resouceScopeTableRepository.findAll();
+        for (ResouceScopeTable resouceScopeTable : list) {
+            SelectOption selectOption = new SelectOption(resouceScopeTable.getName(), resouceScopeTable.getId());
+            if (clientTable != null && clientTable.getClientResouceScopeTables() != null) {
+                for (ClientResouceScopeTable clientResouceScopeTable : clientTable.getClientResouceScopeTables()) {
+                    if (clientResouceScopeTable.getScope().getId() == resouceScopeTable.getId()) {
+                        selectOption.setSelected(true);
+                        break;
+                    }
+                }
+            }
+            listReturn.add(selectOption);
+        }
+        return listReturn;
     }
 
 
