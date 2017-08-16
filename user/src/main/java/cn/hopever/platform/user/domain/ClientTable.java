@@ -10,10 +10,7 @@ import org.springframework.security.oauth2.provider.ClientDetails;
 
 import javax.persistence.*;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by Donghui Huo on 2016/9/8.
@@ -22,7 +19,7 @@ import java.util.Set;
 @Table(name = "platform_user_client")
 @Data
 @EqualsAndHashCode(of = {"id"})
-@ToString(exclude = {"authorities","modules","moduleRoles", "users"})
+@ToString(exclude = {"authorities", "modules", "moduleRoles", "users"})
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "hopever.user.client")
 public class ClientTable implements ClientDetails {
@@ -30,7 +27,7 @@ public class ClientTable implements ClientDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "client_id", nullable = false, length = 50,unique = true)
+    @Column(name = "client_id", nullable = false, length = 50, unique = true)
     private String clientId;
 
     @Column(name = "client_name", nullable = false)
@@ -48,11 +45,9 @@ public class ClientTable implements ClientDetails {
     @Column(name = "scoped")
     private boolean scoped = true;
 
-    @Column(name = "scope", nullable = true)
-    private String scope;
-
-    @Column(name = "internal_client", nullable = true)
-    private boolean internalClient = false;
+    @OneToMany(mappedBy = "client", fetch = FetchType.EAGER)
+    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    private List<ClientResouceScopeTable> clientResouceScopeTables;
 
     @Column(name = "authorized_grant_types", nullable = false)
     private String authorizedGrantTypes;
@@ -60,7 +55,7 @@ public class ClientTable implements ClientDetails {
     @Column(name = "registered_redirect_uri", nullable = true)
     private String registeredRedirectUri;
 
-    @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     @JoinTable(name = "platform_user_client_client_role", joinColumns = @JoinColumn(name = "client_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ClientRoleTable> authorities;
@@ -85,7 +80,6 @@ public class ClientTable implements ClientDetails {
     @ManyToMany(mappedBy = "clients")
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<UserTable> users;
-
 
 
     public void setResourceIds(String resourceIds) {
@@ -116,56 +110,31 @@ public class ClientTable implements ClientDetails {
         return null;
     }
 
-    public void setScope(String scope) {
-        this.scope = scope;
-    }
-
-    public void setScope(Map<String,Boolean> scope) {
-        if (scope != null) {
-            try {
-                this.scope = JacksonUtil.mapper.writeValueAsString(scope);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
     @Override
     public Set<String> getScope() {
-        if (this.scope != null) {
-            try {
-                return JacksonUtil.mapper.readValue(this.scope, Map.class).keySet();
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (this.getClientResouceScopeTables() != null) {
+            Set<String> scopes = new LinkedHashSet<>();
+            for (ClientResouceScopeTable clientResouceScopeTable : this.getClientResouceScopeTables()) {
+                scopes.add(clientResouceScopeTable.getScope().getScopeId());
             }
+            return scopes;
         }
         return null;
     }
 
-    public Map<String,Boolean> getScopeAndApprove() {
-        if (this.scope != null) {
-            try {
-                return JacksonUtil.mapper.readValue(this.scope, Map.class);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
 
     public void setAuthorizedGrantTypes(String authorizedGrantTypes) {
         this.authorizedGrantTypes = authorizedGrantTypes;
     }
 
     public void setAuthorizedGrantTypes(Set<String> authorizedGrantTypes) {
-        if (authorizedGrantTypes != null&&authorizedGrantTypes.size()>0) {
+        if (authorizedGrantTypes != null && authorizedGrantTypes.size() > 0) {
             try {
                 this.authorizedGrantTypes = JacksonUtil.mapper.writeValueAsString(authorizedGrantTypes);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }else{
+        } else {
             this.authorizedGrantTypes = null;
         }
     }
@@ -238,19 +207,21 @@ public class ClientTable implements ClientDetails {
     @Override
     public boolean isAutoApprove(String scope) {
         //需要根据scope来判定
-        try {
-            Map<String,Boolean> scopes = JacksonUtil.mapper.readValue(this.scope, Map.class);
-            return scopes.get(scope);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (this.getClientResouceScopeTables() != null) {
+            for (ClientResouceScopeTable clientResouceScopeTable : this.getClientResouceScopeTables()) {
+                if (scope.equals(clientResouceScopeTable.getScope().getScopeId())) {
+                    return clientResouceScopeTable.isAutoApprove();
+                }
+            }
         }
         return false;
     }
+
     @Override
-    public Set<GrantedAuthority> getAuthorities(){
-        Set<GrantedAuthority> set  = new HashSet<GrantedAuthority>();
-        if(this.authorities!=null){
-            for(GrantedAuthority ga:this.authorities){
+    public Set<GrantedAuthority> getAuthorities() {
+        Set<GrantedAuthority> set = new HashSet<GrantedAuthority>();
+        if (this.authorities != null) {
+            for (GrantedAuthority ga : this.authorities) {
                 set.add(ga);
             }
             return set;
@@ -258,7 +229,8 @@ public class ClientTable implements ClientDetails {
         return null;
     }
 
-    public List<ClientRoleTable> getAuthoritiesBasic(){
+    public List<ClientRoleTable> getAuthoritiesBasic() {
         return this.authorities;
     }
+
 }

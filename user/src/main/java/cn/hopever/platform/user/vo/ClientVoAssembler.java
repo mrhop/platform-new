@@ -4,8 +4,6 @@ import cn.hopever.platform.user.domain.ClientRoleTable;
 import cn.hopever.platform.user.domain.ClientTable;
 import cn.hopever.platform.user.domain.ModuleRoleTable;
 import cn.hopever.platform.user.domain.ModuleTable;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -17,19 +15,8 @@ import java.util.List;
 @Component
 public class ClientVoAssembler {
 
-    private ModelMapper modelMapper;
 
     public ClientVoAssembler() {
-        modelMapper = new ModelMapper();
-        PropertyMap<ClientTable, ClientVo> map = new PropertyMap<ClientTable, ClientVo>() {
-            protected void configure() {
-                skip().setAuthorities(null);
-                skip().setModules(null);
-                skip().setModuleRoles(null);
-                skip().setUsers(null);
-            }
-        };
-        modelMapper.addMappings(map);
     }
 
     public ClientVo toResource(ClientTable clientTable) {
@@ -44,7 +31,6 @@ public class ClientVoAssembler {
                 crr.setName(crt.getName());
                 sCrr.add(crr);
             }
-            resource.setAuthorities(sCrr);
         }
         if (clientTable.getModules() != null) {
             ArrayList<ModuleVo> sMr = new ArrayList<>();
@@ -54,7 +40,6 @@ public class ClientVoAssembler {
                 mr.setModuleName(mt.getModuleName());
                 sMr.add(mr);
             }
-            resource.setModules(sMr);
         }
         if (clientTable.getModuleRoles() != null) {
             ArrayList<ModuleRoleVo> sMr = new ArrayList<>();
@@ -64,7 +49,7 @@ public class ClientVoAssembler {
                 mr.setName(mt.getName());
                 sMr.add(mr);
             }
-            resource.setModuleRoles(sMr);
+
         }
         return resource;
     }
@@ -80,7 +65,6 @@ public class ClientVoAssembler {
     private ClientVo createResource(ClientTable clientTable) {
         ClientVo clientVo = null;
         if (clientTable != null) {
-            clientVo = modelMapper.map(clientTable, ClientVo.class);
             clientVo.setClientSecret(null);
         }
         return clientVo;

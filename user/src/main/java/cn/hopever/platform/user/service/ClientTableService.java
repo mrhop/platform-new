@@ -1,6 +1,7 @@
 package cn.hopever.platform.user.service;
 
 import cn.hopever.platform.user.domain.ClientTable;
+import cn.hopever.platform.utils.web.TableParameters;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.oauth2.provider.ClientDetails;
@@ -30,6 +31,6 @@ public interface ClientTableService extends ClientDetailsService {
     public ClientTable getByClientId(String clientId);
     public List<ClientTable> getByIds(List<Long> ids);
     public Page<ClientTable> getList(Pageable pageable, Map<String, Object> filterMap);
-
+    public Page<ClientTable> getList(TableParameters body);
 
 }

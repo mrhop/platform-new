@@ -9,11 +9,14 @@ import cn.hopever.platform.user.repository.ClientTableRepository;
 import cn.hopever.platform.user.repository.CustomClientTableRepository;
 import cn.hopever.platform.user.repository.UserTableRepository;
 import cn.hopever.platform.user.service.ClientTableService;
+import cn.hopever.platform.utils.web.TableParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 import org.springframework.stereotype.Service;
@@ -52,18 +55,18 @@ public class ClientTableServiceImpl implements ClientTableService {
     @Override
     public void delete(ClientTable client) {
         clientRoleTableRepository.delete(clientRoleTableRepository.findOneByAuthority(client.getClientId()));
-        if(client.getModuleRoles()!=null){
-            for(ModuleRoleTable mrt :client.getModuleRoles()){
+        if (client.getModuleRoles() != null) {
+            for (ModuleRoleTable mrt : client.getModuleRoles()) {
                 mrt.setClient(null);
             }
         }
-        if(client.getModules()!=null){
-            for(ModuleTable mt :client.getModules()){
+        if (client.getModules() != null) {
+            for (ModuleTable mt : client.getModules()) {
                 mt.setClient(null);
             }
         }
-        if(client.getUsers()!=null){
-            for(UserTable ut :client.getUsers()){
+        if (client.getUsers() != null) {
+            for (UserTable ut : client.getUsers()) {
                 ut.getClients().remove(client);
             }
         }
@@ -110,6 +113,20 @@ public class ClientTableServiceImpl implements ClientTableService {
         return customClientTableRepository.findByFilters(filterMap, pageable);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ClientTable> getList(TableParameters body) {
+        Page<ClientTable> list;
+        PageRequest pageRequest;
+        if (body.getSorts() == null || body.getSorts().isEmpty()) {
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "id");
+        } else {
+            String key = body.getSorts().keySet().iterator().next();
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
+        }
+        return customClientTableRepository.findByFilters( body.getFilters(), pageRequest);
+    }
+
 
     @Override
     public ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException {
@@ -119,6 +136,7 @@ public class ClientTableServiceImpl implements ClientTableService {
         }
         return cd;
     }
+
     @Override
     public ClientTable getByClientId(String clientId) throws ClientRegistrationException {
         ClientTable cd = clientTableRepository.findOneByClientId(clientId);

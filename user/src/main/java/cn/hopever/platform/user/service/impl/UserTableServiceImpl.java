@@ -15,7 +15,6 @@ import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -67,7 +66,6 @@ public class UserTableServiceImpl implements UserTableService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    @CachePut
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserTable user = userTableRepository.findOneByUsername(username);
         if (user == null) {

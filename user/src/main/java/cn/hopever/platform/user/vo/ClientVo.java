@@ -2,11 +2,9 @@ package cn.hopever.platform.user.vo;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.omg.CORBA.Object;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -26,32 +24,15 @@ public class ClientVo {
 
     private String clientSecret;
 
-    private boolean secretRequired = true;
-
-    private Set<String> resourceIds;
-
-    private boolean scoped = true;
-
     private boolean internalClient;
 
-    private Set<String> scope;
+    private String scopesStr;
+
+    private List<Long> scopeIds;
+
+    private List<Long> autoApprovaledScopeIds;
 
     private Set<String> authorizedGrantTypes;
 
-    private String registeredRedirectUri;
-
-    private List<ClientRoleVo> authorities;
-
-    private Integer accessTokenValiditySeconds;
-
-    private Integer refreshTokenValiditySeconds;
-
-    private Map<String, Object> additionalInformation;
-
-    private List<ModuleVo> modules;
-
-    private List<ModuleRoleVo> moduleRoles;
-
-    private List<UserVo> users;
-
+    private String authorizedGrantTypesStr;
 }

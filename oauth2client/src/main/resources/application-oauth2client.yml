@@ -10,10 +10,9 @@ config:
         userUri: http://localhost:9091/resources/principal #用于返回登录的用户的基本信息
         moduleList: http://localhost:9091/hateoas/module/list/
         # as a sample to test
-        clientID: cms_admin_client
+        clientID: test_client
         clientSecret: secret
         clientScopes:
-                  - cms_admin_client
                   - internal_client
 spring:
   mvc:

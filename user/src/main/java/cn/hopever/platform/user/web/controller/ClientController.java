@@ -1,6 +1,5 @@
 package cn.hopever.platform.user.web.controller;
 
-import cn.hopever.platform.user.domain.ClientRoleTable;
 import cn.hopever.platform.user.domain.ClientTable;
 import cn.hopever.platform.user.domain.RoleTable;
 import cn.hopever.platform.user.service.ClientRoleTableService;
@@ -8,14 +7,13 @@ import cn.hopever.platform.user.service.ClientTableService;
 import cn.hopever.platform.user.service.RoleTableService;
 import cn.hopever.platform.user.vo.ClientVoAssembler;
 import cn.hopever.platform.utils.json.JacksonUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import cn.hopever.platform.utils.test.PrincipalSample;
+import cn.hopever.platform.utils.web.TableParameters;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -125,46 +123,39 @@ public class ClientController {
     }
 
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
+    // @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
-    public Map getList(@RequestBody JsonNode body, Principal principal) {
+    public Map getList(@RequestBody TableParameters body, Principal principal) {
+        principal = new PrincipalSample("admin");
+        Page<ClientTable> list = clientTableService.getList(body);
         Map<String, Object> map = new HashMap<>();
-        List<HashMap<String, Object>> listReturn;
-        Page<ClientTable> list;
-        PageRequest pageRequest;
-        if (body.get("sort") == null || body.get("sort").isNull()) {
-            pageRequest = new PageRequest(body.get("currentPage").asInt(), body.get("rowSize").asInt(), Sort.Direction.ASC, "id");
-        } else {
-            pageRequest = new PageRequest(body.get("currentPage").asInt(), body.get("rowSize").asInt(), Sort.Direction.fromString(body.get("sort").get("sortDirection").textValue()), body.get("sort").get("sortName").textValue());
-        }
-        Map<String, Object> filterMap = null;
-        if (body.get("filters") != null && !body.get("filters").isNull()) {
-            filterMap = JacksonUtil.mapper.convertValue(body.get("filters"), Map.class);
-        }
-        list = clientTableService.getList(pageRequest, filterMap);
-        if (list != null && list.iterator().hasNext()) {
-            listReturn = new ArrayList<>();
-            for (ClientTable ct : list) {
-                HashMap<String, Object> mapTemp = new HashMap<>();
-                mapTemp.put("key", ct.getId());
-                List<Object> listTmp = new ArrayList<>();
-                listTmp.add("");
-                listTmp.add(ct.getClientId());
-                listTmp.add(ct.getClientName());
-                listTmp.add(ct.isInternalClient() ? "Y" : "N");
-                mapTemp.put("value", listTmp);
-                listReturn.add(mapTemp);
-            }
-            map.put("data", listReturn);
-            map.put("totalCount", list.getTotalElements());
-            map.put("rowSize", body.get("rowSize").asInt());
-            map.put("currentPage", list.getNumber());
-        } else {
-            map.put("data", null);
-            map.put("totalCount", 0);
-            map.put("rowSize", body.get("rowSize").asInt());
-            map.put("currentPage", 0);
-        }
+//        List<HashMap<String, Object>> listReturn = null;
+//        if (list != null && list.iterator().hasNext()) {
+//            listReturn = new ArrayList<>();
+//            for (ClientTable ut : list) {
+//                HashMap<String, Object> mapTemp = new HashMap<>();
+//                mapTemp.put("key", ut.getId());
+//                List<Object> listTmp = new ArrayList<>();
+//                listTmp.add(ut.getUsername());
+//                listTmp.add(ut.getName());
+//                listTmp.add(ut.getEmail());
+//                listTmp.add(ut.getPhone());
+//                listTmp.add(ut.isEnabled());
+//                listTmp.add(ut.getCreateUser() == null ? null : ut.getCreateUser().getUsername());
+//                listTmp.add(ut.getCreatedDate() != null ? ut.getCreatedDate().getTime() : null);
+//                mapTemp.put("value", listTmp);
+//                listReturn.add(mapTemp);
+//            }
+//            map.put("rows", listReturn);
+//            map.put("totalCount", list.getTotalElements());
+//
+//        } else {
+//            map.put("rows", null);
+//            map.put("totalCount", 0);
+//        }
+//        map.put("pager", body.getPager());
+//        map.put("filters", body.getFilters());
+//        map.put("sorts", body.getSorts());
         return map;
     }
 
@@ -182,7 +173,7 @@ public class ClientController {
     public Map updateClient(@RequestBody JsonNode body, Principal principal) {
         Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
         ClientTable ct = clientTableService.getById(Long.valueOf(map.get("id").toString()));
-        if(ct.getClientId().equals("user_admin_client")){
+        if (ct.getClientId().equals("user_admin_client")) {
             return null;
         }
         if (body.get("data").get("clientName") != null && !body.get("data").get("clientName").isNull()) {
@@ -209,42 +200,7 @@ public class ClientController {
                 isInternalClient = b.get(0);
             }
         }
-        if (isInternalClient && !ct.isInternalClient()) {
-            ct.setInternalClient(true);
-            ct.getAuthoritiesBasic().add(clientRoleTableService.getByAuthority("internal_client"));
-            Map<String, Boolean> scopes = ct.getScopeAndApprove();
-            scopes.put("internal_client", true);
-            try {
-                ct.setScope(JacksonUtil.mapper.writeValueAsString(scopes));
-            } catch (JsonProcessingException e) {
-                ct.setScope("");
-            }
-        } else if (!isInternalClient && ct.isInternalClient()) {
-            ct.setInternalClient(false);
-            List<ClientRoleTable> listAuth = ct.getAuthoritiesBasic();
-            for(Iterator<ClientRoleTable> it = listAuth.iterator();it.hasNext();){
-                ClientRoleTable crt = it.next();
-                if ("internal_client".equals(crt.getAuthority())) {
-                    it.remove();
-                }
-            }
-            Map<String, Boolean> scopes = ct.getScopeAndApprove();
-            for(Iterator<Map.Entry<String,Boolean>> it = scopes.entrySet().iterator();it.hasNext();){
-                Map.Entry<String,Boolean> entry = it.next();
-                if ("internal_client".equals(entry.getKey())) {
-                    it.remove();
-                }
-            }
-            if (scopes.size() > 0) {
-                try {
-                    ct.setScope(JacksonUtil.mapper.writeValueAsString(scopes));
-                } catch (JsonProcessingException e) {
-                    ct.setScope("");
-                }
-            } else {
-                ct.setScope("");
-            }
-        }
+
         clientTableService.save(ct);
         return null;
     }
@@ -255,7 +211,7 @@ public class ClientController {
         Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
         ClientTable ct = new ClientTable();
         if (body.get("data").get("clientId") != null && !body.get("data").get("clientId").isNull()) {
-            if(clientTableService.getByClientId(body.get("data").get("clientId").asText())!=null){
+            if (clientTableService.getByClientId(body.get("data").get("clientId").asText()) != null) {
                 Map mapReturn = new HashMap<>();
                 mapReturn.put("message", "客户端账户已存在");
                 return mapReturn;
@@ -286,45 +242,6 @@ public class ClientController {
                 isInternalClient = b.get(0);
             }
         }
-        if (isInternalClient) {
-            ct.setInternalClient(true);
-            String clientId = body.get("data").get("clientId").textValue();
-            String clientName = body.get("data").get("clientName").textValue();
-            List<ClientRoleTable> list = new ArrayList<>();
-            ClientRoleTable crt = new ClientRoleTable();
-            crt.setAuthority(clientId);
-            crt.setName(clientName);
-            crt.setLevel((short)0);
-            list.add(clientRoleTableService.saveAuthority(crt));
-            list.add(clientRoleTableService.getByAuthority("internal_client"));
-            ct.setAuthorities(list);
-            Map<String, Boolean> scopes = new HashMap<>();
-            scopes.put("internal_client", true);
-            scopes.put(clientId, true);
-            try {
-                ct.setScope(JacksonUtil.mapper.writeValueAsString(scopes));
-            } catch (JsonProcessingException e) {
-                ct.setScope("");
-            }
-        } else if (!isInternalClient) {
-            ct.setInternalClient(false);
-            String clientId = body.get("data").get("clientId").textValue();
-            String clientName = body.get("data").get("clientName").textValue();
-            List<ClientRoleTable> list = new ArrayList<>();
-            ClientRoleTable crt = new ClientRoleTable();
-            crt.setAuthority(clientId);
-            crt.setName(clientName);
-            crt.setLevel((short)0);
-            list.add(clientRoleTableService.saveAuthority(crt));
-            ct.setAuthorities(list);
-            Map<String, Boolean> scopes = new HashMap<>();
-            scopes.put(clientId, true);
-            try {
-                ct.setScope(JacksonUtil.mapper.writeValueAsString(scopes));
-            } catch (JsonProcessingException e) {
-                ct.setScope("");
-            }
-        }
         clientTableService.save(ct);
         return null;
     }
@@ -333,7 +250,7 @@ public class ClientController {
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long id, Principal principal) {
         ClientTable ct = this.clientTableService.getById(id);
-        if(!ct.getClientId().equals("user_admin_client")){
+        if (!ct.getClientId().equals("user_admin_client")) {
             this.clientTableService.delete(ct);
         }
     }
