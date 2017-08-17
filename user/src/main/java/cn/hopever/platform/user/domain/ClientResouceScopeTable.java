@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
-import java.util.List;
 
 /**
  * Created by Donghui Huo on 2016/9/8.
@@ -15,7 +14,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(of = {"id"})
 @Cacheable
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "hopever.user.resourcescope")
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "hopever.user.clientresourcescope")
 public class ClientResouceScopeTable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,9 +32,5 @@ public class ClientResouceScopeTable {
 
     @Column(name = "auto_approve")
     private boolean autoApprove = false;
-
-    @ManyToMany(mappedBy = "authorities")
-    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<UserTable> users;
 
 }

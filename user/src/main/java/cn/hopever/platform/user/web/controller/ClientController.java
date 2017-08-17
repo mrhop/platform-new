@@ -139,9 +139,11 @@ public class ClientController {
         if (body == null) {
             if (key == null) {
                 // 新增
-                mapReturn.put("scopeIds", clientTableService.getResouceScopeOptions(null));
+                mapReturn.put("scopeIds", clientTableService.getResouceScopeOptions());
             } else {
                 // 更新 - 考虑principal对其显示的限制
+                mapReturn.put("scopeIds", clientTableService.getResouceScopeOptions());
+                mapReturn.put("autoApprovaledScopeIds", clientTableService.getAutoApprovaledScopeOptions(key));
             }
         } else {
             if (body.get("clients") != null) {

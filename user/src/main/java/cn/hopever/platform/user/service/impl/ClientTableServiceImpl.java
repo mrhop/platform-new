@@ -90,7 +90,12 @@ public class ClientTableServiceImpl implements ClientTableService {
     public void delete(long id) {
         ClientTable clientTable = clientTableRepository.findOne(id);
         if (clientTable != null && !clientTable.getClientId().equals("user_admin_client")) {
-            clientTableRepository.delete(id);
+            if (clientTable.getUsers() != null) {
+                for (UserTable ut : clientTable.getUsers()) {
+                    ut.getClients().remove(clientTable);
+                }
+            }
+            clientTableRepository.delete(clientTable);
             roleTableRepository.delete(roleTableRepository.findOneByAuthority("ROLE_" + clientTable.getClientId()));
         }
     }
@@ -159,23 +164,23 @@ public class ClientTableServiceImpl implements ClientTableService {
     }
 
     @Override
-    public List<SelectOption> getResouceScopeOptions(Long id) {
+    public List<SelectOption> getResouceScopeOptions() {
         List<SelectOption> listReturn = new ArrayList<>();
-        ClientTable clientTable = null;
-        if (id != null) {
-            clientTable = clientTableRepository.findOne(id);
-        }
         Iterable<ResouceScopeTable> list = resouceScopeTableRepository.findAll();
         for (ResouceScopeTable resouceScopeTable : list) {
             SelectOption selectOption = new SelectOption(resouceScopeTable.getName(), resouceScopeTable.getId());
-            if (clientTable != null && clientTable.getClientResouceScopeTables() != null) {
-                for (ClientResouceScopeTable clientResouceScopeTable : clientTable.getClientResouceScopeTables()) {
-                    if (clientResouceScopeTable.getScope().getId() == resouceScopeTable.getId()) {
-                        selectOption.setSelected(true);
-                        break;
-                    }
-                }
-            }
+            listReturn.add(selectOption);
+        }
+        return listReturn;
+    }
+
+    @Override
+    public List<SelectOption> getAutoApprovaledScopeOptions(Long id) {
+        List<SelectOption> listReturn = new ArrayList<>();
+        ClientTable clientTable = clientTableRepository.findOne(id);
+        Iterable<ResouceScopeTable> list = resouceScopeTableRepository.findAll();
+        for (ClientResouceScopeTable clientResouceScopeTable : clientTable.getClientResouceScopeTables()) {
+            SelectOption selectOption = new SelectOption(clientResouceScopeTable.getScope().getName(), clientResouceScopeTable.getScope().getId());
             listReturn.add(selectOption);
         }
         return listReturn;
