@@ -1,7 +1,6 @@
 package cn.hopever.platform.user.web.controller;
 
 import cn.hopever.platform.user.domain.ClientTable;
-import cn.hopever.platform.user.domain.ModuleRoleTable;
 import cn.hopever.platform.user.domain.ModuleTable;
 import cn.hopever.platform.user.service.ClientTableService;
 import cn.hopever.platform.user.service.ModuleRoleTableService;
@@ -108,128 +107,128 @@ public class ModuleController {
     public Map info(@RequestParam Long id, Principal principal) {
         //返回user是无法解析的，要使用对象解析为map 的形式
         //do info update
-        ModuleTable mt = moduleTableService.getById(id);
-        Map map = JacksonUtil.mapper.convertValue(moduleVoAssembler.toResource(mt), Map.class);
-        boolean isTop = (mt.getParent() == null && mt.getModuleUrl() == null && mt.getIconClass() != null) ? true : false;
-        map.put("isTop", isTop);
-        if (isTop) {
-            map.put("moduleOrder", ((Integer) map.get("moduleOrder")) / 100);
-        } else {
-            map.put("moduleOrder", ((Integer) map.get("moduleOrder")) % 100);
-        }
-        return map;
+//        ModuleTable mt = moduleTableService.getById(id);
+//        Map map = JacksonUtil.mapper.convertValue(moduleVoAssembler.toResource(mt), Map.class);
+//        boolean isTop = (mt.getParent() == null && mt.getModuleUrl() == null && mt.getIconClass() != null) ? true : false;
+//        map.put("isTop", isTop);
+//        if (isTop) {
+//            map.put("moduleOrder", ((Integer) map.get("moduleOrder")) / 100);
+//        } else {
+//            map.put("moduleOrder", ((Integer) map.get("moduleOrder")) % 100);
+//        }
+        return null;
     }
 
 
     @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public Map updateUser(@RequestBody JsonNode body, Principal principal) {
-        Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
-        ModuleTable mt = moduleTableService.getById(Long.valueOf(map.get("id").toString()));
-        ModuleTable mtParent = null;
-        mt.setModuleName(map.get("moduleName").toString());
-        ClientTable ct = this.clientTableService.getById(Long.valueOf(map.get("client").toString()));
-        mt.setClient(this.clientTableService.getById(Long.valueOf(map.get("client").toString())));
-        if (map.get("authorities") != null) {
-            List list = (List) map.get("authorities");
-            List<ModuleRoleTable> listMr = new ArrayList<>();
-            for (Object id : list) {
-                listMr.add(moduleRoleTableService.getById(Long.valueOf(id.toString())));
-            }
-            mt.setAuthorities(listMr);
-        }
-        if (mt.getParent() == null) {
-            if (map.get("iconClass") != null) {
-                mt.setIconClass(map.get("iconClass").toString());
-            }
-        } else {
-            if (map.get("parent") != null) {
-                mtParent = moduleTableService.getById(Long.valueOf(map.get("parent").toString()));
-                mt.setParent(mtParent);
-            }
-            if (map.get("moduleUrl") != null) {
-                mt.setModuleUrl(map.get("moduleUrl").toString());
-            }
-        }
-        if (map.get("moduleOrder") != null) {
-            if (mt.getParent() == null) {
-                mt.setModuleOrder(Integer.valueOf(map.get("moduleOrder").toString()) * 100);
-            } else {
-                if (mtParent != null) {
-                    mt.setModuleOrder(mtParent.getModuleOrder() + Integer.valueOf(map.get("moduleOrder").toString()));
-                } else {
-                    mt.setModuleOrder(mt.getParent().getModuleOrder() + Integer.valueOf(map.get("moduleOrder").toString()));
-                }
-            }
-        }
-        if (map.get("available") != null && ((List) map.get("available")).size() > 0) {
-            mt.setAvailable(true);
-        } else {
-            mt.setAvailable(false);
-        }
-        if (map.get("activated") != null && ((List) map.get("activated")).size() > 0) {
-            mt.setActivated(true);
-        } else {
-            mt.setActivated(false);
-        }
-        //针对module设置对应的值
-        moduleTableService.save(mt);
+//        Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
+//        ModuleTable mt = moduleTableService.getById(Long.valueOf(map.get("id").toString()));
+//        ModuleTable mtParent = null;
+//        mt.setModuleName(map.get("moduleName").toString());
+//        ClientTable ct = this.clientTableService.getById(Long.valueOf(map.get("client").toString()));
+//        mt.setClient(this.clientTableService.getById(Long.valueOf(map.get("client").toString())));
+//        if (map.get("authorities") != null) {
+//            List list = (List) map.get("authorities");
+//            List<ModuleRoleTable> listMr = new ArrayList<>();
+//            for (Object id : list) {
+//                listMr.add(moduleRoleTableService.getById(Long.valueOf(id.toString())));
+//            }
+//            mt.setAuthorities(listMr);
+//        }
+//        if (mt.getParent() == null) {
+//            if (map.get("iconClass") != null) {
+//                mt.setIconClass(map.get("iconClass").toString());
+//            }
+//        } else {
+//            if (map.get("parent") != null) {
+//                mtParent = moduleTableService.getById(Long.valueOf(map.get("parent").toString()));
+//                mt.setParent(mtParent);
+//            }
+//            if (map.get("moduleUrl") != null) {
+//                mt.setModuleUrl(map.get("moduleUrl").toString());
+//            }
+//        }
+//        if (map.get("moduleOrder") != null) {
+//            if (mt.getParent() == null) {
+//                mt.setModuleOrder(Integer.valueOf(map.get("moduleOrder").toString()) * 100);
+//            } else {
+//                if (mtParent != null) {
+//                    mt.setModuleOrder(mtParent.getModuleOrder() + Integer.valueOf(map.get("moduleOrder").toString()));
+//                } else {
+//                    mt.setModuleOrder(mt.getParent().getModuleOrder() + Integer.valueOf(map.get("moduleOrder").toString()));
+//                }
+//            }
+//        }
+//        if (map.get("available") != null && ((List) map.get("available")).size() > 0) {
+//            mt.setAvailable(true);
+//        } else {
+//            mt.setAvailable(false);
+//        }
+//        if (map.get("activated") != null && ((List) map.get("activated")).size() > 0) {
+//            mt.setActivated(true);
+//        } else {
+//            mt.setActivated(false);
+//        }
+//        //针对module设置对应的值
+//        moduleTableService.save(mt);
         return null;
     }
 
     @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public Map saveUser(@RequestBody JsonNode body, Principal principal) {
-        Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
-        ModuleTable mt = new ModuleTable();
-        ModuleTable mtParent = null;
-        //对module的值进行设置，module name可以重复
-        mt.setModuleName(map.get("moduleName").toString());
-        mt.setClient(this.clientTableService.getById(Long.valueOf(map.get("client").toString())));
-        if (map.get("authorities") != null) {
-            List list = (List) map.get("authorities");
-            List<ModuleRoleTable> listMr = new ArrayList<>();
-            for (Object id : list) {
-                listMr.add(moduleRoleTableService.getById(Long.valueOf(id.toString())));
-            }
-            mt.setAuthorities(listMr);
-        }
-        if (map.get("isTop") != null && ((List) map.get("isTop")).size() > 0) {
-            mt.setParent(null);
-            mt.setModuleUrl(null);
-            mt.setIconClass(map.get("iconClass").toString());
-        } else {
-            if (map.get("parent") != null) {
-                mtParent = moduleTableService.getById(Long.valueOf(map.get("parent").toString()));
-                mt.setParent(mtParent);
-            }
-            if (map.get("moduleUrl") != null) {
-                mt.setModuleUrl(map.get("moduleUrl").toString());
-            }
-            mt.setIconClass(null);
-        }
-        if (map.get("moduleOrder") != null) {
-            if (map.get("isTop") != null && ((List) map.get("isTop")).size() > 0) {
-                mt.setModuleOrder(Integer.valueOf(map.get("moduleOrder").toString()) * 100);
-            } else {
-                if (mtParent != null) {
-                    mt.setModuleOrder(mtParent.getModuleOrder() + Integer.valueOf(map.get("moduleOrder").toString()));
-                } else {
-                    mt.setModuleOrder(null);
-                }
-            }
-        }
-        if (map.get("available") != null && ((List) map.get("available")).size() > 0) {
-            mt.setAvailable(true);
-        } else {
-            mt.setAvailable(false);
-        }
-        if (map.get("activated") != null && ((List) map.get("activated")).size() > 0) {
-            mt.setActivated(true);
-        } else {
-            mt.setActivated(false);
-        }
-        moduleTableService.save(mt);
+//        Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
+//        ModuleTable mt = new ModuleTable();
+//        ModuleTable mtParent = null;
+//        //对module的值进行设置，module name可以重复
+//        mt.setModuleName(map.get("moduleName").toString());
+//        mt.setClient(this.clientTableService.getById(Long.valueOf(map.get("client").toString())));
+//        if (map.get("authorities") != null) {
+//            List list = (List) map.get("authorities");
+//            List<ModuleRoleTable> listMr = new ArrayList<>();
+//            for (Object id : list) {
+//                listMr.add(moduleRoleTableService.getById(Long.valueOf(id.toString())));
+//            }
+//            mt.setAuthorities(listMr);
+//        }
+//        if (map.get("isTop") != null && ((List) map.get("isTop")).size() > 0) {
+//            mt.setParent(null);
+//            mt.setModuleUrl(null);
+//            mt.setIconClass(map.get("iconClass").toString());
+//        } else {
+//            if (map.get("parent") != null) {
+//                mtParent = moduleTableService.getById(Long.valueOf(map.get("parent").toString()));
+//                mt.setParent(mtParent);
+//            }
+//            if (map.get("moduleUrl") != null) {
+//                mt.setModuleUrl(map.get("moduleUrl").toString());
+//            }
+//            mt.setIconClass(null);
+//        }
+//        if (map.get("moduleOrder") != null) {
+//            if (map.get("isTop") != null && ((List) map.get("isTop")).size() > 0) {
+//                mt.setModuleOrder(Integer.valueOf(map.get("moduleOrder").toString()) * 100);
+//            } else {
+//                if (mtParent != null) {
+//                    mt.setModuleOrder(mtParent.getModuleOrder() + Integer.valueOf(map.get("moduleOrder").toString()));
+//                } else {
+//                    mt.setModuleOrder(null);
+//                }
+//            }
+//        }
+//        if (map.get("available") != null && ((List) map.get("available")).size() > 0) {
+//            mt.setAvailable(true);
+//        } else {
+//            mt.setAvailable(false);
+//        }
+//        if (map.get("activated") != null && ((List) map.get("activated")).size() > 0) {
+//            mt.setActivated(true);
+//        } else {
+//            mt.setActivated(false);
+//        }
+//        moduleTableService.save(mt);
         return null;
     }
 

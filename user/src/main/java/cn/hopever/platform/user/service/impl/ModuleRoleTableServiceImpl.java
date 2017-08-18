@@ -2,23 +2,29 @@ package cn.hopever.platform.user.service.impl;
 
 import cn.hopever.platform.user.domain.ClientTable;
 import cn.hopever.platform.user.domain.ModuleRoleTable;
+import cn.hopever.platform.user.domain.ModuleTable;
 import cn.hopever.platform.user.domain.UserTable;
 import cn.hopever.platform.user.repository.ClientTableRepository;
 import cn.hopever.platform.user.repository.CustomModuleRoleTableRepository;
 import cn.hopever.platform.user.repository.ModuleRoleTableRepository;
 import cn.hopever.platform.user.repository.UserTableRepository;
 import cn.hopever.platform.user.service.ModuleRoleTableService;
+import cn.hopever.platform.user.vo.ModuleRoleVo;
+import cn.hopever.platform.user.vo.ModuleRoleVoAssembler;
+import cn.hopever.platform.utils.web.TableParameters;
+import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Donghui Huo on 2016/10/17.
@@ -33,6 +39,8 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
     @Autowired
     private CustomModuleRoleTableRepository customModuleRoleTableRepository;
 
+    @Autowired
+    private ModuleRoleVoAssembler moduleRoleVoAssembler;
     @Autowired
     private ClientTableRepository clientTableRepository;
 
@@ -69,13 +77,46 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
     }
 
     @Override
-    public Page<ModuleRoleTable> getList(Pageable pageable, Map<String, Object> filterMap) {
-        return customModuleRoleTableRepository.findByFilters(filterMap, pageable);
+    @Transactional(readOnly = true)
+    public Page<ModuleRoleVo> getList(TableParameters body) {
+        PageRequest pageRequest;
+        if (body.getSorts() == null || body.getSorts().isEmpty()) {
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "id");
+        } else {
+            String key = body.getSorts().keySet().iterator().next();
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
+        }
+        Page<ModuleRoleTable> page = customModuleRoleTableRepository.findByFilters(body.getFilters(), pageRequest);
+        List<ModuleRoleVo> list = new ArrayList<>();
+        for (ModuleRoleTable moduleRoleTable : page) {
+            list.add(moduleRoleVoAssembler.toResource(moduleRoleTable));
+        }
+        return new PageImpl<ModuleRoleVo>(list, pageRequest, page.getTotalElements());
+    }
+
+
+    @Override
+    public ModuleRoleVo getById(Long id) {
+        return moduleRoleVoAssembler.toResource(moduleRoleTableRepository.findOne(id));
     }
 
     @Override
-    public ModuleRoleTable getById(Long id) {
-        return moduleRoleTableRepository.findOne(id);
+    public VueResults.Result update(ModuleRoleVo moduleRoleVo) {
+        ModuleRoleTable moduleRoleTable = moduleRoleTableRepository.findOne(moduleRoleVo.getId());
+        moduleRoleTable = moduleRoleVoAssembler.toDomain(moduleRoleVo, moduleRoleTable);
+        moduleRoleTableRepository.save(moduleRoleTable);
+        return VueResults.generateSuccess("更新成功", "更新模块角色成功");
+    }
+
+    @Override
+    public VueResults.Result save(ModuleRoleVo moduleRoleVo) {
+        ModuleRoleTable moduleRoleTable = new ModuleRoleTable();
+        moduleRoleTable = moduleRoleVoAssembler.toDomain(moduleRoleVo, moduleRoleTable);
+        if (moduleRoleVo.getClientId() != null) {
+            moduleRoleTable.setClient(clientTableRepository.findOne(moduleRoleVo.getId()));
+        }
+        moduleRoleTableRepository.save(moduleRoleTable);
+        return VueResults.generateSuccess("保存成功", "保存模块角色成功");
     }
 
     @Override
@@ -91,11 +132,14 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
     @Override
     public void deleteById(Long id) {
         ModuleRoleTable mrt = moduleRoleTableRepository.findOne(id);
-        mrt.setModules(null);
-        mrt.setClient(null);
         if (mrt.getUsers() != null) {
             for (UserTable ut : mrt.getUsers()) {
                 ut.getModulesAuthorities().remove(mrt);
+            }
+        }
+        if (mrt.getModules() != null) {
+            for (ModuleTable mt : mrt.getModules()) {
+                mt.getAuthorities().remove(mrt);
             }
         }
         moduleRoleTableRepository.delete(mrt);

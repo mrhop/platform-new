@@ -38,6 +38,11 @@ public class ModuleTable {
     @Column(name = "module_order", nullable = true)
     private Integer moduleOrder = 0;
 
+    // 用于和order一起来决定顺序
+    @OneToOne
+    @JoinColumn(name = "before_id")
+    private ModuleTable beforeModule;
+
     @Column(name = "module_url", length = 200)
     private String moduleUrl;
 

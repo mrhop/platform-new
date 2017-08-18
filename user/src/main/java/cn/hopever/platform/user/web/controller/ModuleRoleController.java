@@ -8,15 +8,16 @@ import cn.hopever.platform.user.service.ClientTableService;
 import cn.hopever.platform.user.service.ModuleRoleTableService;
 import cn.hopever.platform.user.service.ModuleTableService;
 import cn.hopever.platform.user.service.RoleTableService;
+import cn.hopever.platform.user.vo.ModuleRoleVo;
 import cn.hopever.platform.user.vo.ModuleRoleVoAssembler;
 import cn.hopever.platform.utils.json.JacksonUtil;
+import cn.hopever.platform.utils.web.TableParameters;
+import cn.hopever.platform.utils.web.VueResults;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,7 @@ import java.util.Map;
  * Created by Donghui Huo on 2016/11/14.
  */
 @RestController
+@CrossOrigin
 @RequestMapping(value = "/modulerole", produces = "application/json")
 public class ModuleRoleController {
 
@@ -105,7 +107,7 @@ public class ModuleRoleController {
         List listOptionSelected = null;
         ClientTable ct = clientTableService.getById(body.get("clientId").asLong());
         List<ModuleRoleTable> list = ct.getModuleRoles();
-        if(list!=null&&list.size()>0){
+        if (list != null && list.size() > 0) {
             listOptions = new ArrayList<>();
             for (ModuleRoleTable mrt : list) {
                 Map mapOption = new HashMap<>();
@@ -114,126 +116,81 @@ public class ModuleRoleController {
                 listOptions.add(mapOption);
             }
         }
-        if( body.get("moduleId")!=null&&!body.get("moduleId").isNull()){
+        if (body.get("moduleId") != null && !body.get("moduleId").isNull()) {
             Long moduleId = body.get("moduleId").asLong();
             ModuleTable mt = this.moduleTableService.getById(moduleId);
-            if(mt.getAuthorities()!=null){
+            if (mt.getAuthorities() != null) {
                 listOptionSelected = new ArrayList<>();
-                for(ModuleRoleTable mrt:mt.getAuthorities()){
-                    if(list.contains(mrt)){
+                for (ModuleRoleTable mrt : mt.getAuthorities()) {
+                    if (list.contains(mrt)) {
                         listOptionSelected.add(mrt.getId());
                     }
                 }
             }
         }
-        if(listOptions!=null){
+        if (listOptions != null) {
             mapReturn = new HashMap<>();
-            mapReturn.put("items",listOptions);
-            mapReturn.put("defaultValue",listOptionSelected);
+            mapReturn.put("items", listOptions);
+            mapReturn.put("defaultValue", listOptionSelected);
         }
         return mapReturn;
     }
 
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
+    //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
-    public Map getList(@RequestBody JsonNode body, Principal principal) {
+    public Map getList(@RequestBody TableParameters body) {
+        Page<ModuleRoleVo> list = moduleRoleTableService.getList(body);
         Map<String, Object> map = new HashMap<>();
-        List<HashMap<String, Object>> listReturn;
-        Page<ModuleRoleTable> list;
-        PageRequest pageRequest;
-        if (body.get("sort") == null || body.get("sort").isNull()) {
-            pageRequest = new PageRequest(body.get("currentPage").asInt(), body.get("rowSize").asInt(), Sort.Direction.ASC, "id");
-        } else {
-            pageRequest = new PageRequest(body.get("currentPage").asInt(), body.get("rowSize").asInt(), Sort.Direction.fromString(body.get("sort").get("sortDirection").textValue()), body.get("sort").get("sortName").textValue());
-        }
-        Map<String, Object> filterMap = null;
-        if (body.get("filters") != null && !body.get("filters").isNull()) {
-            filterMap = JacksonUtil.mapper.convertValue(body.get("filters"), Map.class);
-        }
-        list = moduleRoleTableService.getList(pageRequest, filterMap);
+        List<HashMap<String, Object>> listReturn = null;
         if (list != null && list.iterator().hasNext()) {
             listReturn = new ArrayList<>();
-            for (ModuleRoleTable mrt : list) {
+            for (ModuleRoleVo cv : list) {
                 HashMap<String, Object> mapTemp = new HashMap<>();
-                mapTemp.put("key", mrt.getId());
+                mapTemp.put("key", cv.getId());
                 List<Object> listTmp = new ArrayList<>();
-                listTmp.add("");
-                listTmp.add(mrt.getAuthority());
-                listTmp.add(mrt.getName());
-                if (mrt.getClient() != null) {
-                    listTmp.add(mrt.getClient().getClientName());
-                } else {
-                    listTmp.add("");
-                }
+                listTmp.add(cv.getName());
+                listTmp.add(cv.getAuthority());
+                listTmp.add(cv.getClientName());
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);
             }
-            map.put("data", listReturn);
+            map.put("rows", listReturn);
             map.put("totalCount", list.getTotalElements());
-            map.put("rowSize", body.get("rowSize").asInt());
-            map.put("currentPage", list.getNumber());
+
         } else {
-            map.put("data", null);
+            map.put("rows", null);
             map.put("totalCount", 0);
-            map.put("rowSize", body.get("rowSize").asInt());
-            map.put("currentPage", 0);
         }
+        map.put("pager", body.getPager());
+        map.put("filters", body.getFilters());
+        map.put("sorts", body.getSorts());
         return map;
     }
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
+    //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
-    public Map info(@RequestParam Long id, Principal principal) {
-        //返回user是无法解析的，要使用对象解析为map 的形式
-        ModuleRoleTable mrt = moduleRoleTableService.getById(id);
-        return JacksonUtil.mapper.convertValue(moduleRoleVoAssembler.toResource(mrt), Map.class);
+    public ModuleRoleVo info(@RequestParam Long key) {
+        return moduleRoleTableService.getById(key);
     }
 
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
+    // @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public Map updateUser(@RequestBody JsonNode body, Principal principal) {
-        Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
-        ModuleRoleTable mrt = moduleRoleTableService.getById(Long.valueOf(map.get("id").toString()));
-
-        if (body.get("data").get("client") != null && !body.get("data").get("client").isNull()) {
-            mrt.setClient(clientTableService.getById(body.get("data").get("client").asLong()));
-        }
-        if (body.get("data").get("name") != null && !body.get("data").get("name").isNull()) {
-            mrt.setName(body.get("data").get("name").asText());
-        }
-        moduleRoleTableService.save(mrt);
-        return null;
+    public VueResults.Result updateUser(@RequestParam Long key, @RequestBody ModuleRoleVo moduleRoleVo) {
+        moduleRoleVo.setId(key);
+        return moduleRoleTableService.update(moduleRoleVo);
     }
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
+    // @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public Map saveUser(@RequestBody JsonNode body, Principal principal) {
-        Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
-        ModuleRoleTable mrt = new ModuleRoleTable();
-        if (body.get("data").get("authority") != null && !body.get("data").get("authority").isNull()) {
-            if (moduleRoleTableService.getByAuthority(body.get("data").get("authority").asText()) != null) {
-                Map mapReturn = new HashMap<>();
-                mapReturn.put("message", "模块角色code已存在");
-                return mapReturn;
-            }
-            mrt.setAuthority(body.get("data").get("authority").asText());
-        }
-        if (body.get("data").get("client") != null && !body.get("data").get("client").isNull()) {
-            mrt.setClient(clientTableService.getById(body.get("data").get("client").asLong()));
-        }
-        if (body.get("data").get("name") != null && !body.get("data").get("name").isNull()) {
-            mrt.setName(body.get("data").get("name").textValue());
-        }
-        mrt.setLevel((short) 0);
-        moduleRoleTableService.save(mrt);
-        return null;
+    public VueResults.Result saveUser(@RequestBody ModuleRoleVo moduleRoleVo) {
+        return moduleRoleTableService.save(moduleRoleVo);
     }
 
     @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
-    public void delete(@RequestParam Long id, Principal principal) {
-        this.moduleRoleTableService.deleteById(id);
+    public void delete(@RequestParam Long key, Principal principal) {
+        this.moduleRoleTableService.deleteById(key);
     }
 }

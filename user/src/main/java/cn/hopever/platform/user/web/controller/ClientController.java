@@ -2,7 +2,6 @@ package cn.hopever.platform.user.web.controller;
 
 import cn.hopever.platform.user.service.ClientTableService;
 import cn.hopever.platform.user.vo.ClientVo;
-import cn.hopever.platform.utils.test.PrincipalSample;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,8 +28,7 @@ public class ClientController {
 
     // @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
-    public Map getList(@RequestBody TableParameters body, Principal principal) {
-        principal = new PrincipalSample("admin");
+    public Map getList(@RequestBody TableParameters body) {
         Page<ClientVo> list = clientTableService.getList(body);
         Map<String, Object> map = new HashMap<>();
         List<HashMap<String, Object>> listReturn = null;

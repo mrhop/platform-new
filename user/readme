@@ -1,1 +1,4 @@
 开始进行modulerole的处理
+首先完成modulerole
+然后完成module，module里面注意使用前置的module和order结合
+选择父module的时候注意，因为我们不使用多层的模型，所以这里只是select，如果是多层的模型，我们则使用select tree

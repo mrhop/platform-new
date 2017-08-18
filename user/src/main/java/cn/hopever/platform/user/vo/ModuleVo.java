@@ -17,24 +17,21 @@ public class ModuleVo {
     @NotNull
     private long id;
 
-    private ClientVo client;
-
+    private String clientName;
+    private Long clientId;
     private String moduleName;
-
     private Integer moduleOrder;
-
+    private Long beforeId;
     private String moduleUrl;
 
     private String iconClass;
+    private Long parentId;
+    private String parentName;
 
-    private ModuleVo parent;
-
-    private List<ModuleVo> children;
+    private List<Long> children;
 
     private boolean available = true;
     private boolean activated = true;
-
-    private List<ModuleRoleVo> authorities;
-
+    private List<Long> authorities;
 
 }
