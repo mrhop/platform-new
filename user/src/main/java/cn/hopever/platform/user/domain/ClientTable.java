@@ -47,7 +47,7 @@ public class ClientTable implements ClientDetails {
 
     @OneToMany(mappedBy = "client", cascade = {CascadeType.ALL}, orphanRemoval = true, fetch = FetchType.EAGER)
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<ClientResouceScopeTable> clientResouceScopeTables;
+    private List<ClientResourceScopeTable> clientResourceScopeTables;
 
     @Column(name = "authorized_grant_types", nullable = false)
     private String authorizedGrantTypes;
@@ -112,10 +112,10 @@ public class ClientTable implements ClientDetails {
 
     @Override
     public Set<String> getScope() {
-        if (this.getClientResouceScopeTables() != null) {
+        if (this.getClientResourceScopeTables() != null) {
             Set<String> scopes = new LinkedHashSet<>();
-            for (ClientResouceScopeTable clientResouceScopeTable : this.getClientResouceScopeTables()) {
-                scopes.add(clientResouceScopeTable.getScope().getScopeId());
+            for (ClientResourceScopeTable clientResourceScopeTable : this.getClientResourceScopeTables()) {
+                scopes.add(clientResourceScopeTable.getScope().getScopeId());
             }
             return scopes;
         }
@@ -202,10 +202,10 @@ public class ClientTable implements ClientDetails {
     @Override
     public boolean isAutoApprove(String scope) {
         //需要根据scope来判定
-        if (this.getClientResouceScopeTables() != null) {
-            for (ClientResouceScopeTable clientResouceScopeTable : this.getClientResouceScopeTables()) {
-                if (scope.equals(clientResouceScopeTable.getScope().getScopeId())) {
-                    return clientResouceScopeTable.isAutoApprove();
+        if (this.getClientResourceScopeTables() != null) {
+            for (ClientResourceScopeTable clientResourceScopeTable : this.getClientResourceScopeTables()) {
+                if (scope.equals(clientResourceScopeTable.getScope().getScopeId())) {
+                    return clientResourceScopeTable.isAutoApprove();
                 }
             }
         }

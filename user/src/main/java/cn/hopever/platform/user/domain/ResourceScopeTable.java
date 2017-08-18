@@ -15,10 +15,10 @@ import java.util.List;
 @Table(name = "platform_user_resource_scope")
 @Data
 @EqualsAndHashCode(of = {"id"})
-@ToString(exclude = {"clientResouceScopeTables"})
+@ToString(exclude = {"clientResourceScopeTables"})
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "hopever.user.resourcescope")
-public class ResouceScopeTable {
+public class ResourceScopeTable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -31,6 +31,6 @@ public class ResouceScopeTable {
 
     @OneToMany(mappedBy = "scope", cascade = {CascadeType.ALL}, orphanRemoval = true)
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private List<ClientResouceScopeTable> clientResouceScopeTables;
+    private List<ClientResourceScopeTable> clientResourceScopeTables;
 
 }

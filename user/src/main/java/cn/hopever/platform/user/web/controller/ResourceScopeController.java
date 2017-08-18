@@ -1,8 +1,7 @@
 package cn.hopever.platform.user.web.controller;
 
-import cn.hopever.platform.user.service.ClientTableService;
-import cn.hopever.platform.user.vo.ClientVo;
-import cn.hopever.platform.utils.test.PrincipalSample;
+import cn.hopever.platform.user.service.ResourceScopeTableService;
+import cn.hopever.platform.user.vo.ResourceScopeVo;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
@@ -11,40 +10,36 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Donghui Huo on 2016/8/29.
+ * Created by Donghui Huo on 2017/8/18.
  */
 @RestController
 @CrossOrigin
-@RequestMapping(value = "/client", produces = "application/json")
-public class ClientController {
+@RequestMapping(value = "/resourcescope", produces = "application/json")
+public class ResourceScopeController {
     Logger logger = LoggerFactory.getLogger(ClientController.class);
     @Autowired
-    private ClientTableService clientTableService;
+    private ResourceScopeTableService resourceScopeTableService;
 
     // @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
-    public Map getList(@RequestBody TableParameters body, Principal principal) {
-        principal = new PrincipalSample("admin");
-        Page<ClientVo> list = clientTableService.getList(body);
+    public Map getList(@RequestBody TableParameters body) {
+        Page<ResourceScopeVo> list = resourceScopeTableService.getList(body);
         Map<String, Object> map = new HashMap<>();
         List<HashMap<String, Object>> listReturn = null;
         if (list != null && list.iterator().hasNext()) {
             listReturn = new ArrayList<>();
-            for (ClientVo cv : list) {
+            for (ResourceScopeVo cv : list) {
                 HashMap<String, Object> mapTemp = new HashMap<>();
                 mapTemp.put("key", cv.getId());
                 List<Object> listTmp = new ArrayList<>();
-                listTmp.add(cv.getClientName());
-                listTmp.add(cv.getClientId());
-                listTmp.add(cv.getAuthorizedGrantTypesStr());
-                listTmp.add(cv.getScopesStr());
+                listTmp.add(cv.getName());
+                listTmp.add(cv.getScopeId());
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);
             }
@@ -63,48 +58,29 @@ public class ClientController {
 
     //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
-    public ClientVo info(@RequestParam Long key) {
+    public ResourceScopeVo info(@RequestParam Long key) {
         //返回user是无法解析的，要使用对象解析为map 的形式
-        return clientTableService.getVoById(key);
+        return resourceScopeTableService.getById(key);
     }
 
 
     //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result updateClient(@RequestParam Long key, @RequestBody ClientVo clientVo) {
-        clientVo.setId(key);
-        return clientTableService.update(clientVo);
+    public VueResults.Result updateClient(@RequestParam Long key, @RequestBody ResourceScopeVo resourceScopeVo) {
+        resourceScopeVo.setId(key);
+        return resourceScopeTableService.update(resourceScopeVo);
     }
 
     //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result saveUser(@RequestBody ClientVo clientVo) {
-        return clientTableService.save(clientVo);
+    public VueResults.Result saveUser(@RequestBody ResourceScopeVo resourceScopeVo) {
+        return resourceScopeTableService.save(resourceScopeVo);
     }
 
     //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long key) {
-        this.clientTableService.delete(key);
-    }
-
-    @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
-    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body) {
-        Map mapReturn = new HashMap<>();
-        if (body == null) {
-            if (key == null) {
-                // 新增
-                mapReturn.put("scopeIds", clientTableService.getResourceScopeOptions());
-            } else {
-                // 更新 - 考虑principal对其显示的限制
-                mapReturn.put("scopeIds", clientTableService.getResourceScopeOptions());
-                mapReturn.put("autoApprovaledScopeIds", clientTableService.getAutoApprovaledScopeOptions(key));
-            }
-        } else {
-            if (body.get("clients") != null) {
-            }
-        }
-        return mapReturn;
+        this.resourceScopeTableService.delete(key);
     }
 
 }

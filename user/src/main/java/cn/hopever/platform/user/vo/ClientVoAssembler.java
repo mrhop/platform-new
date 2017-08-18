@@ -1,9 +1,9 @@
 package cn.hopever.platform.user.vo;
 
-import cn.hopever.platform.user.domain.ClientResouceScopeTable;
+import cn.hopever.platform.user.domain.ClientResourceScopeTable;
 import cn.hopever.platform.user.domain.ClientRoleTable;
 import cn.hopever.platform.user.domain.ClientTable;
-import cn.hopever.platform.user.domain.ResouceScopeTable;
+import cn.hopever.platform.user.domain.ResourceScopeTable;
 import cn.hopever.platform.utils.tools.BeanUtils;
 import org.springframework.stereotype.Component;
 
@@ -46,15 +46,15 @@ public class ClientVoAssembler {
                 resource.setAuthorizedGrantTypesStr(agt.toString());
             }
         }
-        if (clientTable.getClientResouceScopeTables() != null) {
+        if (clientTable.getClientResourceScopeTables() != null) {
             ArrayList<String> crs = new ArrayList<>();
             ArrayList<Long> crl = new ArrayList<>();
             ArrayList<Long> crlAuto = new ArrayList<>();
-            for (ClientResouceScopeTable clientResouceScopeTable : clientTable.getClientResouceScopeTables()) {
-                ResouceScopeTable rss = clientResouceScopeTable.getScope();
+            for (ClientResourceScopeTable clientResourceScopeTable : clientTable.getClientResourceScopeTables()) {
+                ResourceScopeTable rss = clientResourceScopeTable.getScope();
                 crs.add(rss.getName());
                 crl.add(rss.getId());
-                if (clientResouceScopeTable.isAutoApprove()) {
+                if (clientResourceScopeTable.isAutoApprove()) {
                     crlAuto.add(rss.getId());
                 }
             }

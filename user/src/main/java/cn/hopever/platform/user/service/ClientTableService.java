@@ -50,7 +50,7 @@ public interface ClientTableService extends ClientDetailsService {
 
     public Page<ClientVo> getList(TableParameters body);
 
-    public List<SelectOption> getResouceScopeOptions();
+    public List<SelectOption> getResourceScopeOptions();
 
     public List<SelectOption> getAutoApprovaledScopeOptions(Long id);
 

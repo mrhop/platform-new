@@ -49,7 +49,7 @@ public class ClientTableServiceImpl implements ClientTableService {
     private ClientRoleTableRepository clientRoleTableRepository;
 
     @Autowired
-    private ResouceScopeTableRepository resouceScopeTableRepository;
+    private ResourceScopeTableRepository resourceScopeTableRepository;
 
     @Override
     public VueResults.Result save(ClientVo client) {
@@ -59,18 +59,18 @@ public class ClientTableServiceImpl implements ClientTableService {
         ClientTable clientTable = new ClientTable();
         BeanUtils.copyNotNullProperties(client, clientTable);
         if (client.getScopeIds() != null) {
-            List<ClientResouceScopeTable> list = new ArrayList<>();
+            List<ClientResourceScopeTable> list = new ArrayList<>();
             for (long id : client.getScopeIds()) {
-                ResouceScopeTable resouceScopeTable = resouceScopeTableRepository.findOne(id);
-                ClientResouceScopeTable clientResouceScopeTable = new ClientResouceScopeTable();
-                clientResouceScopeTable.setClient(clientTable);
-                clientResouceScopeTable.setScope(resouceScopeTable);
+                ResourceScopeTable resourceScopeTable = resourceScopeTableRepository.findOne(id);
+                ClientResourceScopeTable clientResourceScopeTable = new ClientResourceScopeTable();
+                clientResourceScopeTable.setClient(clientTable);
+                clientResourceScopeTable.setScope(resourceScopeTable);
                 if (client.getAutoApprovaledScopeIds() != null && client.getAutoApprovaledScopeIds().contains(id)) {
-                    clientResouceScopeTable.setAutoApprove(true);
+                    clientResourceScopeTable.setAutoApprove(true);
                 }
-                list.add(clientResouceScopeTable);
+                list.add(clientResourceScopeTable);
             }
-            clientTable.setClientResouceScopeTables(list);
+            clientTable.setClientResourceScopeTables(list);
         }
         clientTableRepository.save(clientTable);
         RoleTable roleTable = new RoleTable();
@@ -86,19 +86,19 @@ public class ClientTableServiceImpl implements ClientTableService {
         ClientTable clientTable = clientTableRepository.findOne(client.getId());
         BeanUtils.copyNotNullProperties(client, clientTable);
         if (client.getScopeIds() != null) {
-            List<ClientResouceScopeTable> list = new ArrayList<>();
+            List<ClientResourceScopeTable> list = new ArrayList<>();
             for (long id : client.getScopeIds()) {
-                ResouceScopeTable resouceScopeTable = resouceScopeTableRepository.findOne(id);
-                ClientResouceScopeTable clientResouceScopeTable = new ClientResouceScopeTable();
-                clientResouceScopeTable.setClient(clientTable);
-                clientResouceScopeTable.setScope(resouceScopeTable);
+                ResourceScopeTable resourceScopeTable = resourceScopeTableRepository.findOne(id);
+                ClientResourceScopeTable clientResourceScopeTable = new ClientResourceScopeTable();
+                clientResourceScopeTable.setClient(clientTable);
+                clientResourceScopeTable.setScope(resourceScopeTable);
                 if (client.getAutoApprovaledScopeIds() != null && client.getAutoApprovaledScopeIds().contains(id)) {
-                    clientResouceScopeTable.setAutoApprove(true);
+                    clientResourceScopeTable.setAutoApprove(true);
                 }
-                list.add(clientResouceScopeTable);
+                list.add(clientResourceScopeTable);
             }
-            clientTable.getClientResouceScopeTables().clear();
-            clientTable.getClientResouceScopeTables().addAll(list);
+            clientTable.getClientResourceScopeTables().clear();
+            clientTable.getClientResourceScopeTables().addAll(list);
         }
         clientTableRepository.save(clientTable);
         return VueResults.generateSuccess("更新成功", "应用更新成功");
@@ -187,11 +187,11 @@ public class ClientTableServiceImpl implements ClientTableService {
     }
 
     @Override
-    public List<SelectOption> getResouceScopeOptions() {
+    public List<SelectOption> getResourceScopeOptions() {
         List<SelectOption> listReturn = new ArrayList<>();
-        Iterable<ResouceScopeTable> list = resouceScopeTableRepository.findAll();
-        for (ResouceScopeTable resouceScopeTable : list) {
-            SelectOption selectOption = new SelectOption(resouceScopeTable.getName(), resouceScopeTable.getId());
+        Iterable<ResourceScopeTable> list = resourceScopeTableRepository.findAll();
+        for (ResourceScopeTable resourceScopeTable : list) {
+            SelectOption selectOption = new SelectOption(resourceScopeTable.getName(), resourceScopeTable.getId());
             listReturn.add(selectOption);
         }
         return listReturn;
@@ -201,9 +201,9 @@ public class ClientTableServiceImpl implements ClientTableService {
     public List<SelectOption> getAutoApprovaledScopeOptions(Long id) {
         List<SelectOption> listReturn = new ArrayList<>();
         ClientTable clientTable = clientTableRepository.findOne(id);
-        Iterable<ResouceScopeTable> list = resouceScopeTableRepository.findAll();
-        for (ClientResouceScopeTable clientResouceScopeTable : clientTable.getClientResouceScopeTables()) {
-            SelectOption selectOption = new SelectOption(clientResouceScopeTable.getScope().getName(), clientResouceScopeTable.getScope().getId());
+        Iterable<ResourceScopeTable> list = resourceScopeTableRepository.findAll();
+        for (ClientResourceScopeTable clientResourceScopeTable : clientTable.getClientResourceScopeTables()) {
+            SelectOption selectOption = new SelectOption(clientResourceScopeTable.getScope().getName(), clientResourceScopeTable.getScope().getId());
             listReturn.add(selectOption);
         }
         return listReturn;

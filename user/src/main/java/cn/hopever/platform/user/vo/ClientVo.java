@@ -3,7 +3,6 @@ package cn.hopever.platform.user.vo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 
@@ -14,10 +13,8 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = false)
 public class ClientVo {
 
-    @NotNull
     private long id;
 
-    @NotNull
     private String clientId;
 
     private String clientName;

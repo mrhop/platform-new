@@ -15,7 +15,7 @@ import javax.persistence.*;
 @EqualsAndHashCode(of = {"id"})
 @Cacheable
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "hopever.user.clientresourcescope")
-public class ClientResouceScopeTable {
+public class ClientResourceScopeTable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -28,7 +28,7 @@ public class ClientResouceScopeTable {
     @ManyToOne
     @JoinColumn(name = "scope_id", nullable = true)
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    private ResouceScopeTable scope;
+    private ResourceScopeTable scope;
 
     @Column(name = "auto_approve")
     private boolean autoApprove = false;
