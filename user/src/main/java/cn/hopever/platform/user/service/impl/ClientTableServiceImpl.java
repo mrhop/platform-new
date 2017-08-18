@@ -82,6 +82,29 @@ public class ClientTableServiceImpl implements ClientTableService {
     }
 
     @Override
+    public VueResults.Result update(ClientVo client) {
+        ClientTable clientTable = clientTableRepository.findOne(client.getId());
+        BeanUtils.copyNotNullProperties(client, clientTable);
+        if (client.getScopeIds() != null) {
+            List<ClientResouceScopeTable> list = new ArrayList<>();
+            for (long id : client.getScopeIds()) {
+                ResouceScopeTable resouceScopeTable = resouceScopeTableRepository.findOne(id);
+                ClientResouceScopeTable clientResouceScopeTable = new ClientResouceScopeTable();
+                clientResouceScopeTable.setClient(clientTable);
+                clientResouceScopeTable.setScope(resouceScopeTable);
+                if (client.getAutoApprovaledScopeIds() != null && client.getAutoApprovaledScopeIds().contains(id)) {
+                    clientResouceScopeTable.setAutoApprove(true);
+                }
+                list.add(clientResouceScopeTable);
+            }
+            clientTable.getClientResouceScopeTables().clear();
+            clientTable.getClientResouceScopeTables().addAll(list);
+        }
+        clientTableRepository.save(clientTable);
+        return VueResults.generateSuccess("更新成功", "应用更新成功");
+    }
+
+    @Override
     public void delete(ClientTable client) {
         clientTableRepository.delete(client);
     }

@@ -26,6 +26,8 @@ public interface ClientTableService extends ClientDetailsService {
 
     public VueResults.Result save(ClientVo client);
 
+    public VueResults.Result update(ClientVo client);
+
     public void delete(ClientTable client);
 
     public void delete(long id);

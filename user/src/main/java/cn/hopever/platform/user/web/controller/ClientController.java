@@ -5,16 +5,13 @@ import cn.hopever.platform.user.service.ClientTableService;
 import cn.hopever.platform.user.service.RoleTableService;
 import cn.hopever.platform.user.vo.ClientVo;
 import cn.hopever.platform.user.vo.ClientVoAssembler;
-import cn.hopever.platform.utils.json.JacksonUtil;
 import cn.hopever.platform.utils.test.PrincipalSample;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -84,41 +81,11 @@ public class ClientController {
     }
 
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
+    //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public Map updateClient(@RequestBody JsonNode body, Principal principal) {
-        Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
-//        ClientTable ct = clientTableService.getById(Long.valueOf(map.get("id").toString()));
-//        if (ct.getClientId().equals("user_admin_client")) {
-//            return null;
-//        }
-//        if (body.get("data").get("clientName") != null && !body.get("data").get("clientName").isNull()) {
-//            ct.setClientName(body.get("data").get("clientName").textValue());
-//        }
-//        if (body.get("data").get("clientSecret") != null && !body.get("data").get("clientSecret").isNull()) {
-//            ct.setClientSecret(body.get("data").get("clientSecret").textValue());
-//        }
-//        if (body.get("data").get("authorizedGrantTypes") != null && !body.get("data").get("authorizedGrantTypes").isNull()) {
-//            Set set = JacksonUtil.mapper.convertValue(body.get("data").get("authorizedGrantTypes"), Set.class);
-//            if (set.contains("authorization_code")) {
-//                set.add("refresh_token");
-//            } else {
-//                set.remove("refresh_token");
-//            }
-//            ct.setAuthorizedGrantTypes(set);
-//        } else {
-//            ct.setAuthorizedGrantTypes("");
-//        }
-//        boolean isInternalClient = false;
-//        if (body.get("data").get("internalClient") != null && !body.get("data").get("internalClient").isNull()) {
-//            List<Boolean> b = JacksonUtil.mapper.convertValue(body.get("data").get("internalClient"), List.class);
-//            if (b.size() > 0) {
-//                isInternalClient = b.get(0);
-//            }
-//        }
-//
-//        clientTableService.save(ct);
-        return null;
+    public VueResults.Result updateClient(@RequestParam Long key, @RequestBody ClientVo clientVo) {
+        clientVo.setId(key);
+        return clientTableService.update(clientVo);
     }
 
     //@PreAuthorize("hasRole('ROLE_super_admin')")

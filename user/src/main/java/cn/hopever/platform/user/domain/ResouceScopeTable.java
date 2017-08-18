@@ -29,7 +29,7 @@ public class ResouceScopeTable {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
-    @OneToMany(mappedBy = "scope")
+    @OneToMany(mappedBy = "scope", cascade = {CascadeType.ALL}, orphanRemoval = true)
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ClientResouceScopeTable> clientResouceScopeTables;
 

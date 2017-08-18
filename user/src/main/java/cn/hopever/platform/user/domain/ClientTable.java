@@ -45,7 +45,7 @@ public class ClientTable implements ClientDetails {
     @Column(name = "scoped")
     private boolean scoped = true;
 
-    @OneToMany(mappedBy = "client", cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "client", cascade = {CascadeType.ALL}, orphanRemoval = true, fetch = FetchType.EAGER)
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ClientResouceScopeTable> clientResouceScopeTables;
 
@@ -69,11 +69,11 @@ public class ClientTable implements ClientDetails {
     @Column(name = "additional_information", nullable = true, length = 2000)
     private String additionalInformation;
 
-    @OneToMany(mappedBy = "client", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "client", cascade = {CascadeType.ALL}, orphanRemoval = true)
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ModuleRoleTable> moduleRoles;
 
-    @OneToMany(mappedBy = "client", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "client", cascade = {CascadeType.ALL}, orphanRemoval = true)
     @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ModuleTable> modules;
 
