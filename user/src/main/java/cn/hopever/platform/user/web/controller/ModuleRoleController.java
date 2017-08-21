@@ -163,7 +163,6 @@ public class ModuleRoleController {
             map.put("totalCount", 0);
         }
         map.put("pager", body.getPager());
-        map.put("filters", body.getFilters());
         map.put("sorts", body.getSorts());
         return map;
     }
@@ -188,9 +187,17 @@ public class ModuleRoleController {
         return moduleRoleTableService.save(moduleRoleVo);
     }
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
+    // @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long key, Principal principal) {
         this.moduleRoleTableService.deleteById(key);
     }
+
+    @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
+    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body) {
+        Map mapReturn = new HashMap<>();
+        mapReturn.put("clientIds", moduleRoleTableService.getClientsOptions());
+        return mapReturn;
+    }
+
 }

@@ -43,11 +43,20 @@ public class CustomModuleRoleTableRepositoryImpl extends SimpleJpaRepository<Mod
                 if (mapFilter != null && mapFilter.size() > 0) {
                     for (String key : mapFilter.keySet()) {
                         if (mapFilter.get(key) != null) {
-                            if (predicateReturn != null) {
-                                predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + mapFilter.get(key) + "%"));
+                            if (key.equals("client")) {
+                                if (predicateReturn != null) {
+                                    predicateReturn = builder.and(predicateReturn, builder.equal(root.get("client"), mapFilter.get(key)));
+                                } else {
+                                    predicateReturn = builder.equal(root.get("client"), mapFilter.get(key));
+                                }
                             } else {
-                                predicateReturn = builder.like(root.get(key), "%" + mapFilter.get(key) + "%");
+                                if (predicateReturn != null) {
+                                    predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + mapFilter.get(key) + "%"));
+                                } else {
+                                    predicateReturn = builder.like(root.get(key), "%" + mapFilter.get(key) + "%");
+                                }
                             }
+
                         }
                     }
                 }

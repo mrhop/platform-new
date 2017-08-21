@@ -14,6 +14,7 @@ import java.util.List;
 public interface ClientTableRepository extends PagingAndSortingRepository<ClientTable, Long> {
     public ClientTable findOneByClientId(String clientId);
     public List<ClientTable> findByClientIdLike(String clientId);
+    public List<ClientTable> findByClientIdNot(String clientId);
     public List<ClientTable> findByUsersIn(Collection<UserTable> users);
     public List<ClientTable> findByClientIdLike(String clientId, Pageable pageable);
 }

@@ -1,9 +1,6 @@
 package cn.hopever.platform.user.service.impl;
 
-import cn.hopever.platform.user.domain.ClientTable;
-import cn.hopever.platform.user.domain.ModuleRoleTable;
-import cn.hopever.platform.user.domain.ModuleTable;
-import cn.hopever.platform.user.domain.UserTable;
+import cn.hopever.platform.user.domain.*;
 import cn.hopever.platform.user.repository.ClientTableRepository;
 import cn.hopever.platform.user.repository.CustomModuleRoleTableRepository;
 import cn.hopever.platform.user.repository.ModuleRoleTableRepository;
@@ -11,6 +8,7 @@ import cn.hopever.platform.user.repository.UserTableRepository;
 import cn.hopever.platform.user.service.ModuleRoleTableService;
 import cn.hopever.platform.user.vo.ModuleRoleVo;
 import cn.hopever.platform.user.vo.ModuleRoleVoAssembler;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
@@ -49,7 +47,6 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
 
     @Override
     public List<ModuleRoleTable> getByClients(List<Object> clientIds) {
-
         List<ModuleRoleTable> list = new ArrayList<>();
         for (Object clientId : clientIds) {
             ClientTable clientTable = clientTableRepository.findOne(Long.parseLong(clientId.toString()));
@@ -86,6 +83,10 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
             String key = body.getSorts().keySet().iterator().next();
             pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
         }
+        if (body.getFilters() != null && body.getFilters().containsKey("clientId")) {
+            body.getFilters().put("client", clientTableRepository.findOne(Long.valueOf(body.getFilters().get("clientId").toString())));
+            body.getFilters().remove("clientId");
+        }
         Page<ModuleRoleTable> page = customModuleRoleTableRepository.findByFilters(body.getFilters(), pageRequest);
         List<ModuleRoleVo> list = new ArrayList<>();
         for (ModuleRoleTable moduleRoleTable : page) {
@@ -104,6 +105,9 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
     public VueResults.Result update(ModuleRoleVo moduleRoleVo) {
         ModuleRoleTable moduleRoleTable = moduleRoleTableRepository.findOne(moduleRoleVo.getId());
         moduleRoleTable = moduleRoleVoAssembler.toDomain(moduleRoleVo, moduleRoleTable);
+        if (moduleRoleVo.getClientId() != null) {
+            moduleRoleTable.setClient(clientTableRepository.findOne(moduleRoleVo.getClientId()));
+        }
         moduleRoleTableRepository.save(moduleRoleTable);
         return VueResults.generateSuccess("更新成功", "更新模块角色成功");
     }
@@ -112,8 +116,11 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
     public VueResults.Result save(ModuleRoleVo moduleRoleVo) {
         ModuleRoleTable moduleRoleTable = new ModuleRoleTable();
         moduleRoleTable = moduleRoleVoAssembler.toDomain(moduleRoleVo, moduleRoleTable);
+        if (moduleRoleTableRepository.findOneByAuthority(moduleRoleVo.getAuthority()) != null) {
+            return VueResults.generateError("保存失败", "模块角色ID已存在");
+        }
         if (moduleRoleVo.getClientId() != null) {
-            moduleRoleTable.setClient(clientTableRepository.findOne(moduleRoleVo.getId()));
+            moduleRoleTable.setClient(clientTableRepository.findOne(moduleRoleVo.getClientId()));
         }
         moduleRoleTableRepository.save(moduleRoleTable);
         return VueResults.generateSuccess("保存成功", "保存模块角色成功");
@@ -143,5 +150,16 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
             }
         }
         moduleRoleTableRepository.delete(mrt);
+    }
+
+    @Override
+    public List<SelectOption> getClientsOptions() {
+        List<SelectOption> listReturn = new ArrayList<>();
+        Iterable<ClientTable> list = clientTableRepository.findByClientIdNot("user_admin_client");
+        for (ClientTable clientTable : list) {
+            SelectOption selectOption = new SelectOption(clientTable.getClientName(), clientTable.getId());
+            listReturn.add(selectOption);
+        }
+        return listReturn;
     }
 }

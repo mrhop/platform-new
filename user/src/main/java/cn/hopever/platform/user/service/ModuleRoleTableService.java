@@ -2,6 +2,7 @@ package cn.hopever.platform.user.service;
 
 import cn.hopever.platform.user.domain.ModuleRoleTable;
 import cn.hopever.platform.user.vo.ModuleRoleVo;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.data.domain.Page;
@@ -31,5 +32,8 @@ public interface ModuleRoleTableService {
     public ModuleRoleTable save(ModuleRoleTable moduleRoleTable);
 
     public void deleteById(Long id);
+
+    public List<SelectOption> getClientsOptions();
+
 
 }
