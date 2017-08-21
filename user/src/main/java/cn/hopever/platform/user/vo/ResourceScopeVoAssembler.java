@@ -21,7 +21,7 @@ public class ResourceScopeVoAssembler {
     }
 
     public ResourceScopeTable toDomain(ResourceScopeVo resourceScopeVo, ResourceScopeTable resourceScopeTable) {
-        BeanUtils.copyNotNullProperties(resourceScopeVo, resourceScopeTable);
+        BeanUtils.copyNotNullProperties(resourceScopeVo, resourceScopeTable, "scopeId");
         return resourceScopeTable;
     }
 }

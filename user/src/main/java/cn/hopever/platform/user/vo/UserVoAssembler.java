@@ -62,7 +62,7 @@ public class UserVoAssembler {
     }
 
     public UserTable toDomain(UserVo userVo, UserTable userTable) {
-        BeanUtils.copyNotNullProperties(userVo, userTable, "password", "photo");
+        BeanUtils.copyNotNullProperties(userVo, userTable, "username", "password", "photo");
         if (userVo.getLimitedDate() != null) {
             userTable.setLimitedDate(new Date(userVo.getLimitedDate()));
         }

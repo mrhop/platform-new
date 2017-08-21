@@ -39,6 +39,7 @@ public class ResourceScopeTableServiceImpl implements ResourceScopeTableService 
             return VueResults.generateError("创建失败", "资源范围账户已存在");
         }
         ResourceScopeTable resourceScopeTable = new ResourceScopeTable();
+        resourceScopeTable.setScopeId(resourceScope.getScopeId());
         resourceScopeTableRepository.save(resourceScopeVoAssembler.toDomain(resourceScope, resourceScopeTable));
         return VueResults.generateSuccess("创建成功", "创建资源范围成功");
     }

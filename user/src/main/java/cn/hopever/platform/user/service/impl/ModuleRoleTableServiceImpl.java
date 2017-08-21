@@ -116,6 +116,7 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
     public VueResults.Result save(ModuleRoleVo moduleRoleVo) {
         ModuleRoleTable moduleRoleTable = new ModuleRoleTable();
         moduleRoleTable = moduleRoleVoAssembler.toDomain(moduleRoleVo, moduleRoleTable);
+        moduleRoleTable.setAuthority(moduleRoleVo.getAuthority());
         if (moduleRoleTableRepository.findOneByAuthority(moduleRoleVo.getAuthority()) != null) {
             return VueResults.generateError("保存失败", "模块角色ID已存在");
         }

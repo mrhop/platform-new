@@ -26,7 +26,7 @@ public class ModuleRoleVoAssembler {
     }
 
     public ModuleRoleTable toDomain(ModuleRoleVo moduleRoleVo, ModuleRoleTable moduleRoleTable) {
-        BeanUtils.copyNotNullProperties(moduleRoleVo, moduleRoleTable);
+        BeanUtils.copyNotNullProperties(moduleRoleVo, moduleRoleTable, "authority");
         return moduleRoleTable;
     }
 }

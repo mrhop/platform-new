@@ -84,7 +84,7 @@ public class ClientTableServiceImpl implements ClientTableService {
     @Override
     public VueResults.Result update(ClientVo client) {
         ClientTable clientTable = clientTableRepository.findOne(client.getId());
-        BeanUtils.copyNotNullProperties(client, clientTable);
+        BeanUtils.copyNotNullProperties(client, clientTable,"clientId");
         if (client.getScopeIds() != null) {
             List<ClientResourceScopeTable> list = new ArrayList<>();
             for (long id : client.getScopeIds()) {

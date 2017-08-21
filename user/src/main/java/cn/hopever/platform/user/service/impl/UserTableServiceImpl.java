@@ -359,6 +359,7 @@ public class UserTableServiceImpl implements UserTableService {
             }
         }
         userVoAssembler.toDomain(userVo, user);
+        user.setUsername(userVo.getUsername());
         if (userVo.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(userVo.getPassword()));
         }
@@ -429,6 +430,7 @@ public class UserTableServiceImpl implements UserTableService {
             }
         }
         userVoAssembler.toDomain(userVo, user);
+        user.setUsername(userVo.getUsername());
         if (userVo.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(userVo.getPassword()));
         }
