@@ -20,20 +20,17 @@ public class ModuleVo {
     private String clientName;
     private Long clientId;// list filter  // add select
     private String moduleName; // list   // add text
-    private Integer moduleOrder;
     private Long beforeId; // add 联动 parent tree form element
     private String moduleUrl; // add nullable
 
     private String iconClass; // add nullable
-    private Long parentId;// list filter [tree form element] 联动clientId
+    private Long parentId;// list filter [tree form element] 联动clientId ,不需要parentId在add因为使用beforeId就能完备的体现出其从属的parent
     private String parentName;
-
-    private List<Long> children;
-    private String childrenStr;// list
 
     private boolean available = true;// add  select
     private boolean activated = true;// list // add  select
     private List<Long> authorities; // add  checkbox 联动clientId
-    private String authoritiesStr; // list
+    private String authoritiesStr; // add  checkbox 联动clientId
+    private Long authorityId; // list 用于过滤模块权限
 
 }

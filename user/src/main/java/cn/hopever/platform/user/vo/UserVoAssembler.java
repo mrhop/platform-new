@@ -71,12 +71,4 @@ public class UserVoAssembler {
         }
         return userTable;
     }
-
-    public List<UserVo> toResources(Iterable<UserTable> userTables) {
-        List<UserVo> returnList = new ArrayList<>();
-        for (UserTable ut : userTables) {
-            returnList.add(this.toResource(ut));
-        }
-        return returnList;
-    }
 }

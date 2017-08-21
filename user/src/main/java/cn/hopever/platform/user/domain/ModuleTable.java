@@ -39,7 +39,7 @@ public class ModuleTable {
     private Integer moduleOrder = 0;
 
     // 用于和order一起来决定顺序
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "before_id")
     private ModuleTable beforeModule;
 

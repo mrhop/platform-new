@@ -121,7 +121,7 @@ public class UserController {
 
     // @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result updateUser(@RequestParam(name = "key") Long key, @RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
+    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
         principal = new PrincipalSample("admin");
         userVo.setId(key);
         return userTableService.updateUser(userVo, files, principal);
@@ -129,13 +129,13 @@ public class UserController {
 
     //@PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result saveUser(@RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
+    public VueResults.Result save(@RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
         principal = new PrincipalSample("admin");
         return userTableService.saveUser(userVo, files, principal);
     }
 
     @RequestMapping(value = "/register", method = {RequestMethod.POST})
-    public VueResults.Result registerUser(@RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
+    public VueResults.Result register(@RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
         return userTableService.registerUser(userVo, files);
     }
 

@@ -68,14 +68,14 @@ public class ClientController {
 
     //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result updateClient(@RequestParam Long key, @RequestBody ClientVo clientVo) {
+    public VueResults.Result update(@RequestParam Long key, @RequestBody ClientVo clientVo) {
         clientVo.setId(key);
         return clientTableService.update(clientVo);
     }
 
     //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result saveUser(@RequestBody ClientVo clientVo) {
+    public VueResults.Result save(@RequestBody ClientVo clientVo) {
         return clientTableService.save(clientVo);
     }
 

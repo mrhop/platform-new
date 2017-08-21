@@ -66,14 +66,14 @@ public class ResourceScopeController {
 
     //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result updateClient(@RequestParam Long key, @RequestBody ResourceScopeVo resourceScopeVo) {
+    public VueResults.Result update(@RequestParam Long key, @RequestBody ResourceScopeVo resourceScopeVo) {
         resourceScopeVo.setId(key);
         return resourceScopeTableService.update(resourceScopeVo);
     }
 
     //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result saveUser(@RequestBody ResourceScopeVo resourceScopeVo) {
+    public VueResults.Result save(@RequestBody ResourceScopeVo resourceScopeVo) {
         return resourceScopeTableService.save(resourceScopeVo);
     }
 

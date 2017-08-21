@@ -12,4 +12,6 @@ import java.util.Map;
  */
 public interface CustomModuleTableRepository {
     public Page<ModuleTable> findByFilters(Map<String, Object> mapFilter, Pageable pageable, ClientTable userAdminClient);
+
+    public Page<ModuleTable> findByFilters(Map<String, Object> mapFilter, Pageable pageable);
 }

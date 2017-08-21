@@ -1,20 +1,16 @@
 package cn.hopever.platform.user.web.controller;
 
-import cn.hopever.platform.user.domain.ClientTable;
-import cn.hopever.platform.user.domain.ModuleTable;
 import cn.hopever.platform.user.service.ClientTableService;
 import cn.hopever.platform.user.service.ModuleRoleTableService;
 import cn.hopever.platform.user.service.ModuleTableService;
+import cn.hopever.platform.user.vo.ModuleVo;
 import cn.hopever.platform.user.vo.ModuleVoAssembler;
-import cn.hopever.platform.utils.json.JacksonUtil;
-import com.fasterxml.jackson.databind.JsonNode;
+import cn.hopever.platform.utils.web.TableParameters;
+import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -46,246 +42,89 @@ public class ModuleController {
     ModuleVoAssembler moduleVoAssembler;
 
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
+    //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
-    public Map getList(@RequestBody JsonNode body, Principal principal) {
+    public Map getList(@RequestBody TableParameters body) {
+        Page<ModuleVo> list = moduleTableService.getList(body);
         Map<String, Object> map = new HashMap<>();
-        List<HashMap<String, Object>> listReturn;
-        Page<ModuleTable> list;
-        PageRequest pageRequest;
-        //sort部分有一个order的sort，然后有一个name filter parent filter client filter
-        //我们新增时，考虑将order的基数*10+自身的order设值，所以order的必然是正确的排序方式
-        if (body.get("sort") == null || body.get("sort").isNull()) {
-            pageRequest = new PageRequest(body.get("currentPage").asInt(), body.get("rowSize").asInt(), Sort.Direction.ASC, "moduleOrder");
-        } else {
-            pageRequest = new PageRequest(body.get("currentPage").asInt(), body.get("rowSize").asInt(), Sort.Direction.fromString(body.get("sort").get("sortDirection").textValue()), body.get("sort").get("sortName").textValue());
-        }
-        Map<String, Object> filterMap = null;
-        if (body.get("filters") != null && !body.get("filters").isNull()) {
-            filterMap = JacksonUtil.mapper.convertValue(body.get("filters"), Map.class);
-        }
-        list = moduleTableService.getList(pageRequest, filterMap);
+        List<HashMap<String, Object>> listReturn = null;
         if (list != null && list.iterator().hasNext()) {
             listReturn = new ArrayList<>();
-            for (ModuleTable mt : list) {
+            for (ModuleVo cv : list) {
                 HashMap<String, Object> mapTemp = new HashMap<>();
-                mapTemp.put("key", mt.getId());
+                mapTemp.put("key", cv.getId());
                 List<Object> listTmp = new ArrayList<>();
-                listTmp.add("");
-                listTmp.add(mt.getModuleName());
-                if (mt.getParent() != null) {
-                    listTmp.add(mt.getModuleUrl());
-                    listTmp.add(mt.getParent().getModuleName());
-                } else {
-                    listTmp.add("");
-                    listTmp.add("");
-                }
-                if (mt.getClient() != null) {
-                    listTmp.add(mt.getClient().getClientName());
-                } else {
-                    listTmp.add("");
-                }
-                listTmp.add(mt.isActivated() ? "T" : "F");
+                listTmp.add(cv.getModuleName());
+                listTmp.add(cv.isActivated());
+                listTmp.add(cv.getClientId());
+                listTmp.add(cv.getAuthorityId());
+                listTmp.add(cv.getParentId());
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);
             }
-            map.put("data", listReturn);
+            map.put("rows", listReturn);
             map.put("totalCount", list.getTotalElements());
-            map.put("rowSize", body.get("rowSize").asInt());
-            map.put("currentPage", list.getNumber());
+
         } else {
-            map.put("data", null);
+            map.put("rows", null);
             map.put("totalCount", 0);
-            map.put("rowSize", body.get("rowSize").asInt());
-            map.put("currentPage", 0);
         }
+        map.put("pager", body.getPager());
+        map.put("sorts", body.getSorts());
         return map;
     }
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
+    //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
-    public Map info(@RequestParam Long id, Principal principal) {
-        //返回user是无法解析的，要使用对象解析为map 的形式
-        //do info update
-//        ModuleTable mt = moduleTableService.getById(id);
-//        Map map = JacksonUtil.mapper.convertValue(moduleVoAssembler.toResource(mt), Map.class);
-//        boolean isTop = (mt.getParent() == null && mt.getModuleUrl() == null && mt.getIconClass() != null) ? true : false;
-//        map.put("isTop", isTop);
-//        if (isTop) {
-//            map.put("moduleOrder", ((Integer) map.get("moduleOrder")) / 100);
-//        } else {
-//            map.put("moduleOrder", ((Integer) map.get("moduleOrder")) % 100);
-//        }
-        return null;
+    public ModuleVo info(@RequestParam Long key) {
+        return moduleTableService.getById(key);
     }
 
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
+    // @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public Map updateUser(@RequestBody JsonNode body, Principal principal) {
-//        Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
-//        ModuleTable mt = moduleTableService.getById(Long.valueOf(map.get("id").toString()));
-//        ModuleTable mtParent = null;
-//        mt.setModuleName(map.get("moduleName").toString());
-//        ClientTable ct = this.clientTableService.getById(Long.valueOf(map.get("client").toString()));
-//        mt.setClient(this.clientTableService.getById(Long.valueOf(map.get("client").toString())));
-//        if (map.get("authorities") != null) {
-//            List list = (List) map.get("authorities");
-//            List<ModuleRoleTable> listMr = new ArrayList<>();
-//            for (Object id : list) {
-//                listMr.add(moduleRoleTableService.getById(Long.valueOf(id.toString())));
-//            }
-//            mt.setAuthorities(listMr);
-//        }
-//        if (mt.getParent() == null) {
-//            if (map.get("iconClass") != null) {
-//                mt.setIconClass(map.get("iconClass").toString());
-//            }
-//        } else {
-//            if (map.get("parent") != null) {
-//                mtParent = moduleTableService.getById(Long.valueOf(map.get("parent").toString()));
-//                mt.setParent(mtParent);
-//            }
-//            if (map.get("moduleUrl") != null) {
-//                mt.setModuleUrl(map.get("moduleUrl").toString());
-//            }
-//        }
-//        if (map.get("moduleOrder") != null) {
-//            if (mt.getParent() == null) {
-//                mt.setModuleOrder(Integer.valueOf(map.get("moduleOrder").toString()) * 100);
-//            } else {
-//                if (mtParent != null) {
-//                    mt.setModuleOrder(mtParent.getModuleOrder() + Integer.valueOf(map.get("moduleOrder").toString()));
-//                } else {
-//                    mt.setModuleOrder(mt.getParent().getModuleOrder() + Integer.valueOf(map.get("moduleOrder").toString()));
-//                }
-//            }
-//        }
-//        if (map.get("available") != null && ((List) map.get("available")).size() > 0) {
-//            mt.setAvailable(true);
-//        } else {
-//            mt.setAvailable(false);
-//        }
-//        if (map.get("activated") != null && ((List) map.get("activated")).size() > 0) {
-//            mt.setActivated(true);
-//        } else {
-//            mt.setActivated(false);
-//        }
-//        //针对module设置对应的值
-//        moduleTableService.save(mt);
-        return null;
+    public VueResults.Result update(@RequestParam Long key, @RequestBody ModuleVo moduleVo) {
+        moduleVo.setId(key);
+        return moduleTableService.update(moduleVo);
     }
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
+
+    // @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public Map saveUser(@RequestBody JsonNode body, Principal principal) {
-//        Map map = JacksonUtil.mapper.convertValue(body.get("data"), Map.class);
-//        ModuleTable mt = new ModuleTable();
-//        ModuleTable mtParent = null;
-//        //对module的值进行设置，module name可以重复
-//        mt.setModuleName(map.get("moduleName").toString());
-//        mt.setClient(this.clientTableService.getById(Long.valueOf(map.get("client").toString())));
-//        if (map.get("authorities") != null) {
-//            List list = (List) map.get("authorities");
-//            List<ModuleRoleTable> listMr = new ArrayList<>();
-//            for (Object id : list) {
-//                listMr.add(moduleRoleTableService.getById(Long.valueOf(id.toString())));
-//            }
-//            mt.setAuthorities(listMr);
-//        }
-//        if (map.get("isTop") != null && ((List) map.get("isTop")).size() > 0) {
-//            mt.setParent(null);
-//            mt.setModuleUrl(null);
-//            mt.setIconClass(map.get("iconClass").toString());
-//        } else {
-//            if (map.get("parent") != null) {
-//                mtParent = moduleTableService.getById(Long.valueOf(map.get("parent").toString()));
-//                mt.setParent(mtParent);
-//            }
-//            if (map.get("moduleUrl") != null) {
-//                mt.setModuleUrl(map.get("moduleUrl").toString());
-//            }
-//            mt.setIconClass(null);
-//        }
-//        if (map.get("moduleOrder") != null) {
-//            if (map.get("isTop") != null && ((List) map.get("isTop")).size() > 0) {
-//                mt.setModuleOrder(Integer.valueOf(map.get("moduleOrder").toString()) * 100);
-//            } else {
-//                if (mtParent != null) {
-//                    mt.setModuleOrder(mtParent.getModuleOrder() + Integer.valueOf(map.get("moduleOrder").toString()));
-//                } else {
-//                    mt.setModuleOrder(null);
-//                }
-//            }
-//        }
-//        if (map.get("available") != null && ((List) map.get("available")).size() > 0) {
-//            mt.setAvailable(true);
-//        } else {
-//            mt.setAvailable(false);
-//        }
-//        if (map.get("activated") != null && ((List) map.get("activated")).size() > 0) {
-//            mt.setActivated(true);
-//        } else {
-//            mt.setActivated(false);
-//        }
-//        moduleTableService.save(mt);
-        return null;
+    public VueResults.Result save(@RequestBody ModuleVo moduleVo) {
+        return moduleTableService.save(moduleVo);
     }
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
+    // @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
-    public void delete(@RequestParam Long id, Principal principal) {
-        this.moduleTableService.deleteById(id);
+    public void delete(@RequestParam Long key, Principal principal) {
+        this.moduleTableService.deleteById(key);
     }
 
 
-    @PreAuthorize("hasRole('ROLE_super_admin')")
-    @RequestMapping(value = "/list/parent/options", method = {RequestMethod.GET})
-    public List getListOptions() {
-        //应该根据client获取对应的options，如果没有client，则不进行返回！！！
-        List<Map> listOptions = null;
-        List<ModuleTable> list = moduleTableService.getParentList();
-        if (list != null && list.size() > 0) {
-            listOptions = new ArrayList<>();
-            for (ModuleTable mt : list) {
-                Map mapOption = new HashMap<>();
-                mapOption.put("label", mt.getModuleName());
-                mapOption.put("value", mt.getId());
-                listOptions.add(mapOption);
-            }
+    // @PreAuthorize("hasRole('ROLE_super_admin')")
+    @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
+    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body) {
+        Map mapReturn = new HashMap<>();
+        mapReturn.put("clientIds", moduleTableService.getClientsOptions());
+        ModuleVo moduleVo = null;
+        if(key!=null){
+            moduleVo = moduleTableService.getById(key);
         }
-        return listOptions;
-    }
+        if(body!=null){
+            if(body.get("clientId")!=null||(moduleVo!=null&&moduleVo.getClientId()!=null)){
+                // 此处需要给出tree结构
+                Long clientId = null;
+                if(body.get("clientId")!=null){
+                    clientId = Long.valueOf(body.get("clientId").toString());
+                }else{
+                    clientId = moduleVo.getClientId();
+                }
+                // 根据clientId 获取parent的tree ？？
+                mapReturn.put("parentTree", moduleTableService.getClientsOptions());
+                mapReturn.put("authorityIds", moduleTableService.getClientsOptions());
+            }
 
-
-    @PreAuthorize("hasRole('ROLE_super_admin')")
-    @RequestMapping(value = "/list/parent/client/options", method = {RequestMethod.POST})
-    public Map getListOptionsOfclient(@RequestBody JsonNode body, Principal principal) {
-        Map mapReturn = null;
-        List listOptions = null;
-        Long selected = null;
-        ClientTable ct = clientTableService.getById(body.get("clientId").asLong());
-        List<ModuleTable> list = moduleTableService.getParentListByClient(ct);
-        if (list != null && list.size() > 0) {
-            listOptions = new ArrayList<>();
-            for (ModuleTable mt : list) {
-                Map mapOption = new HashMap<>();
-                mapOption.put("label", mt.getModuleName());
-                mapOption.put("value", mt.getId());
-                listOptions.add(mapOption);
-            }
-        }
-        if (body.get("moduleId") != null && !body.get("moduleId").isNull()) {
-            Long moduleId = body.get("moduleId").asLong();
-            ModuleTable mt = this.moduleTableService.getById(moduleId);
-            if (mt.getParent() != null && list.contains(mt.getParent())) {
-                selected = mt.getParent().getId();
-            }
-        }
-        if (listOptions != null) {
-            mapReturn = new HashMap<>();
-            mapReturn.put("items", listOptions);
-            mapReturn.put("defaultValue", selected);
         }
         return mapReturn;
     }
