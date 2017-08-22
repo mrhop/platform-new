@@ -71,7 +71,7 @@ public class CustomModuleTableRepositoryImpl extends SimpleJpaRepository<ModuleT
                 Predicate predicateReturn = null;
                 if (mapFilter != null && mapFilter.size() > 0) {
                     for (String key : mapFilter.keySet()) {
-                        if (mapFilter.get(key) != null && (key.equals("client") || key.equals("parent"))) {
+                        if (mapFilter.get(key) != null && (key.equals("client") || key.equals("parent")|| key.equals("activated"))) {
                             if (predicateReturn != null) {
                                 predicateReturn = builder.and(predicateReturn, builder.equal(root.get(key), mapFilter.get(key)));
                             } else {

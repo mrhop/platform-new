@@ -21,6 +21,10 @@ public class ModuleVoAssembler {
             resource.setClientId(moduleTable.getClient().getId());
             resource.setClientName(moduleTable.getClient().getClientName());
         }
+        if (moduleTable.getParent() != null) {
+            resource.setParentId(moduleTable.getParent().getId());
+            resource.setParentName(moduleTable.getParent().getModuleName());
+        }
         if (moduleTable.getAuthorities() != null && moduleTable.getAuthorities().size() > 0) {
             List<Long> list = new ArrayList<>();
             List<String> listStr = new ArrayList<>();

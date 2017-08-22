@@ -23,6 +23,7 @@ import java.util.Map;
  * Created by Donghui Huo on 2016/11/14.
  */
 @RestController
+@CrossOrigin
 @RequestMapping(value = "/module", produces = "application/json")
 public class ModuleController {
 
@@ -57,8 +58,8 @@ public class ModuleController {
                 listTmp.add(cv.getModuleName());
                 listTmp.add(cv.isActivated());
                 listTmp.add(cv.getClientId());
-                listTmp.add(cv.getAuthorityId());
-                listTmp.add(cv.getParentId());
+                listTmp.add(cv.getParentName());
+                listTmp.add(cv.getAuthoritiesStr());
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);
             }
@@ -108,23 +109,33 @@ public class ModuleController {
         Map mapReturn = new HashMap<>();
         mapReturn.put("clientIds", moduleTableService.getClientsOptions());
         ModuleVo moduleVo = null;
-        if(key!=null){
+        if (key != null) {
             moduleVo = moduleTableService.getById(key);
         }
-        if(body!=null){
-            if(body.get("clientId")!=null||(moduleVo!=null&&moduleVo.getClientId()!=null)){
+        if (body != null) {
+            Long clientId = null;
+            Long parentId = null;
+            if (body.get("clientId") != null || (moduleVo != null && moduleVo.getClientId() != null)) {
                 // 此处需要给出tree结构
-                Long clientId = null;
-                if(body.get("clientId")!=null){
+                if (body.get("clientId") != null) {
                     clientId = Long.valueOf(body.get("clientId").toString());
-                }else{
+                } else {
                     clientId = moduleVo.getClientId();
                 }
                 // 根据clientId 获取parent的tree ？？
-                mapReturn.put("parentTree", moduleTableService.getClientsOptions());
-                mapReturn.put("authorityIds", moduleTableService.getClientsOptions());
+                mapReturn.put("parentTree", moduleTableService.getParentsOptions(clientId));
+                mapReturn.put("authorityIds", moduleTableService.getModuleRoleOptions(clientId));
             }
-
+            if (body.get("parentId") != null || (moduleVo != null && moduleVo.getParentId() != null)) {
+                if (body.get("parentId") != null) {
+                    parentId = Long.valueOf(body.get("parentId").toString());
+                } else {
+                    parentId = moduleVo.getParentId();
+                }
+            }
+            if (parentId != null || clientId != null) {
+                mapReturn.put("beforeIds", moduleTableService.getBeforeOptions(parentId, clientId));
+            }
         }
         return mapReturn;
     }

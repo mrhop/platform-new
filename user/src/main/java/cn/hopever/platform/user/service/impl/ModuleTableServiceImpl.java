@@ -81,7 +81,6 @@ public class ModuleTableServiceImpl implements ModuleTableService {
         List<ModuleVo> list = new ArrayList<>();
         for (ModuleTable moduleTable : page) {
             ModuleVo moduleVo = moduleVoAssembler.toResource(moduleTable);
-            moduleVo.setAuthorityId(authorityId);
             list.add(moduleVoAssembler.toResource(moduleTable));
         }
         return new PageImpl<ModuleVo>(list, pageRequest, page.getTotalElements());
@@ -127,10 +126,10 @@ public class ModuleTableServiceImpl implements ModuleTableService {
             moduleTable.setModuleOrder(moduleTable1.getModuleOrder());
             recursiveModuleOrder(moduleTable1);
         } else {
-            ModuleTable moduleTable1 = moduleTableRepository.findTopByParentAndClientOrderByModuleOrderAsc(moduleTableParent, clientTable);
+            ModuleTable moduleTable1 = moduleTableRepository.findTopByParentAndClientOrderByModuleOrderDesc(moduleTableParent, clientTable);
             if (moduleTable1 != null) {
                 moduleTable.setBeforeModule(moduleTable1);
-                moduleTable.setModuleOrder(moduleTable1.getModuleOrder() - 1);
+                moduleTable.setModuleOrder(moduleTable1.getModuleOrder() + 1);
             } else {
                 moduleTable.setModuleOrder(0);
             }
@@ -175,10 +174,10 @@ public class ModuleTableServiceImpl implements ModuleTableService {
             moduleTable.setModuleOrder(moduleTable1.getModuleOrder());
             recursiveModuleOrder(moduleTable1);
         } else {
-            ModuleTable moduleTable1 = moduleTableRepository.findTopByParentAndClientOrderByModuleOrderAsc(moduleTableParent, clientTable);
+            ModuleTable moduleTable1 = moduleTableRepository.findTopByParentAndClientOrderByModuleOrderDesc(moduleTableParent, clientTable);
             if (moduleTable1 != null) {
                 moduleTable.setBeforeModule(moduleTable1);
-                moduleTable.setModuleOrder(moduleTable1.getModuleOrder() - 1);
+                moduleTable.setModuleOrder(moduleTable1.getModuleOrder() + 1);
             } else {
                 moduleTable.setModuleOrder(0);
             }
@@ -228,9 +227,9 @@ public class ModuleTableServiceImpl implements ModuleTableService {
     @Override
     public List<TreeOption> getParentsOptions(Long clientId) {
         ClientTable clientTable = clientTableRepository.findOne(clientId);
-        List<ModuleTable> list = moduleTableRepository.findByParentAndClientOrderByModuleOrderAsc(null, clientTable);
+        List<ModuleTable> list = moduleTableRepository.findByClientAndParentIsNullOrderByModuleOrderAsc(clientTable);
         List<TreeOption> listReturn = new ArrayList<>();
-        if(list!=null&&list.size()>0){
+        if (list != null && list.size() > 0) {
             for (ModuleTable moduleTable : list) {
                 listReturn.add(recursiveParentsOptions(moduleTable));
             }
@@ -240,13 +239,35 @@ public class ModuleTableServiceImpl implements ModuleTableService {
 
     // 继续options的实现，同时tree也应该给出一个ruleChange的回调处理
     @Override
-    public List<SelectOption> getBeforeOptions(Long parentId) {
-        return null;
+    public List<SelectOption> getBeforeOptions(Long parentId, Long clientId) {
+        List<SelectOption> listReturn = new ArrayList<>();
+        ModuleTable moduleTableParent = null;
+        List<ModuleTable> list = new ArrayList<>();
+        if (parentId != null && parentId != -1) {
+            moduleTableParent = moduleTableRepository.findOne(parentId);
+            list = moduleTableRepository.findByParentOrderByModuleOrderAsc(moduleTableParent);
+        } else {
+            list = moduleTableRepository.findByClientAndParentIsNullOrderByModuleOrderAsc(clientTableRepository.findOne(clientId));
+        }
+        if (list != null && list.size() > 0) {
+            for (ModuleTable moduleTable : list) {
+                listReturn.add(new SelectOption(moduleTable.getModuleName(), moduleTable.getId()));
+            }
+        }
+        return listReturn;
     }
 
     @Override
     public List<SelectOption> getModuleRoleOptions(Long clientId) {
-        return null;
+        ClientTable clientTable = clientTableRepository.findOne(clientId);
+        List<ModuleRoleTable> list = moduleRoleTableRepository.findByClient(clientTable);
+        List<SelectOption> listReturn = new ArrayList<>();
+        if (list != null && list.size() > 0) {
+            for (ModuleRoleTable moduleRoleTable : list) {
+                listReturn.add(new SelectOption(moduleRoleTable.getName(), moduleRoleTable.getId()));
+            }
+        }
+        return listReturn;
     }
 
     private void recursiveModuleOrder(ModuleTable moduleTable) {
@@ -267,10 +288,10 @@ public class ModuleTableServiceImpl implements ModuleTableService {
         TreeOption treeOption = new TreeOption(moduleTable.getId(), moduleTable.getModuleName());
         treeOption.setEmitClick(true);
         treeOption.setIconClass(moduleTable.getIconClass());
-        treeOption.setUrl(moduleTable.getModuleUrl());
+        //treeOption.setUrl(moduleTable.getModuleUrl());
         if (moduleTable.getChildren() != null && moduleTable.getChildren().size() > 0) {
             List<TreeOption> list = new ArrayList<>();
-            for(ModuleTable moduleTable1:moduleTable.getChildren()){
+            for (ModuleTable moduleTable1 : moduleTable.getChildren()) {
                 list.add(recursiveParentsOptions(moduleTable1));
             }
             treeOption.setChildren(list);
