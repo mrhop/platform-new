@@ -22,12 +22,10 @@ public class ClientResourceScopeTable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = true)
-    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private ClientTable client;
 
     @ManyToOne
     @JoinColumn(name = "scope_id", nullable = true)
-    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private ResourceScopeTable scope;
 
     @Column(name = "auto_approve")

@@ -31,9 +31,9 @@ public interface ModuleTableService {
 
     public List<SelectOption> getClientsOptions();
 
-    public List<TreeOption> getParentsOptions(Long clientId);
+    public List<TreeOption> getParentsOptions(Long clientId, Long id);
 
-    public List<SelectOption> getBeforeOptions(Long parentId,Long clientId);
+    public List<SelectOption> getBeforeOptions(Long parentId, Long clientId, Long id);
 
     public List<SelectOption> getModuleRoleOptions(Long clientId);
 

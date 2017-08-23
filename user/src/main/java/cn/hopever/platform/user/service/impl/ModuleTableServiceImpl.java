@@ -60,7 +60,7 @@ public class ModuleTableServiceImpl implements ModuleTableService {
     public Page<ModuleVo> getList(TableParameters body) {
         PageRequest pageRequest;
         if (body.getSorts() == null || body.getSorts().isEmpty()) {
-            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "id");
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "moduleOrder");
         } else {
             String key = body.getSorts().keySet().iterator().next();
             pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
@@ -74,7 +74,7 @@ public class ModuleTableServiceImpl implements ModuleTableService {
             authorityId = Long.valueOf(body.getFilters().get("authorityId").toString());
         }
         if (body.getFilters() != null && body.getFilters().containsKey("parentId")) {
-            body.getFilters().put("parent", moduleRoleTableRepository.findOne(Long.valueOf(body.getFilters().get("parentId").toString())));
+            body.getFilters().put("parent", moduleTableRepository.findOne(Long.valueOf(body.getFilters().get("parentId").toString())));
             body.getFilters().remove("parentId");
         }
         Page<ModuleTable> page = customModuleTableRepository.findByFilters(body.getFilters(), pageRequest);
@@ -97,17 +97,9 @@ public class ModuleTableServiceImpl implements ModuleTableService {
     public VueResults.Result update(ModuleVo moduleVo) {
         ModuleTable moduleTable = moduleTableRepository.findOne(moduleVo.getId());
         moduleTable = moduleVoAssembler.toDomain(moduleVo, moduleTable);
-        ClientTable clientTable = null;
         ModuleTable moduleTableParent = null;
-        ModuleTable moduleTableAfter = null;
-
-        if (moduleVo.getClientId() != null) {
-            clientTable = clientTableRepository.findOne(moduleVo.getClientId());
-            moduleTable.setClient(clientTable);
-        }
         if (moduleVo.getParentId() != null) {
             moduleTableParent = moduleTableRepository.findOne(moduleVo.getParentId());
-            moduleTable.setParent(moduleTableParent);
         }
         if (moduleVo.getAuthorities() != null) {
             List<ModuleRoleTable> list = new ArrayList<>();
@@ -116,28 +108,40 @@ public class ModuleTableServiceImpl implements ModuleTableService {
             }
             moduleTable.setAuthorities(list);
         }
-        if (moduleVo.getBeforeId() != null) {
+        if (moduleVo.getBeforeId() != null && !(moduleTable.getBeforeModule() != null && moduleTable.getBeforeModule().getId() == moduleVo.getBeforeId())) {
+            ModuleTable moduleTableOld = moduleTableRepository.findOneByBeforeModule(moduleTable);
+            if (moduleTableOld != null) {
+                moduleTableOld.setBeforeModule(moduleTable.getBeforeModule());
+                moduleTableRepository.save(moduleTableOld);
+            }
             ModuleTable moduleTable1 = moduleTableRepository.findOne(moduleVo.getBeforeId());
             moduleTable.setBeforeModule(moduleTable1);
-            moduleTableAfter = moduleTableRepository.findOneByBeforeModule(moduleTable1);
+            ModuleTable moduleTableAfter = moduleTableRepository.findOneByBeforeModule(moduleTable1);
             if (moduleTableAfter != null) {
                 moduleTableAfter.setBeforeModule(moduleTable);
+                moduleTableRepository.save(moduleTableAfter);
             }
             moduleTable.setModuleOrder(moduleTable1.getModuleOrder());
             recursiveModuleOrder(moduleTable1);
         } else {
-            ModuleTable moduleTable1 = moduleTableRepository.findTopByParentAndClientOrderByModuleOrderDesc(moduleTableParent, clientTable);
+            ModuleTable moduleTable1 = moduleTableRepository.findTopByParentAndClientOrderByModuleOrderDesc(moduleTableParent, moduleTable.getClient());
             if (moduleTable1 != null) {
-                moduleTable.setBeforeModule(moduleTable1);
-                moduleTable.setModuleOrder(moduleTable1.getModuleOrder() + 1);
+                if (moduleTable.getId() != moduleTable1.getId()) {
+                    ModuleTable moduleTableOld = moduleTableRepository.findOneByBeforeModule(moduleTable);
+                    if (moduleTableOld != null) {
+                        moduleTableOld.setBeforeModule(moduleTable.getBeforeModule());
+                        moduleTableRepository.save(moduleTableOld);
+                    }
+                    moduleTable.setBeforeModule(moduleTable1);
+                    moduleTable.setModuleOrder(moduleTable1.getModuleOrder() + 1);
+                }
             } else {
+                moduleTable.setBeforeModule(null);
                 moduleTable.setModuleOrder(0);
             }
         }
+        moduleTable.setParent(moduleTableParent);
         moduleTableRepository.save(moduleTable);
-        if (moduleTableAfter != null) {
-            moduleTableRepository.save(moduleTableAfter);
-        }
         return VueResults.generateSuccess("更新成功", "更新模块成功");
     }
 
@@ -202,7 +206,7 @@ public class ModuleTableServiceImpl implements ModuleTableService {
         if (moduleTableAfter != null) {
             moduleTableAfter.setBeforeModule(moduleTableBefore);
             this.moduleTableRepository.save(moduleTableAfter);
-        } else {
+        } else if (moduleTableBefore != null) {
             this.moduleTableRepository.save(moduleTableBefore);
         }
         this.moduleTableRepository.delete(mt);
@@ -225,13 +229,21 @@ public class ModuleTableServiceImpl implements ModuleTableService {
     }
 
     @Override
-    public List<TreeOption> getParentsOptions(Long clientId) {
+    public List<TreeOption> getParentsOptions(Long clientId, Long id) {
         ClientTable clientTable = clientTableRepository.findOne(clientId);
-        List<ModuleTable> list = moduleTableRepository.findByClientAndParentIsNullOrderByModuleOrderAsc(clientTable);
+        List<ModuleTable> list = null;
+        if (id == null) {
+            list = moduleTableRepository.findByClientAndParentIsNullOrderByModuleOrderAsc(clientTable);
+        } else {
+            list = moduleTableRepository.findByClientAndParentIsNullAndIdNotOrderByModuleOrderAsc(clientTable, id);
+        }
         List<TreeOption> listReturn = new ArrayList<>();
         if (list != null && list.size() > 0) {
             for (ModuleTable moduleTable : list) {
-                listReturn.add(recursiveParentsOptions(moduleTable));
+                TreeOption treeOption = recursiveParentsOptions(moduleTable, id);
+                if (treeOption != null) {
+                    listReturn.add(treeOption);
+                }
             }
         }
         return listReturn;
@@ -239,15 +251,23 @@ public class ModuleTableServiceImpl implements ModuleTableService {
 
     // 继续options的实现，同时tree也应该给出一个ruleChange的回调处理
     @Override
-    public List<SelectOption> getBeforeOptions(Long parentId, Long clientId) {
+    public List<SelectOption> getBeforeOptions(Long parentId, Long clientId, Long id) {
         List<SelectOption> listReturn = new ArrayList<>();
         ModuleTable moduleTableParent = null;
         List<ModuleTable> list = new ArrayList<>();
         if (parentId != null && parentId != -1) {
             moduleTableParent = moduleTableRepository.findOne(parentId);
-            list = moduleTableRepository.findByParentOrderByModuleOrderAsc(moduleTableParent);
+            if (id == null) {
+                list = moduleTableRepository.findByParentOrderByModuleOrderAsc(moduleTableParent);
+            } else {
+                list = moduleTableRepository.findByParentAndIdNotOrderByModuleOrderAsc(moduleTableParent, id);
+            }
         } else {
-            list = moduleTableRepository.findByClientAndParentIsNullOrderByModuleOrderAsc(clientTableRepository.findOne(clientId));
+            if (id == null) {
+                list = moduleTableRepository.findByClientAndParentIsNullOrderByModuleOrderAsc(clientTableRepository.findOne(clientId));
+            } else {
+                list = moduleTableRepository.findByClientAndParentIsNullAndIdNotOrderByModuleOrderAsc(clientTableRepository.findOne(clientId), id);
+            }
         }
         if (list != null && list.size() > 0) {
             for (ModuleTable moduleTable : list) {
@@ -284,19 +304,25 @@ public class ModuleTableServiceImpl implements ModuleTableService {
         }
     }
 
-    private TreeOption recursiveParentsOptions(ModuleTable moduleTable) {
-        TreeOption treeOption = new TreeOption(moduleTable.getId(), moduleTable.getModuleName());
-        treeOption.setEmitClick(true);
-        treeOption.setIconClass(moduleTable.getIconClass());
-        //treeOption.setUrl(moduleTable.getModuleUrl());
-        if (moduleTable.getChildren() != null && moduleTable.getChildren().size() > 0) {
-            List<TreeOption> list = new ArrayList<>();
-            for (ModuleTable moduleTable1 : moduleTable.getChildren()) {
-                list.add(recursiveParentsOptions(moduleTable1));
+    private TreeOption recursiveParentsOptions(ModuleTable moduleTable, Long id) {
+        if (id == null || id != moduleTable.getId()) {
+            TreeOption treeOption = new TreeOption(moduleTable.getId(), moduleTable.getModuleName());
+            treeOption.setEmitClick(true);
+            treeOption.setIconClass(moduleTable.getIconClass());
+            //treeOption.setUrl(moduleTable.getModuleUrl());
+            if (moduleTable.getChildren() != null && moduleTable.getChildren().size() > 0) {
+                List<TreeOption> list = new ArrayList<>();
+                for (ModuleTable moduleTable1 : moduleTable.getChildren()) {
+                    TreeOption treeOptionTemp = recursiveParentsOptions(moduleTable1, id);
+                    if (treeOptionTemp != null) {
+                        list.add(treeOptionTemp);
+                    }
+                }
+                treeOption.setChildren(list);
             }
-            treeOption.setChildren(list);
+            return treeOption;
         }
-        return treeOption;
+        return null;
     }
 
 }

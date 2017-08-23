@@ -3,7 +3,6 @@ package cn.hopever.platform.user.vo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -14,7 +13,6 @@ import java.util.List;
 //获取角色的一些信息并进行处理，
 public class ModuleVo {
 
-    @NotNull
     private long id;
 
     private String clientName;

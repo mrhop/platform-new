@@ -56,7 +56,6 @@ public class ModuleTable {
 
     @OneToMany(mappedBy = "parent", cascade = {CascadeType.ALL}, orphanRemoval = true)
     @OrderBy("moduleOrder asc")
-    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ModuleTable> children;
 
     @Column(name = "available", nullable = false)
@@ -67,7 +66,6 @@ public class ModuleTable {
 
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "platform_user_module_module_role", joinColumns = @JoinColumn(name = "module_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ModuleRoleTable> authorities;
 
 }

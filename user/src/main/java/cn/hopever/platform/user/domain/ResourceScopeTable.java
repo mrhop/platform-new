@@ -30,7 +30,6 @@ public class ResourceScopeTable {
     private String name;
 
     @OneToMany(mappedBy = "scope", cascade = {CascadeType.ALL}, orphanRemoval = true)
-    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ClientResourceScopeTable> clientResourceScopeTables;
 
 }

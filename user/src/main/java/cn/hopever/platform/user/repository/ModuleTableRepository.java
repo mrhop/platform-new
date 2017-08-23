@@ -20,7 +20,10 @@ public interface ModuleTableRepository extends PagingAndSortingRepository<Module
 
     public ModuleTable findTopByParentAndClientOrderByModuleOrderDesc(ModuleTable parent, ClientTable client);
 
+    public List<ModuleTable> findByClientAndParentIsNullAndIdNotOrderByModuleOrderAsc(ClientTable client, Long id);
     public List<ModuleTable> findByClientAndParentIsNullOrderByModuleOrderAsc(ClientTable client);
+
+    public List<ModuleTable> findByParentAndIdNotOrderByModuleOrderAsc(ModuleTable parent, Long id);
     public List<ModuleTable> findByParentOrderByModuleOrderAsc(ModuleTable parent);
 
     public List<ModuleTable> findDistinctByModuleNameLike(String moduleName, Pageable pageable);

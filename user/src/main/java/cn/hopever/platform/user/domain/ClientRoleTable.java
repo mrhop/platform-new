@@ -32,7 +32,6 @@ public class ClientRoleTable implements GrantedAuthority {
     private short level;
 
     @ManyToMany(mappedBy = "authorities")
-    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<ClientTable> clients;
 
     @Column(name = "name", nullable = false, length = 50, unique = true)

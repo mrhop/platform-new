@@ -35,7 +35,6 @@ public class RoleTable implements GrantedAuthority {
     private short level = 3;
 
     @ManyToMany(mappedBy = "authorities")
-    @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     private List<UserTable> users;
 
 }
