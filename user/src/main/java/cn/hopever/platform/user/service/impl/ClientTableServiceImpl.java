@@ -113,13 +113,15 @@ public class ClientTableServiceImpl implements ClientTableService {
     public void delete(long id) {
         ClientTable clientTable = clientTableRepository.findOne(id);
         if (clientTable != null && !clientTable.getClientId().equals("user_admin_client")) {
+            RoleTable roleTable = roleTableRepository.findOneByAuthority("ROLE_" + clientTable.getClientId());
             if (clientTable.getUsers() != null) {
                 for (UserTable ut : clientTable.getUsers()) {
                     ut.getClients().remove(clientTable);
+                    ut.getAuthorities().remove(roleTable);
                 }
             }
-            clientTableRepository.delete(clientTable);
             roleTableRepository.delete(roleTableRepository.findOneByAuthority("ROLE_" + clientTable.getClientId()));
+            clientTableRepository.delete(clientTable);
         }
     }
 

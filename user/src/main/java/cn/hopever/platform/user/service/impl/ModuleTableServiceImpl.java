@@ -1,8 +1,6 @@
 package cn.hopever.platform.user.service.impl;
 
-import cn.hopever.platform.user.domain.ClientTable;
-import cn.hopever.platform.user.domain.ModuleRoleTable;
-import cn.hopever.platform.user.domain.ModuleTable;
+import cn.hopever.platform.user.domain.*;
 import cn.hopever.platform.user.repository.*;
 import cn.hopever.platform.user.service.ModuleTableService;
 import cn.hopever.platform.user.vo.ModuleVo;
@@ -21,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -290,6 +289,27 @@ public class ModuleTableServiceImpl implements ModuleTableService {
         return listReturn;
     }
 
+    @Override
+    public List<TreeOption> getLeftMenu(Principal principal, String clientId) {
+        UserTable userTable = userTableRepository.findOneByUsername(principal.getName());
+        ClientTable clientTable = clientTableRepository.findOneByClientId(clientId);
+        if(clientId.equals("user_admin_client")){
+            //不必按照查询来，而要根据user的权限来
+            RoleTable roleTable = getTopRole(userTable);
+            if(roleTable.getAuthority().equals("ROLE_super_admin")){
+                // return 全部
+            } else if(roleTable.getAuthority().equals("ROLE_admin")){
+                // 返回其可以管理的用户选项等
+            } else{
+                // 只返回一个个人信息的处理
+            }
+        }else{
+            // 首先判断用户是否和client 有关联，然后是 获取该client 关联的modulerole
+            // 然后筛选出用户的module role，然后根据role获取module
+        }
+        return null;
+    }
+
     private void recursiveModuleOrder(ModuleTable moduleTable) {
         moduleTable.setModuleOrder(moduleTable.getModuleOrder() - 1);
         if (moduleTable.getBeforeModule() != null) {
@@ -321,6 +341,16 @@ public class ModuleTableServiceImpl implements ModuleTableService {
                 treeOption.setChildren(list);
             }
             return treeOption;
+        }
+        return null;
+    }
+
+    private RoleTable getTopRole(UserTable userTable) {
+        List<RoleTable> rtControllers = userTable.getAuthorities();
+        for (RoleTable rt : rtControllers) {
+            if (rt.getLevel() < 3) {
+                return rt;
+            }
         }
         return null;
     }

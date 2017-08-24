@@ -8,6 +8,7 @@ import cn.hopever.platform.utils.web.TreeOption;
 import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.data.domain.Page;
 
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -36,5 +37,7 @@ public interface ModuleTableService {
     public List<SelectOption> getBeforeOptions(Long parentId, Long clientId, Long id);
 
     public List<SelectOption> getModuleRoleOptions(Long clientId);
+
+    public List<TreeOption> getLeftMenu(Principal principal,String clientId);
 
 }

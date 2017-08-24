@@ -284,19 +284,13 @@ public class UserTableServiceImpl implements UserTableService {
             }
         }
         RoleTable rtTop = roleTableRepository.findOneByAuthority(userVo.getAuthoritiesKey());
+        List<RoleTable> list = user.getAuthorities();
+        list.clear();
         if (userVo.getAuthoritiesKey() != null) {
-            List<RoleTable> list = user.getAuthorities();
-            for (RoleTable rt : list) {
-                if (rt.getLevel() < 3) {
-                    list.remove(rt);
-                    break;
-                }
-            }
             list.add(rtTop);
-            user.setAuthorities(list);
         }
         if (rtTop.getLevel() > 0) {
-            List listPartClients = new ArrayList<>();
+            List<ClientTable> listPartClients = new ArrayList<>();
             listPartClients.add(clientTableRepository.findOneByClientId("user_admin_client"));
             if (rtController != null && rtController.getLevel() != 0 && user.getClients() != null) {
                 for (ClientTable ct : user.getClients()) {
@@ -312,7 +306,11 @@ public class UserTableServiceImpl implements UserTableService {
                 }
             }
             user.setClients(listPartClients);
+            for (ClientTable clientTable : listPartClients) {
+                list.add(roleTableRepository.findOneByAuthority("ROLE_" + clientTable.getClientId()));
+            }
         }
+        user.setAuthorities(list);
         if (rtTop.getLevel() == 2) {
             List<ModuleRoleTable> listPartModuleRoles = new ArrayList<>();
             if (rtController.getLevel() == 1) {
