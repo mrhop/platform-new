@@ -120,7 +120,6 @@ public class ModuleController {
             Long parentId = null;
             if (body.get("clientId") != null) {
                 clientId = Long.valueOf(body.get("clientId").toString());
-                // 根据clientId 获取parent的tree ？？
                 mapReturn.put("parentTree", moduleTableService.getParentsOptions(clientId, key));
             }
             if (body.get("parentId") != null) {

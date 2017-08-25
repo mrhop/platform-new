@@ -3,6 +3,12 @@ http://planet.jboss.org/post/collection_caching_in_the_hibernate_second_level_ca
 来实现cache的有效更新，
 目前效率有些问题，需要后续处理
 模块完事，
+开始将左侧的树实现，首先是user的，tree需要进行测试
+同时要给tree赋予一个选中的特性，
+
+然后开始创建cms的项目，然后是crm的项目
+明天创建一个新库，并将用户只指向到该库，并搭建起cms的库，然后抽取功能
+
 后续调整：
 1>保存更新用户时，当有client的更新时，考虑将role进行相应的处理--处理中
 2>将hibernate的ehcache替换为redis，保证集群可用，并使用jta事务

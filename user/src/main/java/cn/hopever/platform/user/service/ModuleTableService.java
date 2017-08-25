@@ -38,6 +38,6 @@ public interface ModuleTableService {
 
     public List<SelectOption> getModuleRoleOptions(Long clientId);
 
-    public List<TreeOption> getLeftMenu(Principal principal,String clientId);
+    public List getLeftMenu(Principal principal,String clientId);
 
 }

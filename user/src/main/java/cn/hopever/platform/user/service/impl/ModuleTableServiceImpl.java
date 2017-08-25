@@ -1,5 +1,6 @@
 package cn.hopever.platform.user.service.impl;
 
+import cn.hopever.platform.user.config.BaseConfig;
 import cn.hopever.platform.user.domain.*;
 import cn.hopever.platform.user.repository.*;
 import cn.hopever.platform.user.service.ModuleTableService;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -32,6 +34,9 @@ import java.util.Set;
 public class ModuleTableServiceImpl implements ModuleTableService {
 
     Logger logger = LoggerFactory.getLogger(ModuleTableServiceImpl.class);
+
+    @Autowired
+    private BaseConfig baseConfig;
 
     @Autowired
     private ModuleVoAssembler moduleVoAssembler;
@@ -294,41 +299,43 @@ public class ModuleTableServiceImpl implements ModuleTableService {
     }
 
     @Override
-    public List<TreeOption> getLeftMenu(Principal principal, String clientId) {
+    public List getLeftMenu(Principal principal, String clientId) {
         UserTable userTable = userTableRepository.findOneByUsername(principal.getName());
         ClientTable clientTable = clientTableRepository.findOneByClientId(clientId);
+        List<TreeOption> listReturn = new ArrayList<>();
         if (clientId.equals("user_admin_client")) {
             //不必按照查询来，而要根据user的权限来
             RoleTable roleTable = getTopRole(userTable);
             if (roleTable.getAuthority().equals("ROLE_super_admin")) {
-                // return 全部
+                return baseConfig.getSuperAdminMenu();
             } else if (roleTable.getAuthority().equals("ROLE_admin")) {
-                // 返回其可以管理的用户选项等
+                return baseConfig.getCommonAdminMenu();
             } else {
-                // 只返回一个个人信息的处理
+                return baseConfig.getCommonUserMenu();
             }
         } else {
-            // 首先判断用户是否和client 有关联，然后是 获取该client 关联的modulerole关联的modulerole
-            // 然后筛选出用户的module role，然后根据role获取module[使用right join的方法]
-            // 获取到moduleRole，然后再获取module
             List<ModuleRoleTable> listModuleRole = customModuleRoleTableRepository.findByUserAndClient(userTable.getId(), clientTable);
             List<Long> moduleRoleIds = new ArrayList<>();
-
             for (ModuleRoleTable moduleRoleTable : listModuleRole) {
                 moduleRoleIds.add(moduleRoleTable.getId());
             }
-
             if (moduleRoleIds.size() > 0) {
                 List<ModuleTable> list = customModuleTableRepository.findByModuleRoles(moduleRoleIds);
-                // 开始进行遍历并赋值
-               // List<ModuleTable> listTop =
-                // 使用moduleRole来控制module
-                for (ModuleTable moduleTable : list) {
-
+                List<ModuleTable> listTop = new ArrayList<>();
+                Iterator<ModuleTable> i = list.iterator();
+                while (i.hasNext()) {
+                    ModuleTable moduleTable = i.next();
+                    if (moduleTable.getParent() == null) {
+                        listTop.add(moduleTable);
+                    }
+                    i.remove();
+                }
+                for (ModuleTable moduleTable : listTop) {
+                    listReturn.add(recursiveLeftMenuptions(moduleTable, list));
                 }
             }
         }
-        return null;
+        return listReturn;
     }
 
     private void recursiveModuleOrder(ModuleTable moduleTable) {
@@ -367,6 +374,28 @@ public class ModuleTableServiceImpl implements ModuleTableService {
             return treeOption;
         }
         return null;
+    }
+
+    private TreeOption recursiveLeftMenuptions(ModuleTable moduleTable, List<ModuleTable> list) {
+        TreeOption treeOption = new TreeOption(moduleTable.getId(), moduleTable.getModuleName());
+        treeOption.setEmitClick(true);
+        treeOption.setIconClass(moduleTable.getIconClass());
+        if (moduleTable.getChildren() != null && moduleTable.getChildren().size() > 0) {
+            List<TreeOption> listMenuChildren = new ArrayList<>();
+            for (ModuleTable moduleTable1 : moduleTable.getChildren()) {
+                if (list.contains(moduleTable1)) {
+                    list.remove(moduleTable1);
+                    TreeOption treeOptionTemp = recursiveLeftMenuptions(moduleTable1, list);
+                    if (treeOptionTemp != null) {
+                        listMenuChildren.add(treeOptionTemp);
+                    }
+                }
+            }
+            treeOption.setChildren(listMenuChildren);
+        } else {
+            treeOption.setUrl(moduleTable.getModuleUrl());
+        }
+        return treeOption;
     }
 
     private RoleTable getTopRole(UserTable userTable) {

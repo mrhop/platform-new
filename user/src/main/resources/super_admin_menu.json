@@ -1,0 +1,86 @@
+[
+  {
+    "title": "控制台",
+    "url": "/",
+    "iconClass": "glyphicon glyphicon-dashboard"
+  },
+  {
+    "title": "用户管理",
+    "iconClass": "glyphicon glyphicon-user",
+    "children": [
+      {
+        "title": "用户列表",
+        "url": "/userlist"
+      },
+      {
+        "title": "新增用户",
+        "url": "/adduser"
+      },
+      {
+        "title": "个人信息",
+        "url": "/personalinfo"
+      }
+    ]
+  },
+  {
+    "title": "角色管理",
+    "url": "/rolelist",
+    "iconClass": "glyphicon glyphicon-pawn"
+  },
+  {
+    "title": "应用管理",
+    "iconClass": "glyphicon glyphicon-list-alt",
+    "children": [
+      {
+        "title": "应用列表",
+        "url": "/applist"
+      },
+      {
+        "title": "新增应用",
+        "url": "/addapp"
+      }
+    ]
+  },
+  {
+    "title": "资源范围管理",
+    "iconClass": "glyphicon glyphicon-modal-window",
+    "children": [
+      {
+        "title": "资源范围列表",
+        "url": "/resourcescopelist"
+      },
+      {
+        "title": "新增资源范围",
+        "url": "/addresourcescope"
+      }
+    ]
+  },
+  {
+    "title": "模块角色管理",
+    "iconClass": "glyphicon glyphicon-th-large",
+    "children": [
+      {
+        "title": "模块角色列表",
+        "url": "/modulerolelist"
+      },
+      {
+        "title": "新增模块角色",
+        "url": "/addmodulerole"
+      }
+    ]
+  },
+  {
+    "title": "模块管理",
+    "iconClass": "glyphicon glyphicon-th",
+    "children": [
+      {
+        "title": "模块列表",
+        "url": "/modulelist"
+      },
+      {
+        "title": "新增模块",
+        "url": "/addmodule"
+      }
+    ]
+  }
+]

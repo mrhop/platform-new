@@ -1,19 +1,19 @@
 package cn.hopever.platform.user.test;
 
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**
  * Created by Donghui Huo on 2016/8/30.
  */
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
 //@WebMvcTest(ExampleTableController.class)
-@AutoConfigureMockMvc
+//@AutoConfigureMockMvc
 public class ExampleTestMvcAllMock {
 
-//    @Autowired
+    //    @Autowired
 //    private MockMvc mvc;
 //
 //    @MockBean
@@ -33,6 +33,9 @@ public class ExampleTestMvcAllMock {
 //                .andExpect(status().isOk())
 //                .andExpect(content().contentType("application/json;charset=UTF-8"));
 //    }
-
+    @Test
+    public void testExample() throws Exception {
+        assertEquals("1234", "1234");
+    }
 
 }

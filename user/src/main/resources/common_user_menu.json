@@ -1,0 +1,17 @@
+[
+  {
+    "title": "控制台",
+    "url": "/",
+    "iconClass": "glyphicon glyphicon-dashboard"
+  },
+  {
+    "title": "用户管理",
+    "iconClass": "glyphicon glyphicon-user",
+    "children": [
+      {
+        "title": "个人信息",
+        "url": "/personalinfo"
+      }
+    ]
+  }
+]
