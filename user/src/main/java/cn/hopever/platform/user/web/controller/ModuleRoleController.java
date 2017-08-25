@@ -45,7 +45,6 @@ public class ModuleRoleController {
     ModuleRoleVoAssembler moduleRoleVoAssembler;
 
 
-
     //@PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body) {
@@ -106,7 +105,16 @@ public class ModuleRoleController {
     @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
     public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body) {
         Map mapReturn = new HashMap<>();
-        mapReturn.put("clientIds", moduleRoleTableService.getClientsOptions());
+        if (body == null) {
+            mapReturn.put("clientIds", moduleRoleTableService.getClientsOptions());
+            if (key != null) {
+                mapReturn.put("moduleIds", moduleRoleTableService.getParentsOptions(null, key));
+            }
+        } else {
+            if (body.get("clientId") != null) {
+                mapReturn.put("moduleIds", moduleRoleTableService.getParentsOptions(Long.valueOf(body.get("clientId").toString()), null));
+            }
+        }
         return mapReturn;
     }
 

@@ -5,6 +5,7 @@ import cn.hopever.platform.user.domain.ModuleTable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -14,4 +15,6 @@ public interface CustomModuleTableRepository {
     public Page<ModuleTable> findByFilters(Map<String, Object> mapFilter, Pageable pageable, ClientTable userAdminClient);
 
     public Page<ModuleTable> findByFilters(Map<String, Object> mapFilter, Pageable pageable);
+
+    public List<ModuleTable> findByModuleRoles(List<Long> moduleRoleIds);
 }

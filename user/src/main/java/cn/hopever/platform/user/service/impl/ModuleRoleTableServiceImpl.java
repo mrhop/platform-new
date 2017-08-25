@@ -1,15 +1,16 @@
 package cn.hopever.platform.user.service.impl;
 
-import cn.hopever.platform.user.domain.*;
-import cn.hopever.platform.user.repository.ClientTableRepository;
-import cn.hopever.platform.user.repository.CustomModuleRoleTableRepository;
-import cn.hopever.platform.user.repository.ModuleRoleTableRepository;
-import cn.hopever.platform.user.repository.UserTableRepository;
+import cn.hopever.platform.user.domain.ClientTable;
+import cn.hopever.platform.user.domain.ModuleRoleTable;
+import cn.hopever.platform.user.domain.ModuleTable;
+import cn.hopever.platform.user.domain.UserTable;
+import cn.hopever.platform.user.repository.*;
 import cn.hopever.platform.user.service.ModuleRoleTableService;
 import cn.hopever.platform.user.vo.ModuleRoleVo;
 import cn.hopever.platform.user.vo.ModuleRoleVoAssembler;
 import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
+import cn.hopever.platform.utils.web.TreeOption;
 import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,9 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
     private ModuleRoleTableRepository moduleRoleTableRepository;
     @Autowired
     private CustomModuleRoleTableRepository customModuleRoleTableRepository;
+
+    @Autowired
+    private ModuleTableRepository moduleTableRepository;
 
     @Autowired
     private ModuleRoleVoAssembler moduleRoleVoAssembler;
@@ -108,6 +112,34 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
         if (moduleRoleVo.getClientId() != null) {
             moduleRoleTable.setClient(clientTableRepository.findOne(moduleRoleVo.getClientId()));
         }
+
+        if (moduleRoleVo.getModuleIds() != null) {
+            List<ModuleTable> listModuleTable = new ArrayList<>();
+            for (Long moduleId : moduleRoleVo.getModuleIds()) {
+                ModuleTable moduleTable = moduleTableRepository.findOne(moduleId);
+                listModuleTable.add(moduleTable);
+                if (moduleTable.getAuthorities() != null) {
+                    if (!moduleTable.getAuthorities().contains(moduleRoleTable)) {
+                        moduleTable.getAuthorities().add(moduleRoleTable);
+                    }
+                } else {
+                    List<ModuleRoleTable> list = new ArrayList<>();
+                    list.add(moduleRoleTable);
+                    moduleTable.setAuthorities(list);
+                }
+            }
+            if (moduleRoleTable.getModules() == null) {
+                moduleRoleTable.setModules(listModuleTable);
+            } else {
+                for (ModuleTable moduleTable : moduleRoleTable.getModules()) {
+                    if (!listModuleTable.contains(moduleTable)) {
+                        moduleTable.getAuthorities().remove(moduleRoleTable);
+                    }
+                }
+                moduleRoleTable.getModules().clear();
+                moduleRoleTable.getModules().addAll(listModuleTable);
+            }
+        }
         moduleRoleTableRepository.save(moduleRoleTable);
         return VueResults.generateSuccess("更新成功", "更新模块角色成功");
     }
@@ -122,6 +154,21 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
         }
         if (moduleRoleVo.getClientId() != null) {
             moduleRoleTable.setClient(clientTableRepository.findOne(moduleRoleVo.getClientId()));
+        }
+        if (moduleRoleVo.getModuleIds() != null) {
+            List<ModuleTable> listModuleTable = new ArrayList<>();
+            for (Long moduleId : moduleRoleVo.getModuleIds()) {
+                ModuleTable moduleTable = moduleTableRepository.findOne(moduleId);
+                listModuleTable.add(moduleTable);
+                if (moduleTable.getAuthorities() != null) {
+                    moduleTable.getAuthorities().add(moduleRoleTable);
+                } else {
+                    List<ModuleRoleTable> list = new ArrayList<>();
+                    list.add(moduleRoleTable);
+                    moduleTable.setAuthorities(list);
+                }
+            }
+            moduleRoleTable.setModules(listModuleTable);
         }
         moduleRoleTableRepository.save(moduleRoleTable);
         return VueResults.generateSuccess("保存成功", "保存模块角色成功");
@@ -162,5 +209,47 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
             listReturn.add(selectOption);
         }
         return listReturn;
+    }
+
+    @Override
+    public List<TreeOption> getParentsOptions(Long clientId, Long moduleRoleId) {
+        ClientTable clientTable = null;
+        if (clientId != null) {
+            clientTable = clientTableRepository.findOne(clientId);
+        } else {
+            clientTable = moduleRoleTableRepository.findOne(moduleRoleId).getClient();
+        }
+        if (clientTable != null) {
+            List<ModuleTable> list = moduleTableRepository.findByClientAndParentIsNullOrderByModuleOrderAsc(clientTable);
+            List<TreeOption> listReturn = new ArrayList<>();
+            if (list != null && list.size() > 0) {
+                for (ModuleTable moduleTable : list) {
+                    TreeOption treeOption = recursiveParentsOptions(moduleTable);
+                    if (treeOption != null) {
+                        listReturn.add(treeOption);
+                    }
+                }
+            }
+            return listReturn;
+        }
+        return null;
+
+    }
+
+    private TreeOption recursiveParentsOptions(ModuleTable moduleTable) {
+        TreeOption treeOption = new TreeOption(moduleTable.getId(), moduleTable.getModuleName());
+        treeOption.setEmitClick(true);
+        treeOption.setIconClass(moduleTable.getIconClass());
+        if (moduleTable.getChildren() != null && moduleTable.getChildren().size() > 0) {
+            List<TreeOption> list = new ArrayList<>();
+            for (ModuleTable moduleTable1 : moduleTable.getChildren()) {
+                TreeOption treeOptionTemp = recursiveParentsOptions(moduleTable1);
+                if (treeOptionTemp != null) {
+                    list.add(treeOptionTemp);
+                }
+            }
+            treeOption.setChildren(list);
+        }
+        return treeOption;
     }
 }

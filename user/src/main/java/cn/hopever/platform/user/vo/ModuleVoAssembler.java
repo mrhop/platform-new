@@ -26,13 +26,13 @@ public class ModuleVoAssembler {
             resource.setParentName(moduleTable.getParent().getModuleName());
         }
         if (moduleTable.getAuthorities() != null && moduleTable.getAuthorities().size() > 0) {
-            List<Long> list = new ArrayList<>();
+            // List<Long> list = new ArrayList<>();
             List<String> listStr = new ArrayList<>();
             for (ModuleRoleTable moduleRoleTable : moduleTable.getAuthorities()) {
-                list.add(moduleRoleTable.getId());
+                // list.add(moduleRoleTable.getId());
                 listStr.add(moduleRoleTable.getName());
             }
-            resource.setAuthorities(list);
+            //resource.setAuthorities(list);
             resource.setAuthoritiesStr(listStr.toString());
         }
         resource.setBeforeId(moduleTable.getBeforeModule() != null ? moduleTable.getBeforeModule().getId() : null);

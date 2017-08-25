@@ -6,6 +6,7 @@ import cn.hopever.platform.user.domain.ModuleTable;
 import cn.hopever.platform.user.repository.CustomModuleTableRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -94,6 +96,24 @@ public class CustomModuleTableRepositoryImpl extends SimpleJpaRepository<ModuleT
                         }
                     }
                 }
+                return predicateReturn;
+            }
+        };
+    }
+
+    @Override
+    public List<ModuleTable> findByModuleRoles(List<Long> moduleRoleIds) {
+        return super.findAll(filterConditions3(moduleRoleIds), new Sort(Sort.Direction.ASC, "moduleOrder"));
+    }
+
+    private Specification<ModuleTable> filterConditions3(List<Long> moduleRoleIds) {
+        return new Specification<ModuleTable>() {
+            public Predicate toPredicate(Root<ModuleTable> root, CriteriaQuery<?> query,
+                                         CriteriaBuilder builder) {
+                query.distinct(true);
+                Join<ModuleTable, ModuleRoleTable> takeJoin = root.join("authorities");
+                Expression<Long> roleId = takeJoin.get("id");
+                Predicate predicateReturn = roleId.in(moduleRoleIds);
                 return predicateReturn;
             }
         };

@@ -1,6 +1,8 @@
 package cn.hopever.platform.user.repository.impl;
 
+import cn.hopever.platform.user.domain.ClientTable;
 import cn.hopever.platform.user.domain.ModuleRoleTable;
+import cn.hopever.platform.user.domain.UserTable;
 import cn.hopever.platform.user.repository.CustomModuleRoleTableRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,10 +12,8 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +32,11 @@ public class CustomModuleRoleTableRepositoryImpl extends SimpleJpaRepository<Mod
     @Override
     public Page<ModuleRoleTable> findByFilters(Map<String, Object> mapFilter, Pageable pageable) {
         return super.findAll(filterConditions1(mapFilter), pageable);
+    }
+
+    @Override
+    public List<ModuleRoleTable> findByUserAndClient(Long userId, ClientTable clientTable) {
+        return super.findAll(filterConditions2(userId, clientTable));
     }
 
     private Specification<ModuleRoleTable> filterConditions1(Map<String, Object> mapFilter) {
@@ -60,6 +65,20 @@ public class CustomModuleRoleTableRepositoryImpl extends SimpleJpaRepository<Mod
                         }
                     }
                 }
+                return predicateReturn;
+            }
+        };
+    }
+
+    private Specification<ModuleRoleTable> filterConditions2(Long userId, ClientTable clientTable) {
+        return new Specification<ModuleRoleTable>() {
+            public Predicate toPredicate(Root<ModuleRoleTable> root, CriteriaQuery<?> query,
+                                         CriteriaBuilder builder) {
+                query.distinct(true);
+                Predicate predicateReturn = builder.equal(root.get("client"), clientTable);
+                Join<ModuleRoleTable, UserTable> takeJoin = root.join("users");
+                Expression<Long> userIdExpression = takeJoin.get("id");
+                predicateReturn = builder.and(predicateReturn, builder.equal(userIdExpression, userId));
                 return predicateReturn;
             }
         };

@@ -113,7 +113,6 @@ public class ModuleController {
             if (key != null) {
                 moduleVo = moduleTableService.getById(key);
                 mapReturn.put("parentTree", moduleTableService.getParentsOptions(moduleVo.getClientId(), key));
-                mapReturn.put("authorityIds", moduleTableService.getModuleRoleOptions(moduleVo.getClientId()));
                 mapReturn.put("beforeIds", moduleTableService.getBeforeOptions(moduleVo.getParentId(), moduleVo.getClientId(), key));
             }
         } else {
@@ -123,7 +122,6 @@ public class ModuleController {
                 clientId = Long.valueOf(body.get("clientId").toString());
                 // 根据clientId 获取parent的tree ？？
                 mapReturn.put("parentTree", moduleTableService.getParentsOptions(clientId, key));
-                mapReturn.put("authorityIds", moduleTableService.getModuleRoleOptions(clientId));
             }
             if (body.get("parentId") != null) {
                 parentId = Long.valueOf(body.get("parentId").toString());

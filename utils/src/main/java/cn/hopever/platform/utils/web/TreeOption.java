@@ -17,6 +17,7 @@ public class TreeOption implements Serializable {
     private boolean emitClick = true;
     private SelectOption emitClickArgs;
     private List<TreeOption> children;
+    private boolean refresh = false;
 
     public TreeOption() {
     }

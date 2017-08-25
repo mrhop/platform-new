@@ -3,6 +3,8 @@ package cn.hopever.platform.user.vo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 /**
  * Created by Donghui Huo on 2016/8/31.
  */
@@ -19,4 +21,6 @@ public class ModuleRoleVo {
     private Long clientId;
 
     private String clientName;
+
+    private List<Long> moduleIds;
 }

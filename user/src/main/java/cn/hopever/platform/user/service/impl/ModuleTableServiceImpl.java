@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Donghui Huo on 2016/10/17.
@@ -41,6 +42,9 @@ public class ModuleTableServiceImpl implements ModuleTableService {
 
     @Autowired
     private ModuleRoleTableRepository moduleRoleTableRepository;
+
+    @Autowired
+    private CustomModuleRoleTableRepository customModuleRoleTableRepository;
 
     @Autowired
     private ClientTableRepository clientTableRepository;
@@ -100,13 +104,13 @@ public class ModuleTableServiceImpl implements ModuleTableService {
         if (moduleVo.getParentId() != null) {
             moduleTableParent = moduleTableRepository.findOne(moduleVo.getParentId());
         }
-        if (moduleVo.getAuthorities() != null) {
-            List<ModuleRoleTable> list = new ArrayList<>();
-            for (Long id : moduleVo.getAuthorities()) {
-                list.add(moduleRoleTableRepository.findOne(id));
-            }
-            moduleTable.setAuthorities(list);
-        }
+//        if (moduleVo.getAuthorities() != null) {
+//            List<ModuleRoleTable> list = new ArrayList<>();
+//            for (Long id : moduleVo.getAuthorities()) {
+//                list.add(moduleRoleTableRepository.findOne(id));
+//            }
+//            moduleTable.setAuthorities(list);
+//        }
         if (moduleVo.getBeforeId() != null && !(moduleTable.getBeforeModule() != null && moduleTable.getBeforeModule().getId() == moduleVo.getBeforeId())) {
             ModuleTable moduleTableOld = moduleTableRepository.findOneByBeforeModule(moduleTable);
             if (moduleTableOld != null) {
@@ -160,13 +164,13 @@ public class ModuleTableServiceImpl implements ModuleTableService {
             moduleTableParent = moduleTableRepository.findOne(moduleVo.getParentId());
             moduleTable.setParent(moduleTableParent);
         }
-        if (moduleVo.getAuthorities() != null) {
-            List<ModuleRoleTable> list = new ArrayList<>();
-            for (Long id : moduleVo.getAuthorities()) {
-                list.add(moduleRoleTableRepository.findOne(id));
-            }
-            moduleTable.setAuthorities(list);
-        }
+//        if (moduleVo.getAuthorities() != null) {
+//            List<ModuleRoleTable> list = new ArrayList<>();
+//            for (Long id : moduleVo.getAuthorities()) {
+//                list.add(moduleRoleTableRepository.findOne(id));
+//            }
+//            moduleTable.setAuthorities(list);
+//        }
         if (moduleVo.getBeforeId() != null) {
             ModuleTable moduleTable1 = moduleTableRepository.findOne(moduleVo.getBeforeId());
             moduleTable.setBeforeModule(moduleTable1);
@@ -293,19 +297,36 @@ public class ModuleTableServiceImpl implements ModuleTableService {
     public List<TreeOption> getLeftMenu(Principal principal, String clientId) {
         UserTable userTable = userTableRepository.findOneByUsername(principal.getName());
         ClientTable clientTable = clientTableRepository.findOneByClientId(clientId);
-        if(clientId.equals("user_admin_client")){
+        if (clientId.equals("user_admin_client")) {
             //不必按照查询来，而要根据user的权限来
             RoleTable roleTable = getTopRole(userTable);
-            if(roleTable.getAuthority().equals("ROLE_super_admin")){
+            if (roleTable.getAuthority().equals("ROLE_super_admin")) {
                 // return 全部
-            } else if(roleTable.getAuthority().equals("ROLE_admin")){
+            } else if (roleTable.getAuthority().equals("ROLE_admin")) {
                 // 返回其可以管理的用户选项等
-            } else{
+            } else {
                 // 只返回一个个人信息的处理
             }
-        }else{
-            // 首先判断用户是否和client 有关联，然后是 获取该client 关联的modulerole
-            // 然后筛选出用户的module role，然后根据role获取module
+        } else {
+            // 首先判断用户是否和client 有关联，然后是 获取该client 关联的modulerole关联的modulerole
+            // 然后筛选出用户的module role，然后根据role获取module[使用right join的方法]
+            // 获取到moduleRole，然后再获取module
+            List<ModuleRoleTable> listModuleRole = customModuleRoleTableRepository.findByUserAndClient(userTable.getId(), clientTable);
+            List<Long> moduleRoleIds = new ArrayList<>();
+
+            for (ModuleRoleTable moduleRoleTable : listModuleRole) {
+                moduleRoleIds.add(moduleRoleTable.getId());
+            }
+
+            if (moduleRoleIds.size() > 0) {
+                List<ModuleTable> list = customModuleTableRepository.findByModuleRoles(moduleRoleIds);
+                // 开始进行遍历并赋值
+               // List<ModuleTable> listTop =
+                // 使用moduleRole来控制module
+                for (ModuleTable moduleTable : list) {
+
+                }
+            }
         }
         return null;
     }
@@ -322,6 +343,9 @@ public class ModuleTableServiceImpl implements ModuleTableService {
         if (moduleTable.getBeforeModule() != null) {
             recursiveModuleOrder(moduleTable.getBeforeModule());
         }
+    }
+
+    private void recursiveModuleTableTop(ModuleTable moduleTable, List<ModuleTable> list, Set<ModuleTable> top) {
     }
 
     private TreeOption recursiveParentsOptions(ModuleTable moduleTable, Long id) {

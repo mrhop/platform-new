@@ -3,8 +3,6 @@ package cn.hopever.platform.user.vo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
-
 /**
  * Created by Donghui Huo on 2016/8/31.
  */
@@ -27,7 +25,7 @@ public class ModuleVo {
 
     private boolean available = true;// add  select
     private boolean activated = true;// list // add  select
-    private List<Long> authorities; // add  checkbox 联动clientId
+    //private List<Long> authorities; // add  checkbox 联动clientId
     private String authoritiesStr; // add  checkbox 联动clientId
     private Long authorityId; // list 用于过滤模块权限
 
