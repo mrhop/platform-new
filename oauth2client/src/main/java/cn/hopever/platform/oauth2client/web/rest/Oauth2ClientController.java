@@ -51,7 +51,7 @@ public class Oauth2ClientController {
     @RequestMapping(value = "/gettokenbycode", method = RequestMethod.GET)
     public void getTokenByCode(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Cookie c = CookieUtil.getCookieByName("accesstoken", request.getCookies());
-        if(c==null){
+        if (c == null) {
             OAuth2AccessToken oa = authorizationCodeRestTemplate.getAccessToken();
             Cookie cookie = new Cookie("accesstoken", oa.getValue());
             //cookie.setPath(request.getContextPath());
@@ -67,7 +67,7 @@ public class Oauth2ClientController {
     @RequestMapping(value = "/gettokenbyclient", method = RequestMethod.GET)
     public void getTokenByClient(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Cookie c = CookieUtil.getCookieByName("accesstoken", request.getCookies());
-        if(c==null){
+        if (c == null) {
             OAuth2AccessToken oa = clientRestTemplate.getAccessToken();
             Cookie cookie = new Cookie("accesstoken", oa.getValue());
             //cookie.setPath(request.getContextPath());
@@ -87,12 +87,6 @@ public class Oauth2ClientController {
 
     @RequestMapping(value = "/getresource", method = RequestMethod.GET)
     public CommonResult getResource(HttpServletRequest request) throws Exception {
-        return commonMethods.getResource(request);
-    }
-
-    @RequestMapping(value = "/leftmenu", method = RequestMethod.GET)
-    public CommonResult getLeftmenu(HttpServletRequest request) throws Exception {
-        request.setAttribute("resourceUrl", oauth2Properties.getModuleList() + oauth2Properties.getClientID());
         return commonMethods.getResource(request);
     }
 

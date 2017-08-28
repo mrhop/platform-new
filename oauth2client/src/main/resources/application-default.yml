@@ -4,9 +4,8 @@ server:
 config:
     oauth2:
         # as a sample to test
-        clientID: cms_admin_client
+        clientID: test_client
         clientSecret: secret
         clientScopes:
-                  - cms_admin_client
-                  - internal_client
+               - internal_client
         clientUseCurrentUri: true

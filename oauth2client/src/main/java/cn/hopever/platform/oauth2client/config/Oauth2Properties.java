@@ -22,8 +22,4 @@ public class Oauth2Properties {
     private String clientSecret;
     private List<String> clientScopes;
     private boolean clientUseCurrentUri = true;
-    private String secretKey;
-    private String validateUserUri;
-    private String userUri;
-    private String moduleList;
 }

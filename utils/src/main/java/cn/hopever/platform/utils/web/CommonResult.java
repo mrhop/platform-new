@@ -31,7 +31,6 @@ public class CommonResult implements Serializable {
         this.responseData = responseData;
     }
 
-
     private String status;
 
     private String message;

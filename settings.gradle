@@ -3,3 +3,5 @@ include 'user'
 include 'utils'
 include 'utilsWeb'
 include 'oauth2client'
+include 'cms'
+

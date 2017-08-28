@@ -1,0 +1,11 @@
+server:
+    port: 9092
+    contextPath: /
+config:
+    oauth2:
+        # as a sample to test
+        clientID: cms_client
+        clientSecret: cms_client
+        clientScopes:
+                  - internal_client
+        clientUseCurrentUri: true
