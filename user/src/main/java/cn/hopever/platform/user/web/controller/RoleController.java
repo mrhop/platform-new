@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class RoleController {
     private RoleTableService roleTableService;
 
 
-    //@PreAuthorize("hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     public Map getList(@RequestBody TableParameters body) {
         Page<RoleTable> list = roleTableService.getList(body);

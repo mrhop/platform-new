@@ -1,15 +1,8 @@
 package cn.hopever.platform.user.web.controller;
 
 import cn.hopever.platform.user.domain.UserTable;
-import cn.hopever.platform.user.service.ClientTableService;
-import cn.hopever.platform.user.service.ModuleRoleTableService;
-import cn.hopever.platform.user.service.RoleTableService;
 import cn.hopever.platform.user.service.UserTableService;
 import cn.hopever.platform.user.vo.UserVo;
-import cn.hopever.platform.user.vo.UserVoAssembler;
-import cn.hopever.platform.utils.moji.MojiUtils;
-import cn.hopever.platform.utils.properties.CommonProperties;
-import cn.hopever.platform.utils.test.PrincipalSample;
 import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
@@ -18,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,28 +28,12 @@ import java.util.Map;
 @RequestMapping(value = "/user", produces = "application/json")
 public class UserController {
     Logger logger = LoggerFactory.getLogger(UserController.class);
-
-    @Autowired
-    private MojiUtils mojiUtils;
-    @Autowired
-    private CommonProperties commonProperties;
     @Autowired
     private UserTableService userTableService;
-    @Autowired
-    private RoleTableService roleTableService;
-    @Autowired
-    private ClientTableService clientTableService;
-    @Autowired
-    private ModuleRoleTableService moduleRoleTableService;
-    @Autowired
-    private UserVoAssembler userVoAssembler;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
-    //@PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body, Principal principal) {
-        principal = new PrincipalSample("admin");
         Page<UserTable> list = userTableService.getList(body, principal);
         Map<String, Object> map = new HashMap<>();
         List<HashMap<String, Object>> listReturn = null;
@@ -90,47 +66,41 @@ public class UserController {
         return map;
     }
 
-    // @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long key, Principal principal) {
-        principal = new PrincipalSample("admin");
         userTableService.delete(key, principal);
     }
 
-    //@PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public UserVo info(@RequestParam Long key, Principal principal) {
-        principal = new PrincipalSample("admin");
         return userTableService.info(key, principal);
     }
 
-    //@PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = {"/", ""}, method = {RequestMethod.GET})
     public UserVo info(Principal principal) {
-        principal = new PrincipalSample("admin");
         return userTableService.info(null, principal);
     }
 
-    //@PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")
     @RequestMapping(value = "/personal/update", method = {RequestMethod.POST})
     public VueResults.Result updatePersonalUser(@RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
-        principal = new PrincipalSample("admin");
         return userTableService.updatePersonalUser(userVo, files, principal);
     }
 
 
-    // @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
-        principal = new PrincipalSample("admin");
         userVo.setId(key);
         return userTableService.updateUser(userVo, files, principal);
     }
 
-    //@PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestParam(name = "photoFiles", required = false) MultipartFile[] files, UserVo userVo, Principal principal) {
-        principal = new PrincipalSample("admin");
         return userTableService.saveUser(userVo, files, principal);
     }
 
@@ -140,9 +110,9 @@ public class UserController {
     }
 
 
+    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
     public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal) {
-        principal = new PrincipalSample("admin");
         Map mapReturn = new HashMap<>();
         if (body == null) {
             if (key == null) {
@@ -164,28 +134,9 @@ public class UserController {
         return mapReturn;
     }
 
-    // @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin') or hasRole('ROLE_admin')")
     @RequestMapping(value = "/setEnabled", method = {RequestMethod.GET})
     public VueResults.Result updateEnabled(@RequestParam Long key, @RequestParam Boolean enabled) {
         return userTableService.updateEnabled(key, enabled);
-    }
-
-
-    @PreAuthorize("hasRole('ROLE_super_admin')")
-    @RequestMapping(value = "/list/relatedusers/options", method = {RequestMethod.GET})
-    public List getListOptionsByClients(@RequestParam String clientId) {
-        List listOptions = null;
-        Long selected = null;
-        List<UserTable> list = userTableService.getListByClientId(clientId);
-        if (list != null && list.size() > 0) {
-            listOptions = new ArrayList<>();
-            for (UserTable ut : list) {
-                Map mapOption = new HashMap<>();
-                mapOption.put("label", ut.getUsername());
-                mapOption.put("value", ut.getUsername());
-                listOptions.add(mapOption);
-            }
-        }
-        return listOptions;
     }
 }

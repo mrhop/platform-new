@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class ResourceScopeController {
     @Autowired
     private ResourceScopeTableService resourceScopeTableService;
 
-    // @PreAuthorize("hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body) {
         Page<ResourceScopeVo> list = resourceScopeTableService.getList(body);
@@ -56,7 +57,7 @@ public class ResourceScopeController {
         return map;
     }
 
-    //@PreAuthorize("hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public ResourceScopeVo info(@RequestParam Long key) {
         //返回user是无法解析的，要使用对象解析为map 的形式
@@ -64,20 +65,20 @@ public class ResourceScopeController {
     }
 
 
-    //@PreAuthorize("hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public VueResults.Result update(@RequestParam Long key, @RequestBody ResourceScopeVo resourceScopeVo) {
         resourceScopeVo.setId(key);
         return resourceScopeTableService.update(resourceScopeVo);
     }
 
-    //@PreAuthorize("hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestBody ResourceScopeVo resourceScopeVo) {
         return resourceScopeTableService.save(resourceScopeVo);
     }
 
-    //@PreAuthorize("hasRole('ROLE_super_admin')")
+    @PreAuthorize("hasRole('ROLE_super_admin')")
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long key) {
         this.resourceScopeTableService.delete(key);
