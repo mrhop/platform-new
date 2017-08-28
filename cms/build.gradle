@@ -1,0 +1,9 @@
+war {
+    baseName = 'cms'
+}
+
+bootRepackage {
+}
+dependencies {
+    compile project(':oauth2client')
+}
