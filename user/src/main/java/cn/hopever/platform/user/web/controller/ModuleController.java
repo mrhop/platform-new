@@ -129,6 +129,7 @@ public class ModuleController {
             if (body.get("clientId") != null) {
                 clientId = Long.valueOf(body.get("clientId").toString());
                 mapReturn.put("parentTree", moduleTableService.getParentsOptions(clientId, key));
+                mapReturn.put("authorityIds", moduleTableService.getModuleRoleOptions(clientId));
             }
             if (body.get("parentId") != null) {
                 parentId = Long.valueOf(body.get("parentId").toString());
