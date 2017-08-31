@@ -1,0 +1,32 @@
+ theme [name  description ]
+2 resource [name type fileType size url filename]
+
+3 template [theme_id name desc ]
+template_module_tag [id1 id2 position]
+-- module_tag [name account desc]
+-- custom_module_tag [name account desc template_id position]
+4 website  --  [website_name url title email phone resource_location  resource_prefix_url related_users,enabled theme_id]
+website_resource [id1 id2 order]
+website_module_tag [id1 id2 template_id]
+默认的page使用的模板
+默认的news使用的模板
+默认的event使用的模板
+website_custom_module_tag [id1 id2 template_id aviable content(内容或者关联的module_id),script]
+5 articles [title subtitle publish_date alias_url content,script template_id ,is_published,created_date, create_user]
+article_module_tag [id1 id2 template_id aviable]
+article_custom_module_tag [id1 id2 template_id aviable content(内容或者关联的module_id),script]
+
+使用article来做总的关联
+不再使用news和event，而是使用tag来整合
+明天来实现media以及media_lib,也可以自定义一些block，最好是使用textarea（html+block——tag的方式【比如hotnews等】，这样将block整合在一起，不存在customblock或者通用block的区别）
+然后开始实现部分功能theme--->resource--->[template-->block|customblock|preview]-->
+media_lib [name account websiteId type[doc file image video audio] ]
+11 media [name type fileType size url filename lib_id]
+12 navigate [title parent before order type id websiteid]
+13 cms_config [resource_location, resource_prefix_url,media_location,media_prefix_url,使用配置文件也可,决定使用配置文件]
+
+contact_form 和poll后续考虑
+
+
+基本模块完事
+开始进行service和controller的实现
