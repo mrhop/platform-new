@@ -108,7 +108,7 @@ public class WebsiteTable {
         }
     }
 
-    public List<Long> getRelatedUsers()  {
+    public List<String> getRelatedUsers()  {
         if (this.relatedUsers != null) {
             try {
                 return JacksonUtil.mapper.readValue(this.relatedUsers, List.class);
@@ -119,7 +119,7 @@ public class WebsiteTable {
         return null;
     }
 
-    public void setRelatedUsers(List<Long> relatedUsers)  {
+    public void setRelatedUsers(List<String> relatedUsers)  {
         try {
             this.relatedUsers = JacksonUtil.mapper.writeValueAsString(relatedUsers);
         } catch (JsonProcessingException e) {

@@ -30,7 +30,7 @@ public class WebsiteVo {
 
     private String resourcePrefixUrl;
 
-    private List<Long> relatedUsers;
+    private List<String> relatedUsers;
 
     private boolean enabled;
 
