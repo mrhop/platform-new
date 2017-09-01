@@ -35,6 +35,9 @@ public class ModuleTable {
     @Column(name = "module_name", nullable = false, length = 50)
     private String moduleName;
 
+    @Column(name = "module_id", nullable = false, length = 50, unique = true)
+    private String moduleId;
+
     @Column(name = "module_order", nullable = true)
     private Integer moduleOrder = 0;
 

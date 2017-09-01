@@ -44,7 +44,7 @@ public class ModuleVoAssembler {
     }
 
     public ModuleTable toDomain(ModuleVo moduleVo, ModuleTable moduleTable) {
-        BeanUtils.copyNotNullProperties(moduleVo, moduleTable);
+        BeanUtils.copyNotNullProperties(moduleVo, moduleTable, "moduleId");
         // 需要进行计算的时候，放在service里面处理
         return moduleTable;
     }

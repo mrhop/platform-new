@@ -57,6 +57,7 @@ public class ModuleController {
                 mapTemp.put("key", cv.getId());
                 List<Object> listTmp = new ArrayList<>();
                 listTmp.add(cv.getModuleName());
+                listTmp.add(cv.getModuleId());
                 listTmp.add(cv.isActivated());
                 listTmp.add(cv.getClientId());
                 listTmp.add(cv.getParentName());

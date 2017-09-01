@@ -42,16 +42,18 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     private AuthenticationManager authenticationManager;
 
     @Autowired
+    private CustomJwtAccessTokenConverter customJwtAccessTokenConverter;
+
+    @Autowired
     @Qualifier("clientTableService")
     private ClientDetailsService clientDetailsService;
 
     @Bean
     public JwtAccessTokenConverter tokenEnhancer() {
         logger.info("Initializing JWT with public key:\n" + publicKey);
-        CustomJwtAccessTokenConverter converter = new CustomJwtAccessTokenConverter();
-        converter.setSigningKey(privateKey);
-        converter.setVerifierKey(publicKey);
-        return converter;
+        customJwtAccessTokenConverter.setSigningKey(privateKey);
+        customJwtAccessTokenConverter.setVerifierKey(publicKey);
+        return customJwtAccessTokenConverter;
     }
 
     @Bean

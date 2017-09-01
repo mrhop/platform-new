@@ -146,12 +146,12 @@ public class ModuleRoleTableServiceImpl implements ModuleRoleTableService {
 
     @Override
     public VueResults.Result save(ModuleRoleVo moduleRoleVo) {
-        ModuleRoleTable moduleRoleTable = new ModuleRoleTable();
-        moduleRoleTable = moduleRoleVoAssembler.toDomain(moduleRoleVo, moduleRoleTable);
-        moduleRoleTable.setAuthority(moduleRoleVo.getAuthority());
         if (moduleRoleTableRepository.findOneByAuthority(moduleRoleVo.getAuthority()) != null) {
             return VueResults.generateError("保存失败", "模块角色ID已存在");
         }
+        ModuleRoleTable moduleRoleTable = new ModuleRoleTable();
+        moduleRoleTable = moduleRoleVoAssembler.toDomain(moduleRoleVo, moduleRoleTable);
+        moduleRoleTable.setAuthority(moduleRoleVo.getAuthority());
         if (moduleRoleVo.getClientId() != null) {
             moduleRoleTable.setClient(clientTableRepository.findOne(moduleRoleVo.getClientId()));
         }

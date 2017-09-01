@@ -1,9 +1,9 @@
 package cn.hopever.platform.user.repository.impl;
 
-import cn.hopever.platform.user.domain.ClientTable;
 import cn.hopever.platform.user.domain.ModuleRoleTable;
 import cn.hopever.platform.user.domain.ModuleTable;
 import cn.hopever.platform.user.repository.CustomModuleTableRepository;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,37 +28,6 @@ public class CustomModuleTableRepositoryImpl extends SimpleJpaRepository<ModuleT
     public CustomModuleTableRepositoryImpl(EntityManager entityManager) {
         super(JpaEntityInformationSupport.getEntityInformation(ModuleTable.class, entityManager), entityManager);
         this.entityManager = entityManager;
-    }
-
-    @Override
-    public Page<ModuleTable> findByFilters(Map<String, Object> mapFilter, Pageable pageable, ClientTable userAdminClient) {
-        return super.findAll(filterConditions1(mapFilter, userAdminClient), pageable);
-    }
-
-    //do this filter
-    private Specification<ModuleTable> filterConditions1(Map<String, Object> mapFilter, ClientTable userAdminClient) {
-        //实现这个
-        return new Specification<ModuleTable>() {
-            public Predicate toPredicate(Root<ModuleTable> root, CriteriaQuery<?> query,
-                                         CriteriaBuilder builder) {
-                Predicate predicateReturn = null;
-                predicateReturn = builder.notEqual(root.get("client"), userAdminClient);
-                //query.distinct(true);
-                if (mapFilter != null && mapFilter.size() > 0) {
-                    for (String key : mapFilter.keySet()) {
-                        if (mapFilter.get(key) != null) {
-                            if (key.equals("moduleName")) {
-                                predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + mapFilter.get(key) + "%"));
-                            } else {
-                                //需要针对filter来进行值得获取和填充
-                                predicateReturn = builder.and(predicateReturn, builder.equal(root.get(key), mapFilter.get(key)));
-                            }
-                        }
-                    }
-                }
-                return predicateReturn;
-            }
-        };
     }
 
     @Override
@@ -89,9 +58,9 @@ public class CustomModuleTableRepositoryImpl extends SimpleJpaRepository<ModuleT
                             }
                         } else if (mapFilter.get(key) != null) {
                             if (predicateReturn != null) {
-                                predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + mapFilter.get(key) + "%"));
+                                predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + StringEscapeUtils.escapeSql(mapFilter.get(key).toString()) + "%"));
                             } else {
-                                predicateReturn = builder.like(root.get(key), "%" + mapFilter.get(key) + "%");
+                                predicateReturn = builder.like(root.get(key), "%" + StringEscapeUtils.escapeSql(mapFilter.get(key).toString()) + "%");
                             }
                         }
                     }
@@ -102,19 +71,26 @@ public class CustomModuleTableRepositoryImpl extends SimpleJpaRepository<ModuleT
     }
 
     @Override
-    public List<ModuleTable> findByModuleRoles(List<Long> moduleRoleIds) {
-        return super.findAll(filterConditions3(moduleRoleIds), new Sort(Sort.Direction.ASC, "moduleOrder"));
+    public List<ModuleTable> findByModuleRoles(List<ModuleRoleTable> moduleRoleTables) {
+        return super.findAll(filterConditions3(moduleRoleTables), new Sort(Sort.Direction.ASC, "moduleOrder"));
     }
 
-    private Specification<ModuleTable> filterConditions3(List<Long> moduleRoleIds) {
+    @Override
+    public List<String> findModuleIdsByModuleRoles(List<ModuleRoleTable> moduleRoleTables) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<String> cq = criteriaBuilder.createQuery(String.class);
+        Root<ModuleTable> moduleTableRoot = cq.from(ModuleTable.class);
+        Predicate predicate = filterConditions3(moduleRoleTables).toPredicate(moduleTableRoot, cq, criteriaBuilder);
+        cq.select(moduleTableRoot.get("moduleId")).where(predicate).distinct(true);
+        return entityManager.createQuery(cq).getResultList();
+    }
+
+    private Specification<ModuleTable> filterConditions3(List<ModuleRoleTable> moduleRoleTables) {
         return new Specification<ModuleTable>() {
             public Predicate toPredicate(Root<ModuleTable> root, CriteriaQuery<?> query,
                                          CriteriaBuilder builder) {
                 query.distinct(true);
-                Join<ModuleTable, ModuleRoleTable> takeJoin = root.join("authorities");
-                Expression<Long> roleId = takeJoin.get("id");
-                Predicate predicateReturn = roleId.in(moduleRoleIds);
-                return predicateReturn;
+                return root.join("authorities").in(moduleRoleTables);
             }
         };
     }

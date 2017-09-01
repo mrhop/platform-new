@@ -2,6 +2,7 @@ package cn.hopever.platform.user.repository.impl;
 
 import cn.hopever.platform.user.domain.RoleTable;
 import cn.hopever.platform.user.repository.CustomRoleTableRepository;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -47,13 +48,13 @@ public class CustomRoleTableRepositoryImpl extends SimpleJpaRepository<RoleTable
                                 if (key.equals("level")) {
                                     predicateReturn = builder.equal(root.get(key), mapFilter.get(key));
                                 } else {
-                                    predicateReturn = builder.like(root.get(key), "%" + mapFilter.get(key) + "%");
+                                    predicateReturn = builder.like(root.get(key), "%" + StringEscapeUtils.escapeSql(mapFilter.get(key).toString()) + "%");
                                 }
                             } else {
                                 if (key.equals("level")) {
                                     predicateReturn = builder.and(predicateReturn, builder.equal(root.get(key), mapFilter.get(key)));
                                 } else {
-                                    predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + mapFilter.get(key) + "%"));
+                                    predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + StringEscapeUtils.escapeSql(mapFilter.get(key).toString()) + "%"));
                                 }
                             }
                         }

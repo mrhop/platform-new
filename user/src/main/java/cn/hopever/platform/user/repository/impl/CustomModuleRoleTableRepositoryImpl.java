@@ -4,6 +4,7 @@ import cn.hopever.platform.user.domain.ClientTable;
 import cn.hopever.platform.user.domain.ModuleRoleTable;
 import cn.hopever.platform.user.domain.UserTable;
 import cn.hopever.platform.user.repository.CustomModuleRoleTableRepository;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -56,9 +57,9 @@ public class CustomModuleRoleTableRepositoryImpl extends SimpleJpaRepository<Mod
                                 }
                             } else {
                                 if (predicateReturn != null) {
-                                    predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + mapFilter.get(key) + "%"));
+                                    predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + StringEscapeUtils.escapeSql(mapFilter.get(key).toString()) + "%"));
                                 } else {
-                                    predicateReturn = builder.like(root.get(key), "%" + mapFilter.get(key) + "%");
+                                    predicateReturn = builder.like(root.get(key), "%" + StringEscapeUtils.escapeSql(mapFilter.get(key).toString()) + "%");
                                 }
                             }
 

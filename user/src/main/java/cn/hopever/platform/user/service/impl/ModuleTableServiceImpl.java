@@ -109,13 +109,6 @@ public class ModuleTableServiceImpl implements ModuleTableService {
         if (moduleVo.getParentId() != null) {
             moduleTableParent = moduleTableRepository.findOne(moduleVo.getParentId());
         }
-//        if (moduleVo.getAuthorities() != null) {
-//            List<ModuleRoleTable> list = new ArrayList<>();
-//            for (Long id : moduleVo.getAuthorities()) {
-//                list.add(moduleRoleTableRepository.findOne(id));
-//            }
-//            moduleTable.setAuthorities(list);
-//        }
         if (moduleVo.getBeforeId() != null && !(moduleTable.getBeforeModule() != null && moduleTable.getBeforeModule().getId() == moduleVo.getBeforeId())) {
             ModuleTable moduleTableOld = moduleTableRepository.findOneByBeforeModule(moduleTable);
             if (moduleTableOld != null) {
@@ -155,8 +148,12 @@ public class ModuleTableServiceImpl implements ModuleTableService {
 
     @Override
     public VueResults.Result save(ModuleVo moduleVo) {
+        if (moduleTableRepository.findOneByModuleId(moduleVo.getModuleId()) != null) {
+            return VueResults.generateError("保存失败", "模块ID已存在");
+        }
         ModuleTable moduleTable = new ModuleTable();
         moduleTable = moduleVoAssembler.toDomain(moduleVo, moduleTable);
+        moduleTable.setModuleId(moduleVo.getModuleId());
         ClientTable clientTable = null;
         ModuleTable moduleTableParent = null;
         ModuleTable moduleTableAfter = null;
@@ -169,13 +166,6 @@ public class ModuleTableServiceImpl implements ModuleTableService {
             moduleTableParent = moduleTableRepository.findOne(moduleVo.getParentId());
             moduleTable.setParent(moduleTableParent);
         }
-//        if (moduleVo.getAuthorities() != null) {
-//            List<ModuleRoleTable> list = new ArrayList<>();
-//            for (Long id : moduleVo.getAuthorities()) {
-//                list.add(moduleRoleTableRepository.findOne(id));
-//            }
-//            moduleTable.setAuthorities(list);
-//        }
         if (moduleVo.getBeforeId() != null) {
             ModuleTable moduleTable1 = moduleTableRepository.findOne(moduleVo.getBeforeId());
             moduleTable.setBeforeModule(moduleTable1);
@@ -315,12 +305,8 @@ public class ModuleTableServiceImpl implements ModuleTableService {
             }
         } else {
             List<ModuleRoleTable> listModuleRole = customModuleRoleTableRepository.findByUserAndClient(userTable.getId(), clientTable);
-            List<Long> moduleRoleIds = new ArrayList<>();
-            for (ModuleRoleTable moduleRoleTable : listModuleRole) {
-                moduleRoleIds.add(moduleRoleTable.getId());
-            }
-            if (moduleRoleIds.size() > 0) {
-                List<ModuleTable> list = customModuleTableRepository.findByModuleRoles(moduleRoleIds);
+            if (listModuleRole.size() > 0) {
+                List<ModuleTable> list = customModuleTableRepository.findByModuleRoles(listModuleRole);
                 List<ModuleTable> listTop = new ArrayList<>();
                 Iterator<ModuleTable> i = list.iterator();
                 while (i.hasNext()) {
@@ -336,6 +322,18 @@ public class ModuleTableServiceImpl implements ModuleTableService {
             }
         }
         return listReturn;
+    }
+
+    @Override
+    public List getFlatModule(Principal principal, String clientId) {
+        UserTable userTable = userTableRepository.findOneByUsername(principal.getName());
+        ClientTable clientTable = clientTableRepository.findOneByClientId(clientId);
+        List<String> listReturn = new ArrayList<>();
+        List<ModuleRoleTable> listModuleRole = customModuleRoleTableRepository.findByUserAndClient(userTable.getId(), clientTable);
+        if (listModuleRole.size() > 0) {
+            listReturn = customModuleTableRepository.findModuleIdsByModuleRoles(listModuleRole);
+        }
+        return  listReturn;
     }
 
     private void recursiveModuleOrder(ModuleTable moduleTable) {

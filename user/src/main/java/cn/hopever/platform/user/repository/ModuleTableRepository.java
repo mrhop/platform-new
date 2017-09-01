@@ -14,7 +14,8 @@ import java.util.List;
  * Created by Donghui Huo on 2016/8/30.
  */
 public interface ModuleTableRepository extends PagingAndSortingRepository<ModuleTable, Long> {
-    public ModuleTable findOneByModuleName(String moduleName);
+
+    public ModuleTable findOneByModuleId(String moduleId);
 
     public ModuleTable findOneByBeforeModule(ModuleTable moduleTable);
 
