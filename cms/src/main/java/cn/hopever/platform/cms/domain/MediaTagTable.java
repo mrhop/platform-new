@@ -12,7 +12,7 @@ import java.util.List;
  * 上传时，采用zip包上传，然后统一放置在对应的theme下，或者顺序创建
  */
 @Entity
-@Table(name = "platform_cms_media_tag")
+@Table(name = "platform_cms_media_tag", indexes = {@Index(columnList = "websiteTable")})
 @Data
 @EqualsAndHashCode(of = {"id"})
 @Cacheable

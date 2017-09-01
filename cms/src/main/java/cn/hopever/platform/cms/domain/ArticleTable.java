@@ -10,7 +10,6 @@ import java.util.List;
 
 /**
  * Created by Donghui Huo on 2017/8/30.
- * 上传时，采用zip包上传，然后统一放置在对应的theme下，或者顺序创建
  */
 @Entity
 @Table(name = "platform_cms_article")
@@ -65,5 +64,9 @@ public class ArticleTable {
 
     @OneToMany(mappedBy = "articleTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<StaticResourceTable> staticResourceTables;
+
+    // 对应的article 0 ，news 1，event 2
+    @Column(name = "type")
+    private short type = 0;
 
 }

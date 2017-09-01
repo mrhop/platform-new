@@ -7,4 +7,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * Created by Donghui Huo on 2016/8/30.
  */
 public interface ArticleTagTableRepository extends PagingAndSortingRepository<ArticleTagTable, Long> {
+    public ArticleTagTable findOneByTagId(String tagId);
 }

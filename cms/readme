@@ -30,3 +30,5 @@ contact_form 和poll后续考虑
 
 基本模块完事
 开始进行service和controller的实现
+
+优化的过程是仅仅是article加了一个type，
