@@ -305,8 +305,12 @@ public class ModuleTableServiceImpl implements ModuleTableService {
             }
         } else {
             List<ModuleRoleTable> listModuleRole = customModuleRoleTableRepository.findByUserAndClient(userTable.getId(), clientTable);
-            if (listModuleRole.size() > 0) {
-                List<ModuleTable> list = customModuleTableRepository.findByModuleRoles(listModuleRole);
+            List<Long> moduleRoleIds = new ArrayList<>();
+            for (ModuleRoleTable moduleRoleTable : listModuleRole) {
+                moduleRoleIds.add(moduleRoleTable.getId());
+            }
+            if (moduleRoleIds.size() > 0) {
+                List<ModuleTable> list = customModuleTableRepository.findByModuleRoles(moduleRoleIds);
                 List<ModuleTable> listTop = new ArrayList<>();
                 Iterator<ModuleTable> i = list.iterator();
                 while (i.hasNext()) {
@@ -330,10 +334,15 @@ public class ModuleTableServiceImpl implements ModuleTableService {
         ClientTable clientTable = clientTableRepository.findOneByClientId(clientId);
         List<String> listReturn = new ArrayList<>();
         List<ModuleRoleTable> listModuleRole = customModuleRoleTableRepository.findByUserAndClient(userTable.getId(), clientTable);
-        if (listModuleRole.size() > 0) {
-            listReturn = customModuleTableRepository.findModuleIdsByModuleRoles(listModuleRole);
+        List<Long> moduleRoleIds = new ArrayList<>();
+        for (ModuleRoleTable moduleRoleTable : listModuleRole) {
+            moduleRoleIds.add(moduleRoleTable.getId());
         }
-        return  listReturn;
+        if (moduleRoleIds.size() > 0) {
+            listReturn = customModuleTableRepository.findModuleIdsByModuleRoles(moduleRoleIds);
+
+        }
+        return listReturn;
     }
 
     private void recursiveModuleOrder(ModuleTable moduleTable) {
