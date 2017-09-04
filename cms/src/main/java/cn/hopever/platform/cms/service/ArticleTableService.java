@@ -15,16 +15,18 @@ public interface ArticleTableService extends GenericService<ArticleVo> {
 
     public VueResults.Result updatePublished(Long id, boolean published);
 
-    public VueResults.Result saveNews(ArticleVo articleVo);
+    public VueResults.Result saveNews(ArticleVo articleVo, Principal principal);
 
-    public VueResults.Result saveEvent(ArticleVo articleVo);
+    public VueResults.Result saveEvent(ArticleVo articleVo, Principal principal);
 
-    public VueResults.Result updateNews(ArticleVo articleVo);
+    public VueResults.Result updateNews(ArticleVo articleVo, Principal principal);
 
-    public VueResults.Result updateEvent(ArticleVo articleVo);
+    public VueResults.Result updateEvent(ArticleVo articleVo, Principal principal);
 
     public Page<ArticleVo> getNewsList(TableParameters body, Principal principal);
 
     public Page<ArticleVo> getEventList(TableParameters body, Principal principal);
+
+    public VueResults.Result updatePublished(Long id, boolean published, Principal principal);
 
 }

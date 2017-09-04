@@ -22,7 +22,7 @@ public class ArticleTagVoAssembler implements GenericVoAssembler<ArticleTagVo, A
 
     @Override
     public ArticleTagTable toDomain(ArticleTagVo articleTagVo, ArticleTagTable articleTagTable) {
-        BeanUtils.copyNotNullProperties(articleTagTable, articleTagVo);
+        BeanUtils.copyNotNullProperties(articleTagTable, articleTagVo,"tagId");
         return articleTagTable;
     }
 }

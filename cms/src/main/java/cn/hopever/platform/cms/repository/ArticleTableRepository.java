@@ -12,10 +12,10 @@ import java.util.Date;
  */
 public interface ArticleTableRepository extends PagingAndSortingRepository<ArticleTable, Long> {
     @Modifying
-    @Query("update ArticleTable a set a.published = true,a.publishDate = ?1 where a.createUser = ?2")
+    @Query("update ArticleTable a set a.published = true,a.publishDate = ?1 where a.id = ?2")
     int publishArticle(Date publishDate, Long id);
 
     @Modifying
-    @Query("update ArticleTable a set a.published = false where a.createUser = ?1")
+    @Query("update ArticleTable a set a.published = false,a.publishDate = null where a.id = ?1")
     int unpublishArticle(Long id);
 }

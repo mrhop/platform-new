@@ -15,6 +15,8 @@ public class TemplateVo {
     private Long themeId;
     private String themeName;
 
+    private String contentPosition;
+
     private String description;
 
 }

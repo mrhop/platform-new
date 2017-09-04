@@ -37,4 +37,7 @@ public class ArticleVo {
     private String websiteName;
     private Long websiteId;
 
+    private String templateName;
+    private Long templateId;
+
 }

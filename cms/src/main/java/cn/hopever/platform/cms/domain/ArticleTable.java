@@ -59,6 +59,10 @@ public class ArticleTable {
     @JoinColumn(name = "website_id")
     private WebsiteTable websiteTable;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "template_id")
+    private TemplateTable templateTable;
+
     @OneToMany(mappedBy = "articleTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<BlockTable> blockTables;
 

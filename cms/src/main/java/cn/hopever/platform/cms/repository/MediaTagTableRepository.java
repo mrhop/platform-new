@@ -7,5 +7,5 @@ import org.springframework.data.repository.PagingAndSortingRepository;
  * Created by Donghui Huo on 2016/8/30.
  */
 public interface MediaTagTableRepository extends PagingAndSortingRepository<MediaTagTable, Long> {
-
+    public MediaTagTable findOneByTagId(String tagId);
 }

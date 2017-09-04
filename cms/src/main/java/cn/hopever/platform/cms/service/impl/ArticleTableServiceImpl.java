@@ -2,10 +2,7 @@ package cn.hopever.platform.cms.service.impl;
 
 import cn.hopever.platform.cms.domain.ArticleTable;
 import cn.hopever.platform.cms.domain.ArticleTagTable;
-import cn.hopever.platform.cms.repository.ArticleTableRepository;
-import cn.hopever.platform.cms.repository.ArticleTagTableRepository;
-import cn.hopever.platform.cms.repository.CustomArticleTableRepository;
-import cn.hopever.platform.cms.repository.WebsiteTableRepository;
+import cn.hopever.platform.cms.repository.*;
 import cn.hopever.platform.cms.service.ArticleTableService;
 import cn.hopever.platform.cms.vo.ArticleVo;
 import cn.hopever.platform.cms.vo.ArticleVoAssembler;
@@ -39,6 +36,9 @@ public class ArticleTableServiceImpl implements ArticleTableService {
     private WebsiteTableRepository websiteTableRepository;
 
     @Autowired
+    private TemplateTableRepository templateTableRepository;
+
+    @Autowired
     private ArticleTagTableRepository articleTagTableRepository;
 
     @Autowired
@@ -65,18 +65,18 @@ public class ArticleTableServiceImpl implements ArticleTableService {
     @Override
     public ArticleVo info(Long id, Principal principal) {
         ArticleTable articleTable = articleTableRepository.findOne(id);
-        return articleVoAssembler.toResource(articleTable);
+        return articleVoAssembler.toResourceAll(articleTable);
     }
 
     @Override
     public VueResults.Result update(ArticleVo articleVo, MultipartFile[] files, Principal principal) {
-        this.internalSaveArticle(articleVo, "update", (short) 0);
+        this.internalSaveArticle(articleVo, "update", (short) 0, principal);
         return VueResults.generateSuccess("更新成功", "更新文章成功");
     }
 
     @Override
     public VueResults.Result save(ArticleVo articleVo, MultipartFile[] files, Principal principal) {
-        this.internalSaveArticle(articleVo, "save", (short) 0);
+        this.internalSaveArticle(articleVo, "save", (short) 0, principal);
         return VueResults.generateSuccess("新增成功", "新增文章成功");
     }
 
@@ -91,26 +91,26 @@ public class ArticleTableServiceImpl implements ArticleTableService {
     }
 
     @Override
-    public VueResults.Result saveNews(ArticleVo articleVo) {
-        internalSaveArticle(articleVo, "save", (short) 2);
+    public VueResults.Result saveNews(ArticleVo articleVo, Principal principal) {
+        internalSaveArticle(articleVo, "save", (short) 2, principal);
         return VueResults.generateSuccess("新增成功", "新增新闻成功");
     }
 
     @Override
-    public VueResults.Result saveEvent(ArticleVo articleVo) {
-        internalSaveArticle(articleVo, "save", (short) 2);
+    public VueResults.Result saveEvent(ArticleVo articleVo, Principal principal) {
+        internalSaveArticle(articleVo, "save", (short) 2, principal);
         return VueResults.generateSuccess("新增成功", "新增活动成功");
     }
 
     @Override
-    public VueResults.Result updateNews(ArticleVo articleVo) {
-        internalSaveArticle(articleVo, "update", (short) 1);
+    public VueResults.Result updateNews(ArticleVo articleVo, Principal principal) {
+        internalSaveArticle(articleVo, "update", (short) 1, principal);
         return VueResults.generateSuccess("更新成功", "更新新闻成功");
     }
 
     @Override
-    public VueResults.Result updateEvent(ArticleVo articleVo) {
-        internalSaveArticle(articleVo, "update", (short) 2);
+    public VueResults.Result updateEvent(ArticleVo articleVo, Principal principal) {
+        internalSaveArticle(articleVo, "update", (short) 2, principal);
         return VueResults.generateSuccess("更新成功", "更新活动成功");
     }
 
@@ -122,6 +122,16 @@ public class ArticleTableServiceImpl implements ArticleTableService {
     @Override
     public Page<ArticleVo> getEventList(TableParameters body, Principal principal) {
         return getInternalList(body, (short) 2);
+    }
+
+    @Override
+    public VueResults.Result updatePublished(Long id,boolean published, Principal principal) {
+        if(published){
+            articleTableRepository.publishArticle(new Date(),id);
+        }else{
+            articleTableRepository.unpublishArticle(id);
+        }
+        return VueResults.generateSuccess("更新成功", "更新发布状态成功");
     }
 
     private Page<ArticleVo> getInternalList(TableParameters body, short type) {
@@ -145,7 +155,7 @@ public class ArticleTableServiceImpl implements ArticleTableService {
         return new PageImpl<ArticleVo>(list, pageRequest, page.getTotalElements());
     }
 
-    private void internalSaveArticle(ArticleVo articleVo, String operation, short type) {
+    private void internalSaveArticle(ArticleVo articleVo, String operation, short type, Principal principal) {
         ArticleTable articleTable = null;
         if ("save".equals(operation)) {
             articleTable = new ArticleTable();
@@ -171,9 +181,21 @@ public class ArticleTableServiceImpl implements ArticleTableService {
             }
         }
         articleTable.setArticleTagTables(list);
-        if (articleVo.getWebsiteId() != null) {
-            articleTable.setWebsiteTable(websiteTableRepository.findOne(articleVo.getWebsiteId()));
+        if (articleTable.isPublished() && articleTable.getPublishDate() == null) {
+            articleTable.setPublishDate(new Date());
         }
+        if ("save".equals(operation)) {
+            articleTable.setCreatedDate(new Date());
+            articleTable.setCreateUser(principal.getName());
+
+            if (articleVo.getWebsiteId() != null) {
+                articleTable.setWebsiteTable(websiteTableRepository.findOne(articleVo.getWebsiteId()));
+            }
+            if (articleVo.getTemplateId() != null) {
+                articleTable.setTemplateTable(templateTableRepository.findOne(articleVo.getTemplateId()));
+            }
+        }
+
         articleTableRepository.save(articleTable);
     }
 }

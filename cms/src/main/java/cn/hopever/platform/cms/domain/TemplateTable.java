@@ -31,6 +31,11 @@ public class TemplateTable {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "content_position")
+    private String contentPosition;
+
+
+
     @OneToMany(mappedBy = "templateTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<BlockTable> blockTables;
 

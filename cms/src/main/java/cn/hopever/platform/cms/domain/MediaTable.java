@@ -60,7 +60,7 @@ public class MediaTable {
     private String createUser;
 
     @Column(name = "published")
-    private boolean published;
+    private boolean published = true;
 
     @Column(name = "click_times")
     private Integer clickTimes;

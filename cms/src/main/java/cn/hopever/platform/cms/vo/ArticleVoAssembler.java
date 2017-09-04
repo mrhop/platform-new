@@ -19,7 +19,7 @@ public class ArticleVoAssembler implements GenericVoAssembler<ArticleVo, Article
     @Override
     public ArticleVo toResource(ArticleTable articleTable) {
         ArticleVo articleVo = new ArticleVo();
-        BeanUtils.copyNotNullProperties(articleTable, articleVo);
+        BeanUtils.copyNotNullProperties(articleTable, articleVo, "content", "script");
         articleVo.setCreatedDate(articleTable.getCreatedDate().getTime());
         if (articleTable.getPublishDate() != null) {
             articleVo.setPublishDate(articleTable.getPublishDate().getTime());
@@ -36,7 +36,16 @@ public class ArticleVoAssembler implements GenericVoAssembler<ArticleVo, Article
         }
         articleVo.setWebsiteId(articleTable.getWebsiteTable().getId());
         articleVo.setWebsiteName(articleTable.getWebsiteTable().getName());
+        articleVo.setTemplateId(articleTable.getTemplateTable().getId());
+        articleVo.setTemplateName(articleTable.getTemplateTable().getName());
         articleVo.setCreatedDate(articleTable.getCreatedDate().getTime());
+        return articleVo;
+    }
+
+    public ArticleVo toResourceAll(ArticleTable articleTable) {
+        ArticleVo articleVo = toResource(articleTable);
+        articleVo.setContent(articleTable.getContent());
+        articleVo.setScript(articleTable.getScript());
         return articleVo;
     }
 
