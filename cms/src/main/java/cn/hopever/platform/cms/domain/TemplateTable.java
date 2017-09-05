@@ -34,9 +34,10 @@ public class TemplateTable {
     @Column(name = "content_position")
     private String contentPosition;
 
-
-
     @OneToMany(mappedBy = "templateTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<BlockTable> blockTables;
+
+    @OneToMany(mappedBy = "templateTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    private List<ArticleTable> articleTables;
 
 }

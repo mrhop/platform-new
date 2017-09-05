@@ -14,16 +14,22 @@ public class ThemeVoAssembler implements GenericVoAssembler<ThemeVo, ThemeTable>
     @Override
     public ThemeVo toResource(ThemeTable themeTable) {
         ThemeVo themeVo = new ThemeVo();
-        BeanUtils.copyNotNullProperties(themeTable,themeVo);
-        if(themeTable.getScreenshots()!=null){
+        BeanUtils.copyNotNullProperties(themeTable, themeVo);
+        if (themeTable.getScreenshots() != null) {
             themeVo.setScreenshots(themeTable.getScreenshots());
+        }
+        if (themeTable.getRelatedUsers() != null) {
+            themeVo.setRelatedUsers(themeTable.getRelatedUsers());
         }
         return themeVo;
     }
 
     @Override
     public ThemeTable toDomain(ThemeVo themeVo, ThemeTable themeTable) {
-        BeanUtils.copyNotNullProperties(themeVo,themeTable);
+        BeanUtils.copyNotNullProperties(themeVo, themeTable);
+        if (themeVo.getRelatedUsers() != null) {
+            themeTable.setRelatedUsers(themeTable.getRelatedUsers());
+        }
         return themeTable;
     }
 }

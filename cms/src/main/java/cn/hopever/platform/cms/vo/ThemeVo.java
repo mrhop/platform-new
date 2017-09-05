@@ -16,6 +16,8 @@ public class ThemeVo {
 
     private List<String> screenshots;
 
+    private List<String> relatedUsers;
+
     private String description;
 
 }

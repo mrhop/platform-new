@@ -57,7 +57,7 @@ public class BlockTableServiceImpl implements BlockTableService {
                 body.getFilters().remove("websiteId");
             }
             if (body.getFilters() != null && body.getFilters().containsKey("templateId")) {
-                body.getFilters().put("templateTable", templateTableRepository.findOne(Long.valueOf(body.getFilters().get("websiteId").toString())));
+                body.getFilters().put("templateTable", templateTableRepository.findOne(Long.valueOf(body.getFilters().get("templateId").toString())));
                 body.getFilters().remove("templateId");
             }
             if (body.getFilters() != null && body.getFilters().containsKey("articleId")) {

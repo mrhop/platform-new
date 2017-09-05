@@ -31,6 +31,9 @@ public class ThemeTable {
     @Column(name = "screenshots", length = 510)
     private String screenshots;
 
+    @Column(name = "related_users")
+    private String relatedUsers;
+
     @Column(name = "description")
     private String description;
 
@@ -57,6 +60,25 @@ public class ThemeTable {
     public void setScreenshots(List<String> screenshots) {
         try {
             this.screenshots = JacksonUtil.mapper.writeValueAsString(screenshots);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<String> getRelatedUsers() {
+        if (this.relatedUsers != null) {
+            try {
+                return JacksonUtil.mapper.readValue(this.relatedUsers, List.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public void setRelatedUsers(List<String> relatedUsers) {
+        try {
+            this.relatedUsers = JacksonUtil.mapper.writeValueAsString(relatedUsers);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

@@ -15,8 +15,12 @@ public class WebsiteVoAssembler implements GenericVoAssembler<WebsiteVo, Website
     public WebsiteVo toResource(WebsiteTable websiteTable) {
         WebsiteVo websiteVo = new WebsiteVo();
         BeanUtils.copyNotNullProperties(websiteTable, websiteVo);
-        websiteVo.setRelatedUsers(websiteTable.getRelatedUsers());
-        websiteVo.setScreenshots(websiteTable.getScreenshots());
+        if(websiteTable.getScreenshots()!=null){
+            websiteVo.setScreenshots(websiteTable.getScreenshots());
+        }
+        if(websiteTable.getRelatedUsers()!=null){
+            websiteVo.setRelatedUsers(websiteTable.getRelatedUsers());
+        }
         websiteVo.setThemeId(websiteTable.getThemeTable().getId());
         websiteVo.setThemeName(websiteTable.getThemeTable().getName());
         return websiteVo;

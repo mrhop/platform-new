@@ -31,5 +31,8 @@ public class StaticResourceVo {
     private Long articleId;
     private String articleTitle;
 
-    private Integer order;
+    // 用于和order一起来决定顺序
+    private Long beforeId;
+
+    private Integer resourceOrder;
 }

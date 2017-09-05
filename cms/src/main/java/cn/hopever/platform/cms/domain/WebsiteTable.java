@@ -52,7 +52,7 @@ public class WebsiteTable {
     @Column(name = "resource_prefix_url", length = 50)
     private String resourcePrefixUrl;
 
-    @Column(name = "related_users", length = 50)
+    @Column(name = "related_users")
     private String relatedUsers;
 
     @Column(name = "enabled")

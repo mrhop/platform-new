@@ -20,7 +20,6 @@ import java.util.Map;
  * Created by Donghui Huo on 2017/8/18.
  */
 @RestController
-@CrossOrigin
 @RequestMapping(value = "/resourcescope", produces = "application/json")
 public class ResourceScopeController {
     Logger logger = LoggerFactory.getLogger(ClientController.class);

@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,11 @@ public class RemoteOauth2AuthenticationProvider implements AuthenticationProvide
             UsernamePasswordAuthenticationToken result = new UsernamePasswordAuthenticationToken(
                     username, null,
                     list);
-            result.setDetails(oa);
+            Map details= new HashMap<>();
+            if(oa.getAdditionalInformation().get("modules")!=null){
+                details.put("modules",details);
+            }
+            result.setDetails(details);
             return result;
         } catch (Exception e) {
             throw new BadCredentialsException("Bad credentials");

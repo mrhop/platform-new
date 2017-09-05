@@ -88,7 +88,6 @@ public class NavigateTableServiceImpl implements NavigateTableService {
             this.navigateTableRepository.save(navigateTableBefore);
         }
         this.navigateTableRepository.delete(nt);
-        navigateTableRepository.delete(id);
     }
 
     @Override
@@ -124,7 +123,7 @@ public class NavigateTableServiceImpl implements NavigateTableService {
             navigateTable.setNavigateOrder(navigateTable1.getNavigateOrder());
             recursiveNavigateOrder(navigateTable1);
         } else {
-            NavigateTable navigateTable1 = navigateTableRepository.findTopByParentAndWebsiteTableOrderByModuleOrderDesc(navigateTableParent, navigateTable.getWebsiteTable());
+            NavigateTable navigateTable1 = navigateTableRepository.findTopByParentAndWebsiteTableOrderByNavigateOrderDesc(navigateTableParent, navigateTable.getWebsiteTable());
             if (navigateTable1 != null) {
                 if (navigateTable.getId() != navigateTable1.getId()) {
                     NavigateTable navigateTableOld = navigateTableRepository.findOneByBeforeNavigate(navigateTable);
@@ -174,7 +173,7 @@ public class NavigateTableServiceImpl implements NavigateTableService {
             navigateTable.setNavigateOrder(navigateTable1.getNavigateOrder());
             recursiveNavigateOrder(navigateTable1);
         } else {
-            NavigateTable navigateTable1 = navigateTableRepository.findTopByParentAndWebsiteTableOrderByModuleOrderDesc(navigateTableParent, websiteTable);
+            NavigateTable navigateTable1 = navigateTableRepository.findTopByParentAndWebsiteTableOrderByNavigateOrderDesc(navigateTableParent, websiteTable);
             if (navigateTable1 != null) {
                 navigateTable.setBeforeNavigate(navigateTable1);
                 navigateTable.setNavigateOrder(navigateTable1.getNavigateOrder() + 1);
@@ -191,12 +190,50 @@ public class NavigateTableServiceImpl implements NavigateTableService {
 
     @Override
     public List<TreeOption> getParentsOptions(Long websiteId, Long id) {
-        return null;
+        WebsiteTable websiteTable = websiteTableRepository.findOne(websiteId);
+        List<NavigateTable> list = null;
+        if (id == null) {
+            list = navigateTableRepository.findByWebsiteTableAndParentIsNullOrderByNavigateOrderAsc(websiteTable);
+        } else {
+            list = navigateTableRepository.findByWebsiteTableAndParentIsNullAndIdNotOrderByNavigateOrderAsc(websiteTable, id);
+        }
+        List<TreeOption> listReturn = new ArrayList<>();
+        if (list != null && list.size() > 0) {
+            for (NavigateTable navigateTable : list) {
+                TreeOption treeOption = recursiveParentsOptions(navigateTable, id);
+                if (treeOption != null) {
+                    listReturn.add(treeOption);
+                }
+            }
+        }
+        return listReturn;
     }
 
     @Override
     public List<SelectOption> getBeforeOptions(Long parentId, Long websiteId, Long id) {
-        return null;
+        List<SelectOption> listReturn = new ArrayList<>();
+        NavigateTable navigateTableParent = null;
+        List<NavigateTable> list = new ArrayList<>();
+        if (parentId != null && parentId != -1) {
+            navigateTableParent = navigateTableRepository.findOne(parentId);
+            if (id == null) {
+                list = navigateTableRepository.findByParentOrderByNavigateOrderAsc(navigateTableParent);
+            } else {
+                list = navigateTableRepository.findByParentAndIdNotOrderByNavigateOrderAsc(navigateTableParent, id);
+            }
+        } else {
+            if (id == null) {
+                list = navigateTableRepository.findByWebsiteTableAndParentIsNullOrderByNavigateOrderAsc(websiteTableRepository.findOne(websiteId));
+            } else {
+                list = navigateTableRepository.findByWebsiteTableAndParentIsNullAndIdNotOrderByNavigateOrderAsc(websiteTableRepository.findOne(websiteId), id);
+            }
+        }
+        if (list != null && list.size() > 0) {
+            for (NavigateTable navigateTable : list) {
+                listReturn.add(new SelectOption(navigateTable.getName(), navigateTable.getId()));
+            }
+        }
+        return listReturn;
     }
 
 
@@ -212,5 +249,26 @@ public class NavigateTableServiceImpl implements NavigateTableService {
         if (navigateTable.getBeforeNavigate() != null) {
             recursiveNavigateOrderBack(navigateTable.getBeforeNavigate());
         }
+    }
+
+    private TreeOption recursiveParentsOptions(NavigateTable navigateTable, Long id) {
+        if (id == null || id != navigateTable.getId()) {
+            TreeOption treeOption = new TreeOption(navigateTable.getId(), navigateTable.getName());
+            treeOption.setEmitClick(true);
+            treeOption.setIconClass(navigateTable.getIconClass());
+            //treeOption.setUrl(navigateTable.getModuleUrl());
+            if (navigateTable.getChildren() != null && navigateTable.getChildren().size() > 0) {
+                List<TreeOption> list = new ArrayList<>();
+                for (NavigateTable navigateTable1 : navigateTable.getChildren()) {
+                    TreeOption treeOptionTemp = recursiveParentsOptions(navigateTable1, id);
+                    if (treeOptionTemp != null) {
+                        list.add(treeOptionTemp);
+                    }
+                }
+                treeOption.setChildren(list);
+            }
+            return treeOption;
+        }
+        return null;
     }
 }

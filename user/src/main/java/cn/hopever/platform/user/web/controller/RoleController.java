@@ -19,7 +19,6 @@ import java.util.Map;
  * Created by Donghui Huo on 2016/8/29.
  */
 @RestController
-@CrossOrigin
 @RequestMapping(value = "/role", produces = "application/json")
 public class RoleController {
     Logger logger = LoggerFactory.getLogger(RoleController.class);

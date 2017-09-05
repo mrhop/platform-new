@@ -32,3 +32,7 @@ contact_form 和poll后续考虑
 开始进行service和controller的实现
 
 优化的过程是仅仅是article加了一个type，
+
+需要一个theme&websitetree 用于进行起始的过滤
+
+正在执行controller的处理，整个完成后再进行前端的处理

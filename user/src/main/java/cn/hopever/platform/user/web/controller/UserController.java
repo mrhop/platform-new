@@ -24,7 +24,6 @@ import java.util.Map;
  * Created by Donghui Huo on 2016/8/29.
  */
 @RestController
-@CrossOrigin
 @RequestMapping(value = "/user", produces = "application/json")
 public class UserController {
     Logger logger = LoggerFactory.getLogger(UserController.class);

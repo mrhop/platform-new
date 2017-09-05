@@ -24,7 +24,6 @@ import java.util.Map;
  * Created by Donghui Huo on 2016/11/14.
  */
 @RestController
-@CrossOrigin
 @RequestMapping(value = "/module", produces = "application/json")
 public class ModuleController {
 
