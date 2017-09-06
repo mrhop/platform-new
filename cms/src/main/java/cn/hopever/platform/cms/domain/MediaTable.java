@@ -13,7 +13,7 @@ import java.util.Date;
  * 可以进行对应的整体更新，或者单独的js和css更新，但是不包含图片以及其他静态资源
  */
 @Entity
-@Table(name = "platform_cms_media", indexes = {@Index(columnList = "mediaTagTable")})
+@Table(name = "platform_cms_media", indexes = {@Index(columnList = "media_tag_id")})
 @Data
 @EqualsAndHashCode(of = {"id"})
 @Cacheable

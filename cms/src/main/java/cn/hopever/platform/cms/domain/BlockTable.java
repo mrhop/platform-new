@@ -26,10 +26,10 @@ public class BlockTable {
     @Column(length = 50)
     private String position;
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "text")
     private String content;
 
-    @Column(length = 2000)
+    @Column(columnDefinition = "text")
     private String script;
 
     // 目的是保证唯一性，在更换theme和template的情况下不会丢失数据，可以自由切换

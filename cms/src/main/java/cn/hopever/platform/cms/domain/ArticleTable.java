@@ -31,10 +31,10 @@ public class ArticleTable {
     @Column(name = "alias_url", length = 50)
     private String aliasUrl;
 
-    @Column(name = "content", length = 2500)
+    @Column(name = "content", columnDefinition = "text")
     private String content;
 
-    @Column(name = "script", length = 2500)
+    @Column(name = "script", columnDefinition = "text")
     private String script;
 
     @Column(name = "published")

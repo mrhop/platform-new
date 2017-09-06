@@ -1,8 +1,8 @@
 package cn.hopever.platform.utils.web;
 
-import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -20,16 +20,15 @@ import java.util.Map;
 @Aspect
 @Order
 @Component
-public class AroundControllerAdvice {
+public class BeforeControllerAdvice {
 
-    public static Logger logger = LoggerFactory.getLogger(AroundControllerAdvice.class);
+    public static Logger logger = LoggerFactory.getLogger(BeforeControllerAdvice.class);
 
-    @Before("execution(public * cn.hopever.platform.*.controller.*.*(..)) && @annotation(moduleAuthorize)")
-    public void packageTableAndForm(ProceedingJoinPoint jp, ModuleAuthorize moduleAuthorize) {
+    @Around("execution(public * cn.hopever.platform.*.controller.*.*(..)) && @annotation(moduleAuthorize)")
+    public void packageTableAndForm(JoinPoint jp, ModuleAuthorize moduleAuthorize) {
         try {
             String module = moduleAuthorize.value();
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            Object detail = authentication.getDetails();
             List<String> listModules = (List<String>) ((Map) authentication.getDetails()).get("modules");
             if (listModules.contains(module)) {
                 return;

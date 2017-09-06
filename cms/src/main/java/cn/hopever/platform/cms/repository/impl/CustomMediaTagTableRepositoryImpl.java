@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * Created by Donghui Huo on 2016/11/30.
  */
-@Repository("customArticleTagTableRepository")
+@Repository("customMediaTagTableRepository")
 public class CustomMediaTagTableRepositoryImpl extends SimpleJpaRepository<MediaTagTable, Long> implements CustomMediaTagTableRepository {
 
     private final EntityManager entityManager;
