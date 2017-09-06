@@ -16,6 +16,7 @@ public class Oauth2Properties {
     // client使用
     private String accessTokenUri;
     private String userAuthorizationUri;
+    private String leftMenu;
     private String domainName;
     private String path;
     private String clientID;

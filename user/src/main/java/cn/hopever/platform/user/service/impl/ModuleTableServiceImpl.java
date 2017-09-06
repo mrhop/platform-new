@@ -289,7 +289,7 @@ public class ModuleTableServiceImpl implements ModuleTableService {
     }
 
     @Override
-    public List getLeftMenu(Principal principal, String clientId) {
+    public List<TreeOption> getLeftMenu(Principal principal, String clientId) {
         UserTable userTable = userTableRepository.findOneByUsername(principal.getName());
         ClientTable clientTable = clientTableRepository.findOneByClientId(clientId);
         List<TreeOption> listReturn = new ArrayList<>();

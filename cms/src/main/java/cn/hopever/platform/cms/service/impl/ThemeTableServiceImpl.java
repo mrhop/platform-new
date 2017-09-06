@@ -84,10 +84,21 @@ public class ThemeTableServiceImpl implements ThemeTableService {
     }
 
     @Override
+    public List<SelectOption> getOptions() {
+        Iterable<ThemeTable> list = themeTableRepository.findAll();
+        List<SelectOption> listReturn = new ArrayList<>();
+        for (ThemeTable themeTable : list) {
+            listReturn.add(new SelectOption(themeTable.getName(), themeTable.getId()));
+        }
+        return listReturn;
+    }
+
+    @Override
     public List<SelectOption> getOptions(Principal principal) {
         Iterable<ThemeTable> list = themeTableRepository.findAll();
         List<SelectOption> listReturn = new ArrayList<>();
         for (ThemeTable themeTable : list) {
+            if(themeTable.getRelatedUsers().contains(principal.getName()))
             listReturn.add(new SelectOption(themeTable.getName(), themeTable.getId()));
         }
         return listReturn;

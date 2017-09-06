@@ -76,6 +76,7 @@ public class BlockTableServiceImpl implements BlockTableService {
 
     @Override
     public void delete(Long id, Principal principal) {
+        // 删除的时候，看一下删除的是template的，如果是，考虑删除关联的website的以及article的
         blockTableRepository.delete(id);
     }
 

@@ -7,6 +7,7 @@ import cn.hopever.platform.cms.repository.WebsiteTableRepository;
 import cn.hopever.platform.cms.service.MediaTagTableService;
 import cn.hopever.platform.cms.vo.MediaTagVo;
 import cn.hopever.platform.cms.vo.MediaTagVoAssembler;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,5 +91,15 @@ public class MediaTagTableServiceImpl implements MediaTagTableService {
         mediaTagTable.setWebsiteTable(websiteTableRepository.findOne(mediaTagVo.getWebsiteId()));
         mediaTagTableRepository.save(mediaTagTable);
         return VueResults.generateSuccess("创建成功", "创建成功");
+    }
+
+    @Override
+    public List<SelectOption> getOptionsByWebsiteId(Long websiteId) {
+        List<SelectOption> listReturn = new ArrayList<>();
+        List<MediaTagTable> list = mediaTagTableRepository.findByWebsiteTable(websiteTableRepository.findOne(websiteId));
+        for (MediaTagTable mediaTagTable : list) {
+            listReturn.add(new SelectOption(mediaTagTable.getName(), mediaTagTable.getId()));
+        }
+        return listReturn;
     }
 }

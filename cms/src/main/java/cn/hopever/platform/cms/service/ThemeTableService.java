@@ -11,5 +11,6 @@ import java.util.List;
  * Created by Donghui Huo on 2017/8/31.
  */
 public interface ThemeTableService extends GenericService<ThemeVo> {
+    public List<SelectOption> getOptions();
     public List<SelectOption> getOptions(Principal principal);
 }

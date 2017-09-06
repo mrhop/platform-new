@@ -2,6 +2,7 @@ config:
     oauth2:
         accessTokenUri: http://localhost:9091/oauth/token
         userAuthorizationUri: http://localhost:9091/oauth/authorize
+        leftMenu: http://localhost:9091/resources/user/leftmenu
         # 目前不考虑单点登录，如果考虑单点登录，则不合适使用login这套流程
         domainName: localhost #用于保证单点登录的实现，在不同的子系统之间，但是为了保证唯一性，以cookie为首要准则
         path: / #用于保证单点登录的实现，在不同的子系统之间，但是为了保证唯一性，以cookie为首要准则

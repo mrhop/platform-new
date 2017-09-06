@@ -1,5 +1,6 @@
 package cn.hopever.platform.cms.web.controller;
 
+import cn.hopever.platform.cms.service.ThemeTableService;
 import cn.hopever.platform.cms.service.WebsiteTableService;
 import cn.hopever.platform.cms.vo.WebsiteVo;
 import cn.hopever.platform.utils.web.GenericController;
@@ -30,12 +31,15 @@ public class WebsiteController implements GenericController<WebsiteVo> {
     @Autowired
     private WebsiteTableService websiteTableService;
 
+    @Autowired
+    private ThemeTableService themeTableService;
+
     //当用户角色为管理员时，可以处理该列表，以及其他的处理
     @Override
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     @PreAuthorize("hasRole('ROLE_admin')")
     public Map getList(@RequestBody TableParameters body, Principal principal) {
-        Page<WebsiteVo> list = websiteTableService.getList(body,principal);
+        Page<WebsiteVo> list = websiteTableService.getList(body, principal);
         Map<String, Object> map = new HashMap<>();
         List<HashMap<String, Object>> listReturn = null;
         if (list != null && list.iterator().hasNext()) {
@@ -62,7 +66,6 @@ public class WebsiteController implements GenericController<WebsiteVo> {
             map.put("totalCount", 0);
         }
         map.put("pager", body.getPager());
-        map.put("filters", body.getFilters());
         map.put("sorts", body.getSorts());
         return map;
     }
@@ -70,7 +73,7 @@ public class WebsiteController implements GenericController<WebsiteVo> {
     @Override
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public WebsiteVo info(@RequestParam Long key, Principal principal) {
-        return null;
+        return websiteTableService.info(key, principal);
     }
 
     @Override
@@ -81,7 +84,8 @@ public class WebsiteController implements GenericController<WebsiteVo> {
     @Override
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshots", required = false) MultipartFile[] files, WebsiteVo websiteVo, Principal principal) {
-        return null;
+        websiteVo.setId(key);
+        return websiteTableService.update(websiteVo, files, principal);
     }
 
     @Override
@@ -92,18 +96,24 @@ public class WebsiteController implements GenericController<WebsiteVo> {
     @Override
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestParam(name = "screenshots", required = false) MultipartFile[] files, WebsiteVo websiteVo, Principal principal) {
-        return null;
+        return websiteTableService.save(websiteVo, files, principal);
     }
 
     @Override
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long key, Principal principal) {
-
+        websiteTableService.delete(key, principal);
     }
 
     @Override
     @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
     public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal) {
+        // 需要提供 themeList 在列表和新增的时候
+        if (key == null) {
+            Map mapReturn = new HashMap<>();
+            mapReturn.put("themes", themeTableService.getOptions());
+            return mapReturn;
+        }
         return null;
     }
 }

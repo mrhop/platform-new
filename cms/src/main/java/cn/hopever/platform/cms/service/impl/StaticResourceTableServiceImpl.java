@@ -55,13 +55,14 @@ public class StaticResourceTableServiceImpl implements StaticResourceTableServic
             String key = body.getSorts().keySet().iterator().next();
             pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
         }
-        if (body.getFilters() != null && body.getFilters().containsKey("websiteId")) {
-            body.getFilters().put("websiteTable", websiteTableRepository.findOne(Long.valueOf(body.getFilters().get("websiteId").toString())));
-            body.getFilters().remove("websiteId");
-        }
+
         if (body.getFilters() != null && body.getFilters().containsKey("themeId")) {
             body.getFilters().put("themeTable", themeTableRepository.findOne(Long.valueOf(body.getFilters().get("themeId").toString())));
             body.getFilters().remove("themeId");
+        }
+        if (body.getFilters() != null && body.getFilters().containsKey("websiteId")) {
+            body.getFilters().put("websiteTable", websiteTableRepository.findOne(Long.valueOf(body.getFilters().get("websiteId").toString())));
+            body.getFilters().remove("websiteId");
         }
         if (body.getFilters() != null && body.getFilters().containsKey("articleId")) {
             body.getFilters().put("articleTable", themeTableRepository.findOne(Long.valueOf(body.getFilters().get("articleId").toString())));

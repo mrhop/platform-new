@@ -85,11 +85,23 @@ public class WebsiteTableServiceImpl implements WebsiteTableService {
     }
 
     @Override
-    public List<SelectOption> getOptions(Principal principal) {
+    public List<SelectOption> getOptions() {
         Iterable<WebsiteTable> list = websiteTableRepository.findAll();
         List<SelectOption> listReturn = new ArrayList<>();
         for (WebsiteTable websiteTable : list) {
             listReturn.add(new SelectOption(websiteTable.getName(), websiteTable.getId()));
+        }
+        return listReturn;
+    }
+
+    @Override
+    public List<SelectOption> getOptions(Principal principal) {
+        Iterable<WebsiteTable> list = websiteTableRepository.findAll();
+        List<SelectOption> listReturn = new ArrayList<>();
+        for (WebsiteTable websiteTable : list) {
+            if (websiteTable.getRelatedUsers().contains(principal.getName())) {
+                listReturn.add(new SelectOption(websiteTable.getName(), websiteTable.getId()));
+            }
         }
         return listReturn;
     }
