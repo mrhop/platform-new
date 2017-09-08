@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Aspect
 @Order
-@Component
+@Component("cmsBeforeControllerAdvice")
 public class BeforeControllerAdvice {
 
     public static Logger logger = LoggerFactory.getLogger(BeforeControllerAdvice.class);

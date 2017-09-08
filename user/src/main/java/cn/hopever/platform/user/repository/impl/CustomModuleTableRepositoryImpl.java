@@ -80,7 +80,6 @@ public class CustomModuleTableRepositoryImpl extends SimpleJpaRepository<ModuleT
         CriteriaQuery<String> cq = criteriaBuilder.createQuery(String.class);
         Root<ModuleTable> moduleTableRoot = cq.from(ModuleTable.class);
         Predicate predicate = filterConditions3(moduleRoleIds).toPredicate(moduleTableRoot, cq, criteriaBuilder);
-        cq.select(moduleTableRoot.get("moduleId")).where(predicate);
         cq.select(moduleTableRoot.get("moduleId")).where(predicate).distinct(true);
         return entityManager.createQuery(cq).getResultList();
     }

@@ -291,11 +291,11 @@ public class ModuleTableServiceImpl implements ModuleTableService {
     @Override
     public List<TreeOption> getLeftMenu(Principal principal, String clientId) {
         UserTable userTable = userTableRepository.findOneByUsername(principal.getName());
+        RoleTable roleTable = getTopRole(userTable);
         ClientTable clientTable = clientTableRepository.findOneByClientId(clientId);
         List<TreeOption> listReturn = new ArrayList<>();
         if (clientId.equals("user_admin_client")) {
             //不必按照查询来，而要根据user的权限来
-            RoleTable roleTable = getTopRole(userTable);
             if (roleTable.getAuthority().equals("ROLE_super_admin")) {
                 return baseConfig.getSuperAdminMenu();
             } else if (roleTable.getAuthority().equals("ROLE_admin")) {
@@ -304,7 +304,12 @@ public class ModuleTableServiceImpl implements ModuleTableService {
                 return baseConfig.getCommonUserMenu();
             }
         } else {
-            List<ModuleRoleTable> listModuleRole = customModuleRoleTableRepository.findByUserAndClient(userTable.getId(), clientTable);
+            List<ModuleRoleTable> listModuleRole = null;
+            if ((roleTable.getAuthority().equals("ROLE_super_admin") || roleTable.getAuthority().equals("ROLE_admin")) && userTable.getClients().contains(clientTable)) {
+                listModuleRole = moduleRoleTableRepository.findByClient(clientTable);
+            } else {
+                listModuleRole = customModuleRoleTableRepository.findByUserAndClient(userTable.getId(), clientTable);
+            }
             List<Long> moduleRoleIds = new ArrayList<>();
             for (ModuleRoleTable moduleRoleTable : listModuleRole) {
                 moduleRoleIds.add(moduleRoleTable.getId());

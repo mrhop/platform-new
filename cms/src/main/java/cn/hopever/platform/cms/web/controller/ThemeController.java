@@ -71,7 +71,7 @@ public class ThemeController implements GenericController<ThemeVo> {
 
     @Override
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshots", required = false) MultipartFile[] files, ThemeVo themeVo, Principal principal) {
+    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshotFiles", required = false) MultipartFile[] files, ThemeVo themeVo, Principal principal) {
         themeVo.setId(key);
         return themeTableService.update(themeVo, files, principal);
     }
@@ -83,7 +83,7 @@ public class ThemeController implements GenericController<ThemeVo> {
 
     @Override
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result save(@RequestParam(name = "screenshots", required = false) MultipartFile[] files, ThemeVo themeVo, Principal principal) {
+    public VueResults.Result save(@RequestParam(name = "screenshotFiles", required = false) MultipartFile[] files, ThemeVo themeVo, Principal principal) {
         return themeTableService.save(themeVo, files, principal);
     }
 
@@ -96,7 +96,7 @@ public class ThemeController implements GenericController<ThemeVo> {
     @Override
     @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
     public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal) {
-        // 没有关联的theme rule change
+        // 需要关联用户的处理
         return null;
     }
 }

@@ -83,7 +83,7 @@ public class WebsiteController implements GenericController<WebsiteVo> {
 
     @Override
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshots", required = false) MultipartFile[] files, WebsiteVo websiteVo, Principal principal) {
+    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshotFiles", required = false) MultipartFile[] files, WebsiteVo websiteVo, Principal principal) {
         websiteVo.setId(key);
         return websiteTableService.update(websiteVo, files, principal);
     }
@@ -95,7 +95,7 @@ public class WebsiteController implements GenericController<WebsiteVo> {
 
     @Override
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result save(@RequestParam(name = "screenshots", required = false) MultipartFile[] files, WebsiteVo websiteVo, Principal principal) {
+    public VueResults.Result save(@RequestParam(name = "screenshotFiles", required = false) MultipartFile[] files, WebsiteVo websiteVo, Principal principal) {
         return websiteTableService.save(websiteVo, files, principal);
     }
 

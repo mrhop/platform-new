@@ -60,7 +60,6 @@ public class UserController {
             map.put("totalCount", 0);
         }
         map.put("pager", body.getPager());
-        map.put("filters", body.getFilters());
         map.put("sorts", body.getSorts());
         return map;
     }

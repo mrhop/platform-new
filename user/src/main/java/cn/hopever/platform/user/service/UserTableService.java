@@ -36,7 +36,7 @@ public interface UserTableService extends UserDetailsService {
 
     public Page<UserTable> getSubList(String username, Pageable pageable, Map<String, Object> filterMap);
 
-    public List<UserTable> getListByClientId(String clientId);
+    public List<String> getListByClientId(String clientId);
 
     public void delete(Long id);
 

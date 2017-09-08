@@ -124,32 +124,29 @@ public class UserTableServiceImpl implements UserTableService {
     @Transactional(readOnly = true)
     public Page<UserTable> getSubList(String username, Pageable pageable, Map<String, Object> filterMap) {
         UserTable ut = userTableRepository.findOneByUsername(username);
-        List<RoleTable> list1 = new ArrayList<>();
-        List<RoleTable> list2 = new ArrayList<>();
-        list1.add(roleTableRepository.findOneByAuthority("ROLE_admin"));
-        list2.add(roleTableRepository.findOneByAuthority("ROLE_common_user"));
         List listUpdate = new ArrayList<>();
         List<ClientTable> list = ut.getClients();
         if (list != null) {
             for (ClientTable ct : list) {
                 if (!"user_admin_client".equals(ct.getClientId())) {
-                    listUpdate.add(ct);
+                    listUpdate.add(ct.getId());
                 }
             }
+            filterMap.put("clientIds", listUpdate);
         }
         if (listUpdate != null && listUpdate.size() > 0) {
-            return customUserTableRepository.findByCreateUserAndAuthoritiesInAndClientsInAndFilters(ut, list1, list2, listUpdate, filterMap, pageable);
+            return customUserTableRepository.findByCreateUserAndAuthoritiesInAndClientsInAndFilters(ut, "ROLE_admin", "ROLE_common_user", filterMap, pageable);
         }
         return null;
     }
 
     @Override
-    public List<UserTable> getListByClientId(String clientId) {
+    public List<String> getListByClientId(String clientId) {
         List<RoleTable> list1 = new ArrayList<>();
         list1.add(roleTableRepository.findOneByAuthority("ROLE_common_user"));
         List<ClientTable> list2 = new ArrayList<>();
         list2.add(clientTableRepository.findOneByClientId(clientId));
-        return userTableRepository.findByAuthoritiesInAndClientsIn(list1, list2);
+        return customUserTableRepository.findByAuthorityAndClientId("ROLE_common_user",clientId);
     }
 
     @Override

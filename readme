@@ -12,3 +12,26 @@ http://planet.jboss.org/post/collection_caching_in_the_hibernate_second_level_ca
 后续调整：
 1>保存更新用户时，当有client的更新时，考虑将role进行相应的处理--处理中
 2>将hibernate的ehcache替换为redis，保证集群可用，并使用jta事务
+
+
+为了进行测试，对权限验证进行的部分修改
+
+oauth2client app
+1.CommonMethods
+       // headers.add("Authorization", "Bearer " + c.getValue());
+2.SecurityConfig
+//        web.ignoring().antMatchers("/webjars/**", "/static/**", "/error/*.html", "/index.html", "/gettokenbycode", "/gettokenbyclient");
+        web.ignoring().antMatchers("/webjars/**", "/static/**", "/error/*.html","/**");
+
+user app
+1.ResourceServer
+//                .antMatchers("/resources/user/leftmenu").access("#oauth2.hasScope('internal_client') and isAuthenticated()")
+                .antMatchers("/resources/user/leftmenu").permitAll()
+                .antMatchers("/resources/user/relatedusers").permitAll()
+2.UserResources
+     principal = new PrincipalSample("admin");
+//        return moduleTableService.getLeftMenu(principal, auth.getOAuth2Request().getClientId());
+        return moduleTableService.getLeftMenu(principal, "cms_client");
+
+  //        return userTableService.getListByClientId(auth.getOAuth2Request().getClientId());
+                return userTableService.getListByClientId("cms_client");
