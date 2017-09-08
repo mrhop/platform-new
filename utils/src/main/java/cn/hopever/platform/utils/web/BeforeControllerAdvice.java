@@ -1,8 +1,8 @@
 package cn.hopever.platform.utils.web;
 
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -24,20 +24,15 @@ public class BeforeControllerAdvice {
 
     public static Logger logger = LoggerFactory.getLogger(BeforeControllerAdvice.class);
 
-    @Around("execution(public * cn.hopever.platform.*.controller.*.*(..)) && @annotation(moduleAuthorize)")
+    @Before("execution(public * cn.hopever.platform.*.controller.*.*(..)) && @annotation(moduleAuthorize)")
     public void packageTableAndForm(JoinPoint jp, ModuleAuthorize moduleAuthorize) {
-        try {
-            String module = moduleAuthorize.value();
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            List<String> listModules = (List<String>) ((Map) authentication.getDetails()).get("modules");
-            if (listModules.contains(module)) {
-                return;
-            }
-            throw new AuthorizationServiceException("Bad authorization");
-        } catch (Exception e) {
-            throw new AuthorizationServiceException("Bad authorization");
+        String module = moduleAuthorize.value();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        List<String> listModules = (List<String>) ((Map) authentication.getDetails()).get("modules");
+        if (listModules.contains(module)) {
+            return;
         }
-
+        throw new AuthorizationServiceException("Bad authorization");
     }
 
 }

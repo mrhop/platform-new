@@ -12,6 +12,7 @@ public class SelectOption implements Serializable {
     private String label;
     private Object value;
     private boolean selected = false;
+    private String type;
 
     public SelectOption() {
     }

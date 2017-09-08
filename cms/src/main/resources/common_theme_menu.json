@@ -1,0 +1,16 @@
+[
+  {
+    "title": "主题管理",
+    "iconClass": "glyphicon glyphicon-th-large",
+    "children": [
+      {
+        "title": "主题列表",
+        "url": "/themelist"
+      },
+      {
+        "title": "新增主题",
+        "url": "/addtheme"
+      }
+    ]
+  }
+]
