@@ -26,10 +26,6 @@ public class WebsiteVo {
 
     private String phone;
 
-    private String resourceLocation;
-
-    private String resourcePrefixUrl;
-
     private List<String> relatedUsers;
 
     private boolean enabled;

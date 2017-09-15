@@ -133,6 +133,13 @@ public class TopController {
                 i.read(bArr);
                 String data = new String(bArr, "utf-8");
                 return JacksonUtil.mapper.readValue(data, List.class);
+            } else if ("blocktag".equals(type)) {
+                // theme的管理
+                InputStream i = Thread.currentThread().getContextClassLoader().getResourceAsStream("common_blocktag_menu.json");
+                byte[] bArr = new byte[i.available()];
+                i.read(bArr);
+                String data = new String(bArr, "utf-8");
+                return JacksonUtil.mapper.readValue(data, List.class);
             }
         }
 
@@ -143,11 +150,19 @@ public class TopController {
     // 根据类型，来获取左侧的树，根据返回的modules 来进行处理，应该在此调用后端的user，然后将theme或者website部分去除，然后返回
     // cms部分应该包含2部分 theme， website ，剩下的对website和theme本身的处理，应该在admin管理权限里面
     @RequestMapping(value = "/relatedusers", method = {RequestMethod.GET})
-    public List relateduser(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Principal principal, Authentication authentication) throws Exception {
+    public List<SelectOption> relateduser(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Principal principal, Authentication authentication) throws Exception {
         httpServletRequest.setAttribute("resourceUrl", oauth2Properties.getRelatedUsers());
         CommonResult commonResult = commonMethods.getResource(httpServletRequest);
         List<String> list = (List<String>) commonResult.getResponseData().get("data");
-        return list;
+        if (list != null && list.size() > 0) {
+            List<SelectOption> list1 = new ArrayList<>();
+            for (String relateUser : list) {
+                list1.add(new SelectOption(relateUser, relateUser));
+            }
+            return list1;
+        }
+
+        return null;
     }
 
 

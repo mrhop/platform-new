@@ -28,7 +28,7 @@ public class ThemeController implements GenericController<ThemeVo> {
     Logger logger = LoggerFactory.getLogger(ThemeController.class);
     @Autowired
     private ThemeTableService themeTableService;
-    
+
     @Override
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body, Principal principal) {
@@ -42,6 +42,7 @@ public class ThemeController implements GenericController<ThemeVo> {
                 mapTemp.put("key", cv.getId());
                 List<Object> listTmp = new ArrayList<>();
                 listTmp.add(cv.getName());
+                listTmp.add(cv.getThemeId());
                 listTmp.add(cv.getRelatedUsers());
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);
@@ -76,6 +77,13 @@ public class ThemeController implements GenericController<ThemeVo> {
         return themeTableService.update(themeVo, files, principal);
     }
 
+    @RequestMapping(value = "/updateinfo", method = {RequestMethod.POST})
+    public VueResults.Result updateinfo(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshotFiles", required = false) MultipartFile[] files, ThemeVo themeVo, Principal principal) {
+        themeVo.setId(key);
+        themeTableService.update(themeVo, files, principal);
+        return VueResults.generateSuccess("更新成功", "更新成功");
+    }
+
     @Override
     public VueResults.Result save(@RequestBody ThemeVo themeVo, Principal principal) {
         return null;
@@ -90,7 +98,7 @@ public class ThemeController implements GenericController<ThemeVo> {
     @Override
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long key, Principal principal) {
-        themeTableService.delete(key,principal);
+        themeTableService.delete(key, principal);
     }
 
     @Override

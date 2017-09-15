@@ -10,24 +10,26 @@ import java.util.List;
  */
 public interface StaticResourceTableRepository extends PagingAndSortingRepository<StaticResourceTable, Long> {
 
-    public List<StaticResourceTable> findByThemeTableOrderByResourceOrderAsc(ThemeTable themeTable);
+    public List<StaticResourceTable> findByThemeTableAndTypeOrderByResourceOrderAsc(ThemeTable themeTable, String type);
 
-    public List<StaticResourceTable> findByWebsiteTableOrderByResourceOrderAsc(WebsiteTable websiteTable);
+    public List<StaticResourceTable> findByWebsiteTableAndTypeOrderByResourceOrderAsc(WebsiteTable websiteTable, String type);
 
-    public List<StaticResourceTable> findByArticleTableOrderByResourceOrderAsc(ArticleTable articleTable);
+    public List<StaticResourceTable> findByArticleTableAndTypeOrderByResourceOrderAsc(ArticleTable articleTable, String type);
 
-    public List<StaticResourceTable> findByThemeTableAndIdNotOrderByResourceOrderAsc(ThemeTable themeTable, Long id);
+    public List<StaticResourceTable> findByThemeTableAndTypeAndIdNotOrderByResourceOrderAsc(ThemeTable themeTable, String type, Long id);
 
-    public List<StaticResourceTable> findByWebsiteTableAndIdNotOrderByResourceOrderAsc(WebsiteTable websiteTable, Long id);
+    public List<StaticResourceTable> findByWebsiteTableAndTypeAndIdNotOrderByResourceOrderAsc(WebsiteTable websiteTable, String type, Long id);
 
-    public List<StaticResourceTable> findByArticleTableAndIdNotOrderByResourceOrderAsc(ArticleTable articleTable, Long id);
+    public List<StaticResourceTable> findByArticleTableAndTypeAndIdNotOrderByResourceOrderAsc(ArticleTable articleTable, String type, Long id);
 
     public StaticResourceTable findOneByBeforeStaticResource(StaticResourceTable staticResourceTable);
 
-    public StaticResourceTable findTopByThemeTableOrderByResourceOrderDesc(ThemeTable themeTable);
+    public StaticResourceTable findOneByUrl(String url);
 
-    public StaticResourceTable findTopByWebsiteTableOrderByResourceOrderDesc(WebsiteTable websiteTable);
+    public StaticResourceTable findTopByThemeTableAndTypeOrderByResourceOrderDesc(ThemeTable themeTable, String type);
 
-    public StaticResourceTable findTopByArticleTableOrderByResourceOrderDesc(ArticleTable articleTable);
+    public StaticResourceTable findTopByWebsiteTableAndTypeOrderByResourceOrderDesc(WebsiteTable websiteTable, String type);
+
+    public StaticResourceTable findTopByArticleTableAndTypeOrderByResourceOrderDesc(ArticleTable articleTable, String type);
 
 }

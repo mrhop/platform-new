@@ -61,23 +61,25 @@ public class MojiUtils {
         HashMap<String, List<String>> responseData = new HashMap<>();
         List<String> list = new ArrayList<>();
         for (MultipartFile file : files) {
-            String[] fileName = file.getOriginalFilename().split("\\.");
-            String filePrefix = fileName[0] + "-" + UUID.randomUUID();
-            String fileSuffix = fileName[fileName.length - 1];
-            File fileTmp = File.createTempFile(filePrefix, "." + fileSuffix);
-            String fileToSavePath = filePath + filePrefix + "." + fileSuffix;
-            MojiFile mojiFile = mojiBean.getFile(fileToSavePath);
-            file.transferTo(fileTmp);
-            mojiBean.copyToMogile(fileTmp, mojiFile);
-            String pathPrev = "";
-            if ("image".equals(type)) {
-                pathPrev = commonProperties.getImagePathPrev();
-            } else if ("file".equals(type)) {
-                pathPrev = commonProperties.getFilePathPrev();
-            } else if ("doc".equals(type)) {
-                pathPrev = commonProperties.getDocPathPrev();
+            if (!file.isEmpty()) {
+                String[] fileName = file.getOriginalFilename().split("\\.");
+                String filePrefix = fileName[0] + "-" + UUID.randomUUID();
+                String fileSuffix = fileName[fileName.length - 1];
+                File fileTmp = File.createTempFile(filePrefix, "." + fileSuffix);
+                String fileToSavePath = filePath + filePrefix + "." + fileSuffix;
+                MojiFile mojiFile = mojiBean.getFile(fileToSavePath);
+                file.transferTo(fileTmp);
+                mojiBean.copyToMogile(fileTmp, mojiFile);
+                String pathPrev = "";
+                if ("image".equals(type)) {
+                    pathPrev = commonProperties.getImagePathPrev();
+                } else if ("file".equals(type)) {
+                    pathPrev = commonProperties.getFilePathPrev();
+                } else if ("doc".equals(type)) {
+                    pathPrev = commonProperties.getDocPathPrev();
+                }
+                list.add(pathPrev + fileToSavePath);
             }
-            list.add(pathPrev + fileToSavePath);
         }
         responseData.put("fileKeys", list);
         return responseData;

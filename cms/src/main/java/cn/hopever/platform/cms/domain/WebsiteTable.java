@@ -25,7 +25,7 @@ public class WebsiteTable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "website_id", length = 50)
+    @Column(name = "website_id", length = 50,unique = true)
     private String websiteId;
 
     @Column(name = "name", length = 50)
@@ -37,7 +37,7 @@ public class WebsiteTable {
     @Column(name = "subtitle")
     private String subtitle;
 
-    @Column(name = "url", length = 50)
+    @Column(name = "url")
     private String url;
 
     @Column(name = "email", length = 50)
@@ -45,12 +45,6 @@ public class WebsiteTable {
 
     @Column(name = "phone", length = 50)
     private String phone;
-
-    @Column(name = "resource_location", length = 50)
-    private String resourceLocation;
-
-    @Column(name = "resource_prefix_url", length = 50)
-    private String resourcePrefixUrl;
 
     @Column(name = "related_users")
     private String relatedUsers;
@@ -89,7 +83,7 @@ public class WebsiteTable {
     private List<NavigateTable> navigateTables;
 
 
-    public List<String> getScreenshots()  {
+    public List<String> getScreenshots() {
         if (this.screenshots != null) {
             try {
                 return JacksonUtil.mapper.readValue(this.screenshots, List.class);
@@ -100,15 +94,19 @@ public class WebsiteTable {
         return null;
     }
 
-    public void setScreenshots(List<String> screenshots){
-        try {
-            this.screenshots = JacksonUtil.mapper.writeValueAsString(screenshots);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+    public void setScreenshots(List<String> screenshots) {
+        if (screenshots != null && screenshots.size() > 0) {
+            try {
+                this.screenshots = JacksonUtil.mapper.writeValueAsString(screenshots);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        } else {
+            this.screenshots = null;
         }
     }
 
-    public List<String> getRelatedUsers()  {
+    public List<String> getRelatedUsers() {
         if (this.relatedUsers != null) {
             try {
                 return JacksonUtil.mapper.readValue(this.relatedUsers, List.class);
@@ -119,11 +117,15 @@ public class WebsiteTable {
         return null;
     }
 
-    public void setRelatedUsers(List<String> relatedUsers)  {
-        try {
-            this.relatedUsers = JacksonUtil.mapper.writeValueAsString(relatedUsers);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+    public void setRelatedUsers(List<String> relatedUsers) {
+        if (relatedUsers != null && relatedUsers.size() > 0) {
+            try {
+                this.relatedUsers = JacksonUtil.mapper.writeValueAsString(relatedUsers);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        } else {
+            this.relatedUsers = null;
         }
     }
 

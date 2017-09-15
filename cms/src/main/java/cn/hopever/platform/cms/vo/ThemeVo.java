@@ -12,6 +12,8 @@ public class ThemeVo {
 
     private long id;
 
+    private String themeId;
+
     private String name;
 
     private List<String> screenshots;

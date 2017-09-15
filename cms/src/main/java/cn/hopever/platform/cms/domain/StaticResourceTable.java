@@ -22,10 +22,10 @@ public class StaticResourceTable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "name", length = 50)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "filename", length = 50)
+    @Column(name = "filename")
     private String filename;
 
     //script css
@@ -41,7 +41,7 @@ public class StaticResourceTable {
     @Column(name = "url")
     private String url;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     @JoinColumn(name = "theme_id")
     private ThemeTable themeTable;
 
@@ -54,7 +54,7 @@ public class StaticResourceTable {
     private ArticleTable articleTable;
 
     // order 需要后续更新
-    @Column(name = "resource_order", nullable = false)
+    @Column(name = "resource_order")
     private Integer resourceOrder;
 
     // 用于和order一起来决定顺序

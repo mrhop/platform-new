@@ -1,0 +1,16 @@
+[
+  {
+    "title": "Tag管理",
+    "iconClass": "glyphicon glyphicon-list-alt",
+    "children": [
+      {
+        "title": "Tag列表",
+        "url": "/blocktag/list"
+      },
+      {
+        "title": "新增Tag",
+        "url": "/blocktag/add"
+      }
+    ]
+  }
+]

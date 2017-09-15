@@ -25,6 +25,9 @@ public class ThemeTable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "theme_id", length = 50, unique = true)
+    private String themeId;
+
     @Column(name = "name", length = 50)
     private String name;
 
@@ -58,10 +61,14 @@ public class ThemeTable {
     }
 
     public void setScreenshots(List<String> screenshots) {
-        try {
-            this.screenshots = JacksonUtil.mapper.writeValueAsString(screenshots);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        if (screenshots != null && screenshots.size() > 0) {
+            try {
+                this.screenshots = JacksonUtil.mapper.writeValueAsString(screenshots);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        } else {
+            this.screenshots = null;
         }
     }
 
@@ -77,10 +84,14 @@ public class ThemeTable {
     }
 
     public void setRelatedUsers(List<String> relatedUsers) {
-        try {
-            this.relatedUsers = JacksonUtil.mapper.writeValueAsString(relatedUsers);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        if (relatedUsers != null && relatedUsers.size() > 0) {
+            try {
+                this.relatedUsers = JacksonUtil.mapper.writeValueAsString(relatedUsers);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        } else {
+            this.relatedUsers = null;
         }
     }
 

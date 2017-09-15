@@ -1,7 +1,7 @@
 package cn.hopever.platform.cms.repository.impl;
 
-import cn.hopever.platform.cms.domain.StaticResourceTable;
-import cn.hopever.platform.cms.repository.CustomStaticResourceTableRepository;
+import cn.hopever.platform.cms.domain.WebsiteTable;
+import cn.hopever.platform.cms.repository.CustomWebsiteTableRepository;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,31 +20,31 @@ import java.util.Map;
 /**
  * Created by Donghui Huo on 2016/11/30.
  */
-@Repository("customStaticResourceTableRepository")
-public class CustomStaticResourceTableRepositoryImpl extends SimpleJpaRepository<StaticResourceTable, Long> implements CustomStaticResourceTableRepository {
+@Repository("customWebsiteTableRepository")
+public class CustomWebsiteTableRepositoryImpl extends SimpleJpaRepository<WebsiteTable, Long> implements CustomWebsiteTableRepository {
 
     private final EntityManager entityManager;
 
-    public CustomStaticResourceTableRepositoryImpl(EntityManager entityManager) {
-        super(JpaEntityInformationSupport.getEntityInformation(StaticResourceTable.class, entityManager), entityManager);
+    public CustomWebsiteTableRepositoryImpl(EntityManager entityManager) {
+        super(JpaEntityInformationSupport.getEntityInformation(WebsiteTable.class, entityManager), entityManager);
         this.entityManager = entityManager;
     }
 
 
     @Override
-    public Page<StaticResourceTable> findByFilters(Map<String, Object> mapFilter, Pageable pageable) {
+    public Page<WebsiteTable> findByFilters(Map<String, Object> mapFilter, Pageable pageable) {
         return super.findAll(filterConditions1(mapFilter), pageable);
     }
 
-    private Specification<StaticResourceTable> filterConditions1(Map<String, Object> mapFilter) {
-        return new Specification<StaticResourceTable>() {
-            public Predicate toPredicate(Root<StaticResourceTable> root, CriteriaQuery<?> query,
+    private Specification<WebsiteTable> filterConditions1(Map<String, Object> mapFilter) {
+        return new Specification<WebsiteTable>() {
+            public Predicate toPredicate(Root<WebsiteTable> root, CriteriaQuery<?> query,
                                          CriteriaBuilder builder) {
                 query.distinct(true);
                 Predicate predicateReturn = null;
                 if (mapFilter != null && mapFilter.size() > 0) {
                     for (String key : mapFilter.keySet()) {
-                        if ("websiteTable".equals(key) || "themeTable".equals(key) || "articleTable".equals(key) || "type".equals(key)) {
+                        if ("themeTable".equals(key)) {
                             if (predicateReturn != null) {
                                 predicateReturn = builder.and(predicateReturn, builder.equal(root.get(key), mapFilter.get(key)));
                             } else {

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,7 +33,7 @@ public class BlockTagTableServiceImpl implements BlockTagTableService {
 
     @Override
     public Page<BlockTagVo> getList(TableParameters body, Principal principal) {
-        PageRequest pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize());
+        PageRequest pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "id");
         Page<BlockTagTable> page = blockTagTableRepository.findAll(pageRequest);
         List<BlockTagVo> list = new ArrayList<>();
         for (BlockTagTable blockTagTable : page) {
@@ -57,7 +58,7 @@ public class BlockTagTableServiceImpl implements BlockTagTableService {
         BlockTagTable blockTagTable = blockTagTableRepository.findOne(blockTagVo.getId());
         blockTagVoAssembler.toDomain(blockTagVo, blockTagTable);
         blockTagTableRepository.save(blockTagTable);
-        return VueResults.generateSuccess("更新成功", "更新成功");
+        return null;
     }
 
     @Override
@@ -65,9 +66,9 @@ public class BlockTagTableServiceImpl implements BlockTagTableService {
         if (blockTagTableRepository.findOneByTagId(blockTagVo.getTagId()) != null) {
             return VueResults.generateError("创建失败", "tagID已存在");
         }
-        BlockTagTable blockTagTable = blockTagTableRepository.findOne(blockTagVo.getId());
+        BlockTagTable blockTagTable = new BlockTagTable();
         blockTagVoAssembler.toDomain(blockTagVo, blockTagTable);
         blockTagTableRepository.save(blockTagTable);
-        return VueResults.generateSuccess("创建成功", "创建成功");
+        return null;
     }
 }

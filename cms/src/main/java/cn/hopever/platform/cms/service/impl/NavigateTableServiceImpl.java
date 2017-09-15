@@ -52,7 +52,7 @@ public class NavigateTableServiceImpl implements NavigateTableService {
     public Page<NavigateVo> getList(TableParameters body, Principal principal) {
         PageRequest pageRequest;
         if (body.getSorts() == null || body.getSorts().isEmpty()) {
-            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize());
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "id");
         } else {
             String key = body.getSorts().keySet().iterator().next();
             pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);

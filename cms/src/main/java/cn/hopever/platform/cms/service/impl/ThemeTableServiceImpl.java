@@ -5,9 +5,12 @@ import cn.hopever.platform.cms.repository.ThemeTableRepository;
 import cn.hopever.platform.cms.service.ThemeTableService;
 import cn.hopever.platform.cms.vo.ThemeVo;
 import cn.hopever.platform.cms.vo.ThemeVoAssembler;
+import cn.hopever.platform.utils.moji.MojiUtils;
 import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Donghui Huo on 2017/8/31.
@@ -30,6 +34,10 @@ import java.util.List;
 @Transactional
 public class ThemeTableServiceImpl implements ThemeTableService {
 
+    Logger logger = LoggerFactory.getLogger(ThemeTableServiceImpl.class);
+
+    @Autowired
+    private MojiUtils mojiUtils;
     @Autowired
     private ThemeTableRepository themeTableRepository;
     @Autowired
@@ -39,7 +47,7 @@ public class ThemeTableServiceImpl implements ThemeTableService {
     public Page<ThemeVo> getList(TableParameters body, Principal principal) {
         PageRequest pageRequest;
         if (body.getSorts() == null || body.getSorts().isEmpty()) {
-            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize());
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "id");
         } else {
             String key = body.getSorts().keySet().iterator().next();
             pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
@@ -70,8 +78,34 @@ public class ThemeTableServiceImpl implements ThemeTableService {
     public VueResults.Result update(ThemeVo themeVo, MultipartFile[] files, Principal principal) {
         ThemeTable themeTable = themeTableRepository.findOne(themeVo.getId());
         themeVoAssembler.toDomain(themeVo, themeTable);
+        List<String> preScreenShots = themeTable.getScreenshots();
+        if (files != null && files.length > 0) {
+            try {
+                Map<String, List<String>> mapScreenshots = mojiUtils.uploadImg("cms/theme/" + themeTable.getThemeId() + "/screenshots", files);
+                List<String> list = mapScreenshots.get("fileKeys");
+                if (list != null && list.size() > 0) {
+                    if (preScreenShots != null) {
+                        for (int i = 0; i < files.length; i++) {
+                            MultipartFile file = files[i];
+                            if (!file.isEmpty()) {
+                                if (i >= preScreenShots.size()) {
+                                    preScreenShots.add(list.remove(0));
+                                }
+                            } else {
+                                preScreenShots.set(i, list.remove(0));
+                            }
+                        }
+                        themeTable.setScreenshots(preScreenShots);
+                    } else {
+                        themeTable.setScreenshots(list);
+                    }
+                }
+            } catch (Exception e) {
+                logger.error("update theme screemshots failed", e);
+            }
+        }
         themeTableRepository.save(themeTable);
-        return VueResults.generateSuccess("更新成功", "更新成功");
+        return null;
     }
 
     @Override
@@ -79,7 +113,19 @@ public class ThemeTableServiceImpl implements ThemeTableService {
     public VueResults.Result save(ThemeVo themeVo, MultipartFile[] files, Principal principal) {
         ThemeTable themeTable = new ThemeTable();
         themeVoAssembler.toDomain(themeVo, themeTable);
+
         themeTableRepository.save(themeTable);
+        if (files != null && files.length > 0) {
+            try {
+                Map<String, List<String>> mapScreenshots = mojiUtils.uploadImg("cms/theme/" + themeTable.getThemeId() + "/screenshots", files);
+                List<String> list = mapScreenshots.get("fileKeys");
+                if (list != null && list.size() > 0) {
+                    themeTable.setScreenshots(list);
+                }
+            } catch (Exception e) {
+                logger.error("save theme screemshots failed", e);
+            }
+        }
         return VueResults.generateSuccess("创建成功", "创建成功");
     }
 
@@ -98,8 +144,8 @@ public class ThemeTableServiceImpl implements ThemeTableService {
         Iterable<ThemeTable> list = themeTableRepository.findAll();
         List<SelectOption> listReturn = new ArrayList<>();
         for (ThemeTable themeTable : list) {
-            if(themeTable.getRelatedUsers().contains(principal.getName()))
-            listReturn.add(new SelectOption(themeTable.getName(), themeTable.getId()));
+            if (themeTable.getRelatedUsers().contains(principal.getName()))
+                listReturn.add(new SelectOption(themeTable.getName(), themeTable.getId()));
         }
         return listReturn;
     }

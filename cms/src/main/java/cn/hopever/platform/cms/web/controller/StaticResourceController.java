@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import java.util.Map;
 @RestController
 @CrossOrigin
 @RequestMapping(value = "/staticresource", produces = "application/json")
+//此处的安全考虑需要看到是否包含website或者theme，然后当没有这些存在时，不做处理
 public class StaticResourceController implements GenericController<StaticResourceVo> {
     Logger logger = LoggerFactory.getLogger(StaticResourceController.class);
     @Autowired
@@ -42,7 +44,7 @@ public class StaticResourceController implements GenericController<StaticResourc
                 mapTemp.put("key", cv.getId());
                 List<Object> listTmp = new ArrayList<>();
                 listTmp.add(cv.getName());
-                listTmp.add(cv.getFilename());
+                listTmp.add(cv.getType());
                 listTmp.add(cv.getFileType());
                 listTmp.add(cv.getSize());
                 listTmp.add(cv.getResourceOrder());
@@ -64,7 +66,7 @@ public class StaticResourceController implements GenericController<StaticResourc
     @Override
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public StaticResourceVo info(@RequestParam Long key, Principal principal) {
-        return staticResourceTableService.info(key,principal);
+        return staticResourceTableService.info(key, principal);
     }
 
     @Override
@@ -76,7 +78,7 @@ public class StaticResourceController implements GenericController<StaticResourc
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "files", required = false) MultipartFile[] files, StaticResourceVo staticResourceVo, Principal principal) {
         staticResourceVo.setId(key);
-        return staticResourceTableService.update(staticResourceVo,files,principal);
+        return staticResourceTableService.update(staticResourceVo, files, principal);
     }
 
     @Override
@@ -85,9 +87,13 @@ public class StaticResourceController implements GenericController<StaticResourc
     }
 
     @Override
-    @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestParam(name = "files", required = false) MultipartFile[] files, StaticResourceVo staticResourceVo, Principal principal) {
-        return staticResourceTableService.save(staticResourceVo,files,principal);
+        return null;
+    }
+
+    @RequestMapping(value = "/save", method = {RequestMethod.POST})
+    public VueResults.Result save(HttpServletRequest httpServletRequest, @RequestParam(name = "files", required = false) MultipartFile[] files, StaticResourceVo staticResourceVo, Principal principal) {
+        return staticResourceTableService.save(staticResourceVo, files, principal);
     }
 
     @Override
@@ -98,8 +104,10 @@ public class StaticResourceController implements GenericController<StaticResourc
 
     @Override
     @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
-    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal) {
+    public Map rulechange(@RequestParam(required = true) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal) {
         //没有相关的改变
-        return null;
+        Map map = new HashMap<>();
+        map.put("beforeStaticResources", staticResourceTableService.getBeforeOptions(key));
+        return map;
     }
 }

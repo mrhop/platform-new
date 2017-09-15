@@ -9,3 +9,8 @@ config:
         clientScopes:
                   - internal_client
         clientUseCurrentUri: true
+    cms:
+        staticResourcePath: C:\\xampp\\htdocs\\cms_basic\\
+        #staticResourcePath: /usr/local/nginx/html/cms_basic/
+        staticResourceRelativePath: http://localhost/cms_basic/
+        #staticResourcePath: http://localhost/cms_basic/
