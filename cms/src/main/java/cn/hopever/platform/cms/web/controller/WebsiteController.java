@@ -6,7 +6,6 @@ import cn.hopever.platform.cms.vo.WebsiteVo;
 import cn.hopever.platform.oauth2client.config.Oauth2Properties;
 import cn.hopever.platform.oauth2client.web.common.CommonMethods;
 import cn.hopever.platform.utils.web.*;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +46,7 @@ public class WebsiteController implements GenericController<WebsiteVo> {
     @Override
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     //@PreAuthorize("hasRole('ROLE_admin')")
-    public Map getList(@RequestBody TableParameters body, Principal principal) {
+    public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Page<WebsiteVo> list = websiteTableService.getList(body, principal);
         Map<String, Object> map = new HashMap<>();
         List<HashMap<String, Object>> listReturn = null;
@@ -78,67 +79,66 @@ public class WebsiteController implements GenericController<WebsiteVo> {
 
     @Override
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
-    public WebsiteVo info(@RequestParam Long key, Principal principal) {
+    public WebsiteVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return websiteTableService.info(key, principal);
     }
 
     @Override
-    public VueResults.Result update(@RequestParam Long key, @RequestBody WebsiteVo websiteVo, Principal principal) {
+    public VueResults.Result update(@RequestParam Long key, @RequestBody WebsiteVo websiteVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshotFiles", required = false) MultipartFile[] files, WebsiteVo websiteVo, Principal principal) {
+    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshotFiles", required = false) MultipartFile[] files, WebsiteVo websiteVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         websiteVo.setId(key);
         return websiteTableService.update(websiteVo, files, principal);
     }
 
     @RequestMapping(value = "/updateinfo", method = {RequestMethod.POST})
-    public VueResults.Result updateinfo(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshotFiles", required = false) MultipartFile[] files, WebsiteVo websiteVo, Principal principal) {
+    public VueResults.Result updateinfo(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshotFiles", required = false) MultipartFile[] files, WebsiteVo websiteVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         websiteVo.setId(key);
         websiteTableService.update(websiteVo, files, principal);
         return VueResults.generateSuccess("更新成功", "更新成功");
     }
 
     @Override
-    public VueResults.Result save(@RequestBody WebsiteVo websiteVo, Principal principal) {
+    public VueResults.Result save(@RequestBody WebsiteVo websiteVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result save(@RequestParam(name = "screenshotFiles", required = false) MultipartFile[] files, WebsiteVo websiteVo, Principal principal) {
+    public VueResults.Result save(@RequestParam(name = "screenshotFiles", required = false) MultipartFile[] files, WebsiteVo websiteVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return websiteTableService.save(websiteVo, files, principal);
     }
 
     @Override
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
-    public void delete(@RequestParam Long key, Principal principal) {
+    public void delete(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         websiteTableService.delete(key, principal);
     }
 
     @Override
-    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal) {
-        return null;
-    }
-
     @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
-    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, HttpServletRequest httpServletRequest, Principal principal) throws Exception {
-        // 需要提供 themeList 在列表和新增的时候
+    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Map mapReturn = new HashMap<>();
         httpServletRequest.setAttribute("resourceUrl", oauth2Properties.getRelatedUsers());
-        CommonResult commonResult = commonMethods.getResource(httpServletRequest);
-        List<String> list = (List<String>) commonResult.getResponseData().get("data");
-        if (list != null && list.size() > 0) {
-            List<SelectOption> list1 = new ArrayList<>();
-            for (String relateUser : list) {
-                list1.add(new SelectOption(relateUser, relateUser));
+        try {
+            CommonResult commonResult = commonMethods.getResource(httpServletRequest);
+            List<String> list = (List<String>) commonResult.getResponseData().get("data");
+            if (list != null && list.size() > 0) {
+                List<SelectOption> list1 = new ArrayList<>();
+                for (String relateUser : list) {
+                    list1.add(new SelectOption(relateUser, relateUser));
+                }
+                mapReturn.put("relatedUsers", list1);
             }
-            mapReturn.put("relatedUsers", list1);
-        }
-        if (key == null) {
-            mapReturn.put("themes", themeTableService.getOptions());
+            if (key == null) {
+                mapReturn.put("themes", themeTableService.getOptions());
+            }
+        } catch (Exception e) {
+            logger.error("website rulechange:" + e);
         }
         return mapReturn;
     }

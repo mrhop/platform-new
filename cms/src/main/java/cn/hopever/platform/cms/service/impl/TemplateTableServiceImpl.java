@@ -1,6 +1,8 @@
 package cn.hopever.platform.cms.service.impl;
 
+import cn.hopever.platform.cms.domain.BlockTable;
 import cn.hopever.platform.cms.domain.TemplateTable;
+import cn.hopever.platform.cms.repository.BlockTableRepository;
 import cn.hopever.platform.cms.repository.CustomTemplateTableRepository;
 import cn.hopever.platform.cms.repository.TemplateTableRepository;
 import cn.hopever.platform.cms.repository.ThemeTableRepository;
@@ -38,6 +40,8 @@ public class TemplateTableServiceImpl implements TemplateTableService {
     private TemplateVoAssembler templateVoAssembler;
     @Autowired
     private ThemeTableRepository themeTableRepository;
+    @Autowired
+    private BlockTableRepository blockTableRepository;
 
     @Override
     public Page<TemplateVo> getList(TableParameters body, Principal principal) {
@@ -85,7 +89,20 @@ public class TemplateTableServiceImpl implements TemplateTableService {
         templateVoAssembler.toDomain(templateVo, templateTable);
         templateTable.setThemeTable(themeTableRepository.findOne(templateVo.getThemeId()));
         templateTableRepository.save(templateTable);
-        return VueResults.generateSuccess("创建成功", "创建成功");
+        if (templateVo.getBlocks() != null && templateVo.getBlocks().size() > 0) {
+            List<BlockTable> blockTables = new ArrayList<>();
+            for (List<String> list : templateVo.getBlocks()) {
+                BlockTable blockTable = new BlockTable();
+                blockTable.setTemplateTable(templateTable);
+                blockTable.setName(list.get(0));
+                blockTable.setPosition(list.get(1));
+                blockTable.setContent(list.get(2));
+                blockTable.setScript(list.get(3));
+                blockTables.add(blockTable);
+            }
+            blockTableRepository.save(blockTables);
+        }
+        return null;
     }
 
 

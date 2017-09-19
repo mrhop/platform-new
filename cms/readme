@@ -38,3 +38,6 @@ contact_form 和poll后续考虑
 正在执行controller的处理，整个完成后再进行前端的处理
 
 后端基本完成，开始执行前端的处理
+
+template 保存完成
+以后需要考虑的是，内置css的ckeditor， ckeditor上传图片和选择图片【website的图片库】，ckeditor使用block tag，个性化设置！！！！！！

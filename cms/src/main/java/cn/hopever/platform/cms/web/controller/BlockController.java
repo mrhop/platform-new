@@ -5,6 +5,7 @@ import cn.hopever.platform.cms.vo.BlockVo;
 import cn.hopever.platform.utils.web.GenericController;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +34,7 @@ public class BlockController implements GenericController<BlockVo> {
     @Override
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     // 这个目前来看没有施展的余地
-    public Map getList(@RequestBody TableParameters body, Principal principal) {
+    public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Page<BlockVo> list = blockTableService.getList(body, principal);
         Map<String, Object> map = new HashMap<>();
         List<HashMap<String, Object>> listReturn = null;
@@ -61,7 +63,7 @@ public class BlockController implements GenericController<BlockVo> {
 
     @Override
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
-    public BlockVo info(@RequestParam Long key, Principal principal) {
+    public BlockVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return blockTableService.info(key, principal);
     }
 
@@ -70,36 +72,36 @@ public class BlockController implements GenericController<BlockVo> {
     // 此处仍然做处理
     @Override
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result update(@RequestParam Long key, @RequestBody BlockVo blockVo, Principal principal) {
+    public VueResults.Result update(@RequestParam Long key, @RequestBody BlockVo blockVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         blockVo.setId(key);
         return blockTableService.update(blockVo, null, principal);
     }
 
     @Override
-    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshots", required = false) MultipartFile[] files, BlockVo blockVo, Principal principal) {
+    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshots", required = false) MultipartFile[] files, BlockVo blockVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result save(@RequestBody BlockVo blockVo, Principal principal) {
+    public VueResults.Result save(@RequestBody BlockVo blockVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return blockTableService.save(blockVo, null, principal);
     }
 
     @Override
-    public VueResults.Result save(@RequestParam(name = "screenshots", required = false) MultipartFile[] files, BlockVo blockVo, Principal principal) {
+    public VueResults.Result save(@RequestParam(name = "screenshots", required = false) MultipartFile[] files, BlockVo blockVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return  null;
     }
 
     @Override
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
-    public void delete(@RequestParam Long key, Principal principal) {
+    public void delete(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         blockTableService.delete(key, principal);
     }
 
     @Override
     @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
-    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal) {
+    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         // 没有过滤或者选项的更迭，因为是附着在页面或者template上做的更改，已然完成固定选择
         return null;
     }

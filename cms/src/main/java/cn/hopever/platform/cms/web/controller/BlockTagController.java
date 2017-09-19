@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +32,7 @@ public class BlockTagController implements GenericController<BlockTagVo> {
     private BlockTagTableService blockTagTableService;
     @Override
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
-    public Map getList(@RequestBody TableParameters body, Principal principal) {
+    public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Page<BlockTagVo> list = blockTagTableService.getList(body, principal);
         Map<String, Object> map = new HashMap<>();
         List<HashMap<String, Object>> listReturn = null;
@@ -59,42 +61,42 @@ public class BlockTagController implements GenericController<BlockTagVo> {
 
     @Override
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
-    public BlockTagVo info(@RequestParam Long key, Principal principal) {
+    public BlockTagVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return blockTagTableService.info(key, principal);
     }
 
     @Override
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result update(@RequestParam Long key, @RequestBody BlockTagVo blockTagVo, Principal principal) {
+    public VueResults.Result update(@RequestParam Long key, @RequestBody BlockTagVo blockTagVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
        blockTagVo.setId(key);
         return blockTagTableService.update(blockTagVo,null,principal);
     }
 
     @Override
-    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshots", required = false) MultipartFile[] files, BlockTagVo blockTagVo, Principal principal) {
+    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshots", required = false) MultipartFile[] files, BlockTagVo blockTagVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result save(@RequestBody BlockTagVo blockTagVo, Principal principal) {
+    public VueResults.Result save(@RequestBody BlockTagVo blockTagVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return blockTagTableService.save(blockTagVo,null,principal);
     }
 
     @Override
-    public VueResults.Result save(@RequestParam(name = "screenshots", required = false) MultipartFile[] files, BlockTagVo blockTagVo, Principal principal) {
+    public VueResults.Result save(@RequestParam(name = "screenshots", required = false) MultipartFile[] files, BlockTagVo blockTagVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
-    public void delete(@RequestParam Long key, Principal principal) {
+    public void delete(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         blockTagTableService.delete(key, principal);
     }
 
     @Override
     @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
-    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal) {
+    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         // 没有关联的处理
         return null;
     }

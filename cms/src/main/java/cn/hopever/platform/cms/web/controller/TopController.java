@@ -7,9 +7,9 @@ import cn.hopever.platform.oauth2client.config.Oauth2Properties;
 import cn.hopever.platform.oauth2client.web.common.CommonMethods;
 import cn.hopever.platform.utils.json.JacksonUtil;
 import cn.hopever.platform.utils.web.CommonResult;
+import cn.hopever.platform.utils.web.CookieUtil;
 import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TreeOption;
-import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -17,6 +17,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.InputStream;
 import java.security.Principal;
@@ -98,11 +99,20 @@ public class TopController {
     @RequestMapping(value = "/leftmenu", method = {RequestMethod.GET})
     public List leftmenu(@RequestParam("type") String type, @RequestParam(value = "id", required = false) Long id, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Principal principal, Authentication authentication) throws Exception {
         if (id != null) {
-            Cookie cookie = new Cookie("current-" + type, id.toString());
-            httpServletResponse.addCookie(cookie);
             if ("website".equals(type)) {
+                Cookie cookie = new Cookie("current-" + type, id.toString());
                 WebsiteVo websiteVo = websiteTableService.info(id, principal);
                 Cookie cookieTheme = new Cookie("current-theme", websiteVo.getThemeId().toString());
+                httpServletResponse.addCookie(cookie);
+                httpServletResponse.addCookie(cookieTheme);
+            } else if ("theme".equals(type)) {
+                Cookie cookie = new Cookie("current-" + type, id.toString());
+                httpServletResponse.addCookie(cookie);
+                Cookie cookietoDelete = CookieUtil.getCookieByName("current-website", httpServletRequest.getCookies());
+                if (cookietoDelete != null) {
+                    cookietoDelete.setMaxAge(0);
+                    httpServletResponse.addCookie(cookietoDelete);
+                }
             }
             httpServletRequest.setAttribute("resourceUrl", oauth2Properties.getLeftMenu());
             CommonResult commonResult = commonMethods.getResource(httpServletRequest);

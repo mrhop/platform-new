@@ -2,10 +2,7 @@ package cn.hopever.platform.cms.web.controller;
 
 import cn.hopever.platform.cms.service.TemplateTableService;
 import cn.hopever.platform.cms.vo.TemplateVo;
-import cn.hopever.platform.utils.web.GenericController;
-import cn.hopever.platform.utils.web.ModuleAuthorize;
-import cn.hopever.platform.utils.web.TableParameters;
-import cn.hopever.platform.utils.web.VueResults;
+import cn.hopever.platform.utils.web.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +10,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ public class TemplateController implements GenericController<TemplateVo> {
     @Override
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     @ModuleAuthorize("templateList")
-    public Map getList(@RequestBody TableParameters body, Principal principal) {
+    public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Page<TemplateVo> list = templateTableService.getList(body, principal);
         Map<String, Object> map = new HashMap<>();
         List<HashMap<String, Object>> listReturn = null;
@@ -62,42 +62,52 @@ public class TemplateController implements GenericController<TemplateVo> {
 
     @Override
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
-    public TemplateVo info(@RequestParam Long key, Principal principal) {
+    public TemplateVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return templateTableService.info(key, principal);
     }
 
     @Override
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result update(@RequestParam Long key, @RequestBody TemplateVo templateVo, Principal principal) {
+    public VueResults.Result update(@RequestParam Long key, @RequestBody TemplateVo templateVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         templateVo.setId(key);
-        return templateTableService.update(templateVo,null,principal);
+        return templateTableService.update(templateVo, null, principal);
     }
 
     @Override
-    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "files", required = false) MultipartFile[] files, TemplateVo templateVo, Principal principal) {
+    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "files", required = false) MultipartFile[] files, TemplateVo templateVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result save(@RequestBody TemplateVo templateVo, Principal principal) {
-        return templateTableService.save(templateVo,null,principal);
+    public VueResults.Result save(@RequestBody TemplateVo templateVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        // 存储的时候只有save，更新的时候则是都有的
+        Cookie c = CookieUtil.getCookieByName("current-theme", httpServletRequest.getCookies());
+        if (c != null) {
+            templateVo.setThemeId(Long.valueOf(c.getValue()));
+            return templateTableService.save(templateVo, null, principal);
+        } else {
+            //目前先执行测试操作
+            templateVo.setThemeId(5l);
+            return templateTableService.save(templateVo, null, principal);
+//            return VueResults.generateError("保存错误","请刷新页面,重新执行保存操作");
+        }
     }
 
     @Override
-    public VueResults.Result save(@RequestParam(name = "files", required = false) MultipartFile[] files, TemplateVo templateVo, Principal principal) {
+    public VueResults.Result save(@RequestParam(name = "files", required = false) MultipartFile[] files, TemplateVo templateVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
-    public void delete(@RequestParam Long key, Principal principal) {
+    public void delete(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         templateTableService.delete(key, principal);
     }
 
     @Override
     @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
-    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal) {
+    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         //没有相关的变化
         return null;
     }

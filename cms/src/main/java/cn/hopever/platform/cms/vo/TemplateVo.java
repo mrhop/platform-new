@@ -2,6 +2,8 @@ package cn.hopever.platform.cms.vo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * Created by Donghui Huo on 2017/8/31.
  */
@@ -16,6 +18,8 @@ public class TemplateVo {
     private String themeName;
 
     private String contentPosition;
+
+    private List<List<String>> blocks;
 
     private String description;
 

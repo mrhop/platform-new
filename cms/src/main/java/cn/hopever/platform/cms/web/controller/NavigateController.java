@@ -5,6 +5,7 @@ import cn.hopever.platform.cms.vo.NavigateVo;
 import cn.hopever.platform.utils.web.GenericController;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +33,7 @@ public class NavigateController implements GenericController<NavigateVo> {
 
     @Override
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
-    public Map getList(@RequestBody TableParameters body, Principal principal) {
+    public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Page<NavigateVo> list = navigateTableService.getList(body, principal);
         Map<String, Object> map = new HashMap<>();
         List<HashMap<String, Object>> listReturn = null;
@@ -63,42 +65,42 @@ public class NavigateController implements GenericController<NavigateVo> {
 
     @Override
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
-    public NavigateVo info(@RequestParam Long key, Principal principal) {
+    public NavigateVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return navigateTableService.info(key, principal);
     }
 
     @Override
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result update(@RequestParam Long key, @RequestBody NavigateVo navigateVo, Principal principal) {
+    public VueResults.Result update(@RequestParam Long key, @RequestBody NavigateVo navigateVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         navigateVo.setId(key);
         return navigateTableService.update(navigateVo, null, principal);
     }
 
     @Override
-    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshots", required = false) MultipartFile[] files, NavigateVo navigateVo, Principal principal) {
+    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "screenshots", required = false) MultipartFile[] files, NavigateVo navigateVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result save(@RequestBody NavigateVo navigateVo, Principal principal) {
+    public VueResults.Result save(@RequestBody NavigateVo navigateVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return navigateTableService.save(navigateVo, null, principal);
     }
 
     @Override
-    public VueResults.Result save(@RequestParam(name = "screenshots", required = false) MultipartFile[] files, NavigateVo navigateVo, Principal principal) {
+    public VueResults.Result save(@RequestParam(name = "screenshots", required = false) MultipartFile[] files, NavigateVo navigateVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
-    public void delete(@RequestParam Long key, Principal principal) {
+    public void delete(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         navigateTableService.delete(key, principal);
     }
 
     @Override
     @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
-    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal) {
+    public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         //首先parenttree，before select
         Map mapReturn = new HashMap<>();
         if (body != null) {

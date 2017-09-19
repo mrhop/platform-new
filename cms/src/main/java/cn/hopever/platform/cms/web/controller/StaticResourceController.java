@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public class StaticResourceController implements GenericController<StaticResourc
 
     @Override
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
-    public Map getList(@RequestBody TableParameters body, Principal principal) {
+    public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Page<StaticResourceVo> list = staticResourceTableService.getList(body, principal);
         Map<String, Object> map = new HashMap<>();
         List<HashMap<String, Object>> listReturn = null;
@@ -65,46 +66,42 @@ public class StaticResourceController implements GenericController<StaticResourc
 
     @Override
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
-    public StaticResourceVo info(@RequestParam Long key, Principal principal) {
+    public StaticResourceVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return staticResourceTableService.info(key, principal);
     }
 
     @Override
-    public VueResults.Result update(@RequestParam Long key, @RequestBody StaticResourceVo staticResourceVo, Principal principal) {
+    public VueResults.Result update(@RequestParam Long key, @RequestBody StaticResourceVo staticResourceVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "files", required = false) MultipartFile[] files, StaticResourceVo staticResourceVo, Principal principal) {
+    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "files", required = false) MultipartFile[] files, StaticResourceVo staticResourceVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         staticResourceVo.setId(key);
         return staticResourceTableService.update(staticResourceVo, files, principal);
     }
 
     @Override
-    public VueResults.Result save(@RequestBody StaticResourceVo staticResourceVo, Principal principal) {
+    public VueResults.Result save(@RequestBody StaticResourceVo staticResourceVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
-    public VueResults.Result save(@RequestParam(name = "files", required = false) MultipartFile[] files, StaticResourceVo staticResourceVo, Principal principal) {
-        return null;
-    }
-
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result save(HttpServletRequest httpServletRequest, @RequestParam(name = "files", required = false) MultipartFile[] files, StaticResourceVo staticResourceVo, Principal principal) {
+    public VueResults.Result save(@RequestParam(name = "files", required = false) MultipartFile[] files, StaticResourceVo staticResourceVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return staticResourceTableService.save(staticResourceVo, files, principal);
     }
 
     @Override
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
-    public void delete(@RequestParam Long key, Principal principal) {
+    public void delete(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         staticResourceTableService.delete(key, principal);
     }
 
     @Override
     @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
-    public Map rulechange(@RequestParam(required = true) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal) {
+    public Map rulechange(@RequestParam(required = true) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         //没有相关的改变
         Map map = new HashMap<>();
         map.put("beforeStaticResources", staticResourceTableService.getBeforeOptions(key));
