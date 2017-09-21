@@ -3,6 +3,7 @@ package cn.hopever.platform.cms.service;
 import cn.hopever.platform.cms.vo.BlockVo;
 import cn.hopever.platform.utils.web.GenericService;
 
+import java.security.Principal;
 import java.util.List;
 
 /**
@@ -21,4 +22,7 @@ public interface BlockTableService extends GenericService<BlockVo> {
     public List<BlockVo> getBlocksByTemplateAndWebsite(Long templateId, Long websiteId);
 
     public List<BlockVo> getBlocksByArticle(Long articleId);
+
+    public BlockVo deleteAndReturn(Long id, Principal principal);
+
 }

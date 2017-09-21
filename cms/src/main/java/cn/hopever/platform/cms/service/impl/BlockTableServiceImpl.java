@@ -83,7 +83,7 @@ public class BlockTableServiceImpl implements BlockTableService {
     @Override
     public BlockVo info(Long id, Principal principal) {
         BlockTable blockTable = blockTableRepository.findOne(id);
-        return blockVoAssembler.toResource(blockTable);
+        return blockVoAssembler.toResourceAll(blockTable);
     }
 
     @Override
@@ -177,5 +177,13 @@ public class BlockTableServiceImpl implements BlockTableService {
             return listReturn;
         }
         return null;
+    }
+
+    @Override
+    public BlockVo deleteAndReturn(Long id, Principal principal) {
+        BlockTable blockTable = blockTableRepository.findOne(id);
+        BlockVo blockVo = blockVoAssembler.toResource(blockTable);
+        blockTableRepository.delete(id);
+        return blockVo;
     }
 }

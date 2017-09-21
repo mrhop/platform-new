@@ -80,7 +80,7 @@ public class TemplateTableServiceImpl implements TemplateTableService {
         TemplateTable templateTable = templateTableRepository.findOne(templateVo.getId());
         templateVoAssembler.toDomain(templateVo, templateTable);
         templateTableRepository.save(templateTable);
-        return VueResults.generateSuccess("更新成功", "更新成功");
+        return null;
     }
 
     @Override
