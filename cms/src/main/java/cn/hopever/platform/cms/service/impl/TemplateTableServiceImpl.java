@@ -2,13 +2,13 @@ package cn.hopever.platform.cms.service.impl;
 
 import cn.hopever.platform.cms.domain.BlockTable;
 import cn.hopever.platform.cms.domain.TemplateTable;
-import cn.hopever.platform.cms.repository.BlockTableRepository;
-import cn.hopever.platform.cms.repository.CustomTemplateTableRepository;
-import cn.hopever.platform.cms.repository.TemplateTableRepository;
-import cn.hopever.platform.cms.repository.ThemeTableRepository;
+import cn.hopever.platform.cms.domain.ThemeTable;
+import cn.hopever.platform.cms.domain.WebsiteTable;
+import cn.hopever.platform.cms.repository.*;
 import cn.hopever.platform.cms.service.TemplateTableService;
 import cn.hopever.platform.cms.vo.TemplateVo;
 import cn.hopever.platform.cms.vo.TemplateVoAssembler;
+import cn.hopever.platform.utils.tools.BeanUtils;
 import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
@@ -23,7 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Donghui Huo on 2017/8/31.
@@ -41,6 +43,8 @@ public class TemplateTableServiceImpl implements TemplateTableService {
     @Autowired
     private ThemeTableRepository themeTableRepository;
     @Autowired
+    private WebsiteTableRepository websiteTableRepository;
+    @Autowired
     private BlockTableRepository blockTableRepository;
 
     @Override
@@ -55,6 +59,10 @@ public class TemplateTableServiceImpl implements TemplateTableService {
         if (body.getFilters() != null && body.getFilters().containsKey("themeId")) {
             body.getFilters().put("themeTable", themeTableRepository.findOne(Long.valueOf(body.getFilters().get("themeId").toString())));
             body.getFilters().remove("themeId");
+        }
+        if (body.getFilters() != null && body.getFilters().containsKey("websiteId")) {
+            body.getFilters().put("websiteTable", websiteTableRepository.findOne(Long.valueOf(body.getFilters().get("websiteId").toString())));
+            body.getFilters().remove("websiteId");
         }
         Page<TemplateTable> page = customTemplateTableRepository.findByFilters(body.getFilters(), pageRequest);
         List<TemplateVo> list = new ArrayList<>();
@@ -87,29 +95,71 @@ public class TemplateTableServiceImpl implements TemplateTableService {
     public VueResults.Result save(TemplateVo templateVo, MultipartFile[] files, Principal principal) {
         TemplateTable templateTable = new TemplateTable();
         templateVoAssembler.toDomain(templateVo, templateTable);
-        templateTable.setThemeTable(themeTableRepository.findOne(templateVo.getThemeId()));
-        templateTableRepository.save(templateTable);
-        if (templateVo.getBlocks() != null && templateVo.getBlocks().size() > 0) {
-            List<BlockTable> blockTables = new ArrayList<>();
-            for (List<String> list : templateVo.getBlocks()) {
-                BlockTable blockTable = new BlockTable();
-                blockTable.setTemplateTable(templateTable);
-                blockTable.setName(list.get(0));
-                blockTable.setPosition(list.get(1));
-                blockTable.setContent(list.get(2));
-                blockTable.setScript(list.get(3));
-                blockTables.add(blockTable);
+        if (templateVo.getThemeId() != null) {
+            List<TemplateTable> templateTables = new ArrayList<>();
+            Map<Long, TemplateTable> mapTemplateTable = new HashMap<>();
+            ThemeTable themeTable = themeTableRepository.findOne(templateVo.getThemeId());
+            if (themeTable.getWebsiteTables() != null) {
+                for (WebsiteTable websiteTable : themeTable.getWebsiteTables()) {
+                    TemplateTable templateTableTemp = new TemplateTable();
+                    BeanUtils.copyNotNullProperties(templateTable, templateTableTemp);
+                    templateTableTemp.setWebsiteTable(websiteTable);
+                    templateTables.add(templateTableTemp);
+                    mapTemplateTable.put(websiteTable.getId(), templateTableTemp);
+                }
             }
-            blockTableRepository.save(blockTables);
+            templateTable.setThemeTable(themeTable);
+            templateTables.add(templateTable);
+            templateTableRepository.save(templateTables);
+            if (templateVo.getBlocks() != null && templateVo.getBlocks().size() > 0) {
+                List<BlockTable> blockTables = new ArrayList<>();
+                for (List<String> list : templateVo.getBlocks()) {
+                    BlockTable blockTable = new BlockTable();
+                    blockTable.setName(list.get(0));
+                    blockTable.setPosition(list.get(1));
+                    blockTable.setContent(list.get(2));
+                    blockTable.setScript(list.get(3));
+                    blockTables.add(blockTable);
+                    if (themeTable.getWebsiteTables() != null) {
+                        for (WebsiteTable websiteTable : themeTable.getWebsiteTables()) {
+                            BlockTable blockTableTemp = new BlockTable();
+                            BeanUtils.copyNotNullProperties(blockTable, blockTableTemp);
+                            blockTableTemp.setTemplateTable(mapTemplateTable.get(websiteTable.getId()));
+                            blockTables.add(blockTableTemp);
+                        }
+                    }
+                    blockTable.setTemplateTable(templateTable);
+                    blockTables.add(blockTable);
+                }
+                blockTableRepository.save(blockTables);
+            }
+        } else if (templateVo.getWebsiteId() != null) {
+            WebsiteTable websiteTable = websiteTableRepository.findOne(templateVo.getWebsiteId());
+            templateTable.setWebsiteTable(websiteTable);
+            templateTableRepository.save(templateTable);
+            if (templateVo.getBlocks() != null && templateVo.getBlocks().size() > 0) {
+                List<BlockTable> blockTables = new ArrayList<>();
+                for (List<String> list : templateVo.getBlocks()) {
+                    BlockTable blockTable = new BlockTable();
+                    blockTable.setName(list.get(0));
+                    blockTable.setPosition(list.get(1));
+                    blockTable.setContent(list.get(2));
+                    blockTable.setScript(list.get(3));
+                    blockTables.add(blockTable);
+                    blockTable.setTemplateTable(templateTable);
+                    blockTables.add(blockTable);
+                }
+                blockTableRepository.save(blockTables);
+            }
         }
         return null;
     }
 
 
     @Override
-    public List<SelectOption> getOptionsByThemeId(Long themeId) {
+    public List<SelectOption> getOptionsByWebsiteId(Long websiteId) {
         List<SelectOption> listReturn = new ArrayList<>();
-        List<TemplateTable> list = templateTableRepository.findByThemeTable(themeTableRepository.findOne(themeId));
+        List<TemplateTable> list = templateTableRepository.findByWebsiteTable(websiteTableRepository.findOne(websiteId));
         for (TemplateTable templateTable : list) {
             listReturn.add(new SelectOption(templateTable.getName(), templateTable.getId()));
         }

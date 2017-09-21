@@ -34,6 +34,23 @@ public class TemplateController implements GenericController<TemplateVo> {
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     @ModuleAuthorize("templateList")
     public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        if (body.getFilters() == null) {
+            body.setFilters(new HashMap<>());
+        }
+        Cookie c = CookieUtil.getCookieByName("current-website", httpServletRequest.getCookies());
+        if (c != null) {
+            body.getFilters().put("websiteId", Long.valueOf(c.getValue()));
+        } else {
+            //目前先执行测试操作
+            c = CookieUtil.getCookieByName("current-theme", httpServletRequest.getCookies());
+            if (c == null) {
+                // flag 临时测试
+                // return null;
+            }
+            // 此处做临时测试
+            //body.getFilters().put("themeId", Long.valueOf(c.getValue()));
+            body.getFilters().put("themeId", 5L);
+        }
         Page<TemplateVo> list = templateTableService.getList(body, principal);
         Map<String, Object> map = new HashMap<>();
         List<HashMap<String, Object>> listReturn = null;
@@ -82,16 +99,23 @@ public class TemplateController implements GenericController<TemplateVo> {
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestBody TemplateVo templateVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         // 存储的时候只有save，更新的时候则是都有的
-        Cookie c = CookieUtil.getCookieByName("current-theme", httpServletRequest.getCookies());
+        Cookie c = CookieUtil.getCookieByName("current-website", httpServletRequest.getCookies());
         if (c != null) {
-            templateVo.setThemeId(Long.valueOf(c.getValue()));
-            return templateTableService.save(templateVo, null, principal);
+            templateVo.setWebsiteId(Long.valueOf(c.getValue()));
         } else {
             //目前先执行测试操作
+            c = CookieUtil.getCookieByName("current-theme", httpServletRequest.getCookies());
+            if (c == null) {
+                // flag 临时测试
+                //            return VueResults.generateError("保存错误","请刷新页面,重新执行保存操作");
+
+            }
+            // 此处做临时测试
+            // templateVo.setThemeId(Long.valueOf(c.getValue()));
             templateVo.setThemeId(5l);
-            return templateTableService.save(templateVo, null, principal);
-//            return VueResults.generateError("保存错误","请刷新页面,重新执行保存操作");
         }
+        return templateTableService.save(templateVo, null, principal);
+
     }
 
     @Override

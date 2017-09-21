@@ -98,9 +98,6 @@ public class BlockTableServiceImpl implements BlockTableService {
     public VueResults.Result save(BlockVo blockVo, MultipartFile[] files, Principal principal) {
         BlockTable blockTable = new BlockTable();
         blockVoAssembler.toDomain(blockVo, blockTable);
-        if (blockVo.getWebsiteId() != null) {
-            blockTable.setWebsiteTable(websiteTableRepository.findOne(blockVo.getWebsiteId()));
-        }
         if (blockVo.getTemplateId() != null) {
             blockTable.setTemplateTable(templateTableRepository.findOne(blockVo.getTemplateId()));
         }
@@ -113,7 +110,7 @@ public class BlockTableServiceImpl implements BlockTableService {
 
     @Override
     public List<BlockVo> getBlocksByTemplate(Long templateId) {
-        List<BlockTable> list = this.blockTableRepository.findByTemplateTableAndWebsiteTableIsNullOrderByPositionAsc(templateTableRepository.findOne(templateId));
+        List<BlockTable> list = this.blockTableRepository.findByTemplateTableOrderByPositionAsc(templateTableRepository.findOne(templateId));
         if (list != null && list.size() > 0) {
             List<BlockVo> listReturn = new ArrayList<>();
             for (BlockTable blockTable : list) {
@@ -124,37 +121,11 @@ public class BlockTableServiceImpl implements BlockTableService {
         return null;
     }
 
-    @Override
-    public List<BlockVo> getBlocksByTemplateAndWebsite(Long templateId, Long websiteId) {
-        List<BlockTable> list = this.blockTableRepository.findByTemplateTableAndWebsiteTableIsNullOrderByPositionAsc(templateTableRepository.findOne(templateId));
-        List<BlockTable> list1 = this.blockTableRepository.findByWebsiteTableAndTemplateTableOrderByPositionAsc(websiteTableRepository.findOne(websiteId), templateTableRepository.findOne(templateId));
-        if (list != null && list.size() > 0) {
-            List<BlockVo> listReturn = new ArrayList<>();
-            for (BlockTable blockTable : list) {
-                boolean flag = false;
-                if (list1 != null && list.size() > 0) {
-                    for (BlockTable blockTable1 : list1) {
-                        if (blockTable1.getPosition().equals(blockTable.getPosition())) {
-                            listReturn.add(blockVoAssembler.toResourceAll(blockTable1));
-                            list1.remove(blockTable1);
-                            flag = true;
-                            break;
-                        }
-                    }
-                }
-                if (!flag) {
-                    listReturn.add(blockVoAssembler.toResourceAll(blockTable));
-                }
-            }
-            return listReturn;
-        }
-        return null;
-    }
 
     @Override
     public List<BlockVo> getBlocksByArticle(Long articleId) {
         ArticleTable articleTable = articleTableRepository.findOne(articleId);
-        List<BlockVo> list = getBlocksByTemplateAndWebsite(articleTable.getTemplateTable().getId(), articleTable.getWebsiteTable().getId());
+        List<BlockVo> list = getBlocksByTemplate(articleTable.getTemplateTable().getId());
         if (list != null && list.size() > 0) {
             List<BlockTable> list1 = blockTableRepository.findByArticleTableOrderByPositionAsc(articleTable);
             List<BlockVo> listReturn = new ArrayList<>();

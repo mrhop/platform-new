@@ -10,5 +10,5 @@ import java.util.List;
  * Created by Donghui Huo on 2017/8/31.
  */
 public interface TemplateTableService extends GenericService<TemplateVo> {
-    public List<SelectOption> getOptionsByThemeId(Long themeId);
+    public List<SelectOption> getOptionsByWebsiteId(Long websiteId);
 }

@@ -15,11 +15,9 @@ public class BlockVoAssembler implements GenericVoAssembler<BlockVo, BlockTable>
     public BlockVo toResource(BlockTable blockTable) {
         BlockVo blockVo = new BlockVo();
         BeanUtils.copyNotNullProperties(blockTable, blockVo, "content", "script");
-        blockVo.setTemplateId(blockTable.getTemplateTable().getId());
-        blockVo.setTemplateName(blockTable.getTemplateTable().getName());
-        if (blockTable.getWebsiteTable() != null) {
-            blockVo.setWebsiteId(blockTable.getWebsiteTable().getId());
-            blockVo.setWebsiteName(blockTable.getWebsiteTable().getName());
+        if (blockTable.getTemplateTable() != null) {
+            blockVo.setTemplateId(blockTable.getTemplateTable().getId());
+            blockVo.setTemplateName(blockTable.getTemplateTable().getName());
         }
         if (blockTable.getArticleTable() != null) {
             blockVo.setArticleId(blockTable.getArticleTable().getId());

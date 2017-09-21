@@ -44,7 +44,7 @@ public class CustomTemplateTableRepositoryImpl extends SimpleJpaRepository<Templ
                 Predicate predicateReturn = null;
                 if (mapFilter != null && mapFilter.size() > 0) {
                     for (String key : mapFilter.keySet()) {
-                        if ("themeTable".equals(key)) {
+                        if ("themeTable".equals(key) || "websiteTable".equals(key)) {
                             if (predicateReturn != null) {
                                 predicateReturn = builder.and(predicateReturn, builder.equal(root.get(key), mapFilter.get(key)));
                             } else {

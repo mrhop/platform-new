@@ -62,15 +62,15 @@ public class WebsiteTable {
     @JoinColumn(name = "theme_id")
     private ThemeTable themeTable;
 
+    @OneToMany(mappedBy = "themeTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    private List<TemplateTable> templateTables;
+
     //因为和articleTagTables有依赖关系，所以处理完articleTag之后再处理articleTable
     @OneToMany(mappedBy = "websiteTable")
     private List<ArticleTable> articleTables;
 
     @OneToMany(mappedBy = "websiteTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<ArticleTagTable> articleTagTables;
-
-    @OneToMany(mappedBy = "websiteTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
-    private List<BlockTable> blockTables;
 
     @OneToMany(mappedBy = "websiteTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<StaticResourceTable> staticResourceTables;

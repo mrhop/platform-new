@@ -24,9 +24,13 @@ public class TemplateTable {
     @Column(name = "name", length = 50)
     private String name;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "theme_id")
     private ThemeTable themeTable;
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "website_id")
+    private WebsiteTable websiteTable;
 
     @Column(name = "description")
     private String description;

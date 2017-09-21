@@ -113,8 +113,6 @@ public class ThemeTableServiceImpl implements ThemeTableService {
     public VueResults.Result save(ThemeVo themeVo, MultipartFile[] files, Principal principal) {
         ThemeTable themeTable = new ThemeTable();
         themeVoAssembler.toDomain(themeVo, themeTable);
-
-        themeTableRepository.save(themeTable);
         if (files != null && files.length > 0) {
             try {
                 Map<String, List<String>> mapScreenshots = mojiUtils.uploadImg("cms/theme/" + themeTable.getThemeId() + "/screenshots", files);
@@ -126,6 +124,7 @@ public class ThemeTableServiceImpl implements ThemeTableService {
                 logger.error("save theme screemshots failed", e);
             }
         }
+        themeTableRepository.save(themeTable);
         return VueResults.generateSuccess("创建成功", "创建成功");
     }
 

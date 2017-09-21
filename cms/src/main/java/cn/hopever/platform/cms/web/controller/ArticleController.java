@@ -117,10 +117,7 @@ public class ArticleController implements GenericController<ArticleVo> {
         if (body != null) {
             if (body.get("websiteId") != null) {
                 mapReturn.put("articleTags", articleTagTableService.getArticleTagOptions(Long.valueOf(body.get("websiteId").toString()), principal));
-            }
-            if (body.get("themeId") != null) {
-                //当table的时候，不提供该themeId
-                mapReturn.put("templates", templateTableService.getOptionsByThemeId(Long.valueOf(body.get("themeId").toString())));
+                mapReturn.put("templates", templateTableService.getOptionsByWebsiteId(Long.valueOf(body.get("websiteId").toString())));
             }
             if (body.get("templateId") != null) {
                 //此处需要是否在前端处理，另给一个panel（tab，【div 块】【点击第二个tab块的内容修改】，【panel右上角的全屏和预览】），但是在同一个页面，就像我们这个关联的static resource【这个在panel中是一个列表，点击后，panel隐藏，同时新增panel显示】

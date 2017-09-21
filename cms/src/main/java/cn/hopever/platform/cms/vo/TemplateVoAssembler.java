@@ -15,8 +15,14 @@ public class TemplateVoAssembler implements GenericVoAssembler<TemplateVo, Templ
     public TemplateVo toResource(TemplateTable templateTable) {
         TemplateVo templateVo = new TemplateVo();
         BeanUtils.copyNotNullProperties(templateTable, templateVo);
-        templateVo.setThemeId(templateTable.getThemeTable().getId());
-        templateVo.setThemeName(templateTable.getThemeTable().getName());
+        if(templateTable.getThemeTable()!=null){
+            templateVo.setThemeId(templateTable.getThemeTable().getId());
+            templateVo.setThemeName(templateTable.getThemeTable().getName());
+        }
+        if(templateTable.getWebsiteTable()!=null){
+            templateVo.setWebsiteId(templateTable.getWebsiteTable().getId());
+            templateVo.setWebsiteName(templateTable.getWebsiteTable().getName());
+        }
         return templateVo;
     }
 

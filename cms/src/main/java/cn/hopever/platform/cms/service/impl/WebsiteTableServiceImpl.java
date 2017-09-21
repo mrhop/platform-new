@@ -1,13 +1,15 @@
 package cn.hopever.platform.cms.service.impl;
 
+import cn.hopever.platform.cms.domain.BlockTable;
+import cn.hopever.platform.cms.domain.TemplateTable;
+import cn.hopever.platform.cms.domain.ThemeTable;
 import cn.hopever.platform.cms.domain.WebsiteTable;
-import cn.hopever.platform.cms.repository.CustomWebsiteTableRepository;
-import cn.hopever.platform.cms.repository.ThemeTableRepository;
-import cn.hopever.platform.cms.repository.WebsiteTableRepository;
+import cn.hopever.platform.cms.repository.*;
 import cn.hopever.platform.cms.service.WebsiteTableService;
 import cn.hopever.platform.cms.vo.WebsiteVo;
 import cn.hopever.platform.cms.vo.WebsiteVoAssembler;
 import cn.hopever.platform.utils.moji.MojiUtils;
+import cn.hopever.platform.utils.tools.BeanUtils;
 import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
@@ -49,6 +51,10 @@ public class WebsiteTableServiceImpl implements WebsiteTableService {
     private ThemeTableRepository themeTableRepository;
     @Autowired
     private WebsiteVoAssembler websiteVoAssembler;
+    @Autowired
+    private TemplateTableRepository templateTableRepository;
+    @Autowired
+    private BlockTableRepository blockTableRepository;
 
     @Override
     public Page<WebsiteVo> getList(TableParameters body, Principal principal) {
@@ -122,8 +128,8 @@ public class WebsiteTableServiceImpl implements WebsiteTableService {
     public VueResults.Result save(WebsiteVo websiteVo, MultipartFile[] files, Principal principal) {
         WebsiteTable websiteTable = new WebsiteTable();
         websiteVoAssembler.toDomain(websiteVo, websiteTable);
-        websiteTable.setThemeTable(themeTableRepository.findOne(websiteVo.getThemeId()));
-        websiteTableRepository.save(websiteTable);
+        ThemeTable themeTable = themeTableRepository.findOne(websiteVo.getThemeId());
+        websiteTable.setThemeTable(themeTable);
         if (files != null && files.length > 0) {
             try {
                 Map<String, List<String>> mapScreenshots = mojiUtils.uploadImg("cms/website/" + websiteTable.getWebsiteId() + "/screenshots/", files);
@@ -133,6 +139,29 @@ public class WebsiteTableServiceImpl implements WebsiteTableService {
                 }
             } catch (Exception e) {
                 logger.error("save theme screenshots failed", e);
+            }
+        }
+        websiteTableRepository.save(websiteTable);
+        if (themeTable.getTemplateTables() != null) {
+            List<TemplateTable> templateTables = new ArrayList<>();
+            List<BlockTable> blockTables = new ArrayList<>();
+            for (TemplateTable templateTable : themeTable.getTemplateTables()) {
+                TemplateTable templateTableTemp = new TemplateTable();
+                BeanUtils.copyNotNullProperties(templateTable, templateTableTemp, "themeTable", "blockTables", "articleTables");
+                templateTableTemp.setWebsiteTable(websiteTable);
+                templateTables.add(templateTableTemp);
+                if (templateTable.getBlockTables() != null) {
+                    for (BlockTable blockTable : templateTable.getBlockTables()) {
+                        BlockTable blockTableTemp = new BlockTable();
+                        BeanUtils.copyNotNullProperties(blockTable, blockTableTemp, "templateTable", "articleTable");
+                        blockTableTemp.setTemplateTable(templateTableTemp);
+                        blockTables.add(blockTableTemp);
+                    }
+                }
+            }
+            templateTableRepository.save(templateTables);
+            if (blockTables.size() > 0) {
+                blockTableRepository.save(blockTables);
             }
         }
         return null;

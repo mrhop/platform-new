@@ -19,8 +19,6 @@ import java.util.List;
 public interface BlockTableService extends GenericService<BlockVo> {
     public List<BlockVo> getBlocksByTemplate(Long templateId);
 
-    public List<BlockVo> getBlocksByTemplateAndWebsite(Long templateId, Long websiteId);
-
     public List<BlockVo> getBlocksByArticle(Long articleId);
 
     public BlockVo deleteAndReturn(Long id, Principal principal);

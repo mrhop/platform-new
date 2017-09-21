@@ -44,7 +44,7 @@ public class CustomBlockTableRepositoryImpl extends SimpleJpaRepository<BlockTab
                 Predicate predicateReturn = null;
                 if (mapFilter != null && mapFilter.size() > 0) {
                     for (String key : mapFilter.keySet()) {
-                        if ("templateTable".equals(key) || "websiteTable".equals(key) || "articleTable".equals(key)) {
+                        if ("templateTable".equals(key) || "articleTable".equals(key)) {
                             if (predicateReturn != null) {
                                 predicateReturn = builder.and(predicateReturn, builder.equal(root.get(key), mapFilter.get(key)));
 

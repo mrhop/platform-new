@@ -35,15 +35,10 @@ public class BlockController implements GenericController<BlockVo> {
     // 这个目前来看没有施展的余地
     public Map getList(@RequestBody(required = false) TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         String templateKey = httpServletRequest.getParameter("templateKey");
-        String websiteKey = httpServletRequest.getParameter("websiteKey");
-        String articleKey = httpServletRequest.getParameter("templateKey");
+        String articleKey = httpServletRequest.getParameter("articleKey");
         List<BlockVo> list = new ArrayList<>();
         if (templateKey != null) {
-            if (websiteKey != null) {
-                list = blockTableService.getBlocksByTemplateAndWebsite(Long.valueOf(templateKey), Long.valueOf(websiteKey));
-            } else {
-                list = blockTableService.getBlocksByTemplate(Long.valueOf(templateKey));
-            }
+            list = blockTableService.getBlocksByTemplate(Long.valueOf(templateKey));
         } else if (articleKey != null) {
             list = blockTableService.getBlocksByArticle(Long.valueOf(articleKey));
         }
@@ -95,11 +90,9 @@ public class BlockController implements GenericController<BlockVo> {
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestBody BlockVo blockVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         String templateKey = httpServletRequest.getParameter("templateKey");
-        String websiteKey = httpServletRequest.getParameter("websiteKey");
         String articleKey = httpServletRequest.getParameter("templateKey");
-        blockVo.setTemplateId(templateKey!=null?Long.valueOf(templateKey):null);
-        blockVo.setWebsiteId(websiteKey!=null?Long.valueOf(websiteKey):null);
-        blockVo.setArticleId(articleKey!=null?Long.valueOf(articleKey):null);
+        blockVo.setTemplateId(templateKey != null ? Long.valueOf(templateKey) : null);
+        blockVo.setArticleId(articleKey != null ? Long.valueOf(articleKey) : null);
         return blockTableService.save(blockVo, null, principal);
     }
 

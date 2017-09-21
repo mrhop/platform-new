@@ -33,13 +33,9 @@ public class BlockTable {
     private String script;
 
     // 目的是保证唯一性，在更换theme和template的情况下不会丢失数据，可以自由切换
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "template_id")
     private TemplateTable templateTable;
-
-    @ManyToOne
-    @JoinColumn(name = "website_id")
-    private WebsiteTable websiteTable;
 
     @ManyToOne
     @JoinColumn(name = "article_id")

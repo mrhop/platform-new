@@ -21,9 +21,6 @@ public class BlockVo {
     private Long templateId;
     private String templateName;
 
-    private String websiteName;
-    private Long websiteId;
-
     private String articleTitle;
     private Long articleId;
 

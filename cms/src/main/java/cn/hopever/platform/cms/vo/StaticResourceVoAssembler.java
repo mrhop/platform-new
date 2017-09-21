@@ -1,8 +1,10 @@
 package cn.hopever.platform.cms.vo;
 
+import cn.hopever.platform.cms.config.CmsProperties;
 import cn.hopever.platform.cms.domain.StaticResourceTable;
 import cn.hopever.platform.utils.tools.BeanUtils;
 import cn.hopever.platform.utils.web.GenericVoAssembler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -10,6 +12,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class StaticResourceVoAssembler implements GenericVoAssembler<StaticResourceVo, StaticResourceTable> {
+
+    @Autowired
+    private CmsProperties cmsProperties;
 
     @Override
     public StaticResourceVo toResource(StaticResourceTable staticResourceTable) {
@@ -29,7 +34,9 @@ public class StaticResourceVoAssembler implements GenericVoAssembler<StaticResou
         }
         if (staticResourceTable.getBeforeStaticResource() != null) {
             staticResourceVo.setBeforeId(staticResourceTable.getBeforeStaticResource().getId());
+            staticResourceVo.setBeforeName(staticResourceTable.getBeforeStaticResource().getName());
         }
+        staticResourceVo.setUrl(staticResourceVo.getUrl() != null ? cmsProperties.getStaticResourceRelativePath() + staticResourceVo.getUrl() : null);
         return staticResourceVo;
     }
 
