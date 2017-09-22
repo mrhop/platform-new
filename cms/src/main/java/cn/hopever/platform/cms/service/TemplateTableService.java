@@ -11,4 +11,6 @@ import java.util.List;
  */
 public interface TemplateTableService extends GenericService<TemplateVo> {
     public List<SelectOption> getOptionsByWebsiteId(Long websiteId);
+
+    public void copy(Long id);
 }

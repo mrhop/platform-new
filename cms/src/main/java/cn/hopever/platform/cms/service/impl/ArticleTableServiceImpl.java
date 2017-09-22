@@ -125,10 +125,10 @@ public class ArticleTableServiceImpl implements ArticleTableService {
     }
 
     @Override
-    public VueResults.Result updatePublished(Long id,boolean published, Principal principal) {
-        if(published){
-            articleTableRepository.publishArticle(new Date(),id);
-        }else{
+    public VueResults.Result updatePublished(Long id, boolean published, Principal principal) {
+        if (published) {
+            articleTableRepository.publishArticle(new Date(), id);
+        } else {
             articleTableRepository.unpublishArticle(id);
         }
         return VueResults.generateSuccess("更新成功", "更新发布状态成功");
@@ -146,6 +146,11 @@ public class ArticleTableServiceImpl implements ArticleTableService {
             body.getFilters().put("websiteTable", websiteTableRepository.findOne(Long.valueOf(body.getFilters().get("websiteId").toString())));
             body.getFilters().remove("websiteId");
         }
+        if (body.getFilters() != null && body.getFilters().containsKey("articleTagsStr")) {
+            body.getFilters().put("articleTagId", Long.valueOf(body.getFilters().get("articleTagsStr").toString()));
+            body.getFilters().remove("articleTagsStr");
+        }
+
         body.getFilters().put("type", type);
         Page<ArticleTable> page = customArticleTableRepository.findByFilters(body.getFilters(), pageRequest);
         List<ArticleVo> list = new ArrayList<>();

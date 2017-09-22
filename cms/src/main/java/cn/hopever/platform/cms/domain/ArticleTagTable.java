@@ -30,7 +30,7 @@ public class ArticleTagTable {
     private String tagId;
 
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinTable(name = "platform_cms_article_tag", joinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"), indexes = {@Index(columnList = "article_id"), @Index(columnList = "tag_id")})
+    @JoinTable(name = "platform_cms_article_article_tag", joinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"), indexes = {@Index(columnList = "article_id"), @Index(columnList = "tag_id")})
     private List<ArticleTable> articleTables;
 
     @ManyToOne(optional = false)

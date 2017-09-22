@@ -125,7 +125,7 @@ public class ThemeTableServiceImpl implements ThemeTableService {
             }
         }
         themeTableRepository.save(themeTable);
-        return VueResults.generateSuccess("创建成功", "创建成功");
+        return null;
     }
 
     @Override

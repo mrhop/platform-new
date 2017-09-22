@@ -165,4 +165,46 @@ public class TemplateTableServiceImpl implements TemplateTableService {
         }
         return listReturn;
     }
+
+    @Override
+    public void copy(Long id) {
+        TemplateTable templateTable = templateTableRepository.findOne(id);
+        List<TemplateTable> listSave = new ArrayList<>();
+        TemplateTable templateTableTmp = new TemplateTable();
+        BeanUtils.copyNotNullProperties(templateTable, templateTableTmp, "id", "blockTables", "articleTables");
+        List<BlockTable> list = null;
+        if (templateTable.getBlockTables() != null) {
+            list = new ArrayList<>();
+            for (BlockTable blockTable : templateTable.getBlockTables()) {
+                BlockTable blockTableTemp = new BlockTable();
+                BeanUtils.copyNotNullProperties(blockTable, blockTableTemp, "id", "templateTable", "articleTable");
+                blockTableTemp.setTemplateTable(templateTableTmp);
+                list.add(blockTableTemp);
+            }
+        }
+        templateTableTmp.setBlockTables(list);
+        listSave.add(templateTableTmp);
+        ThemeTable themeTable = templateTableTmp.getThemeTable();
+        if (themeTable != null) {
+            if (themeTable.getWebsiteTables() != null) {
+                for (WebsiteTable websiteTable : themeTable.getWebsiteTables()) {
+                    TemplateTable templateTable1 = new TemplateTable();
+                    BeanUtils.copyNotNullProperties(templateTableTmp, templateTable1, "id", "blockTables", "themeTable");
+                    List<BlockTable> blockTables = new ArrayList<>();
+                    if (templateTableTmp.getBlockTables() != null) {
+                        for (BlockTable blockTable : templateTableTmp.getBlockTables()) {
+                            BlockTable blockTable1 = new BlockTable();
+                            BeanUtils.copyNotNullProperties(blockTable, blockTable1, "id", "templateTable", "articleTable");
+                            blockTable1.setTemplateTable(templateTable1);
+                            blockTables.add(blockTable1);
+                        }
+                    }
+                    templateTable1.setWebsiteTable(websiteTable);
+                    templateTable1.setBlockTables(blockTables);
+                    listSave.add(templateTable1);
+                }
+            }
+        }
+        templateTableRepository.save(listSave);
+    }
 }

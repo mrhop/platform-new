@@ -1,5 +1,6 @@
 package cn.hopever.platform.cms.web.controller;
 
+import cn.hopever.platform.cms.config.CommonMethods;
 import cn.hopever.platform.cms.service.ArticleTagTableService;
 import cn.hopever.platform.cms.vo.ArticleTagVo;
 import cn.hopever.platform.utils.web.GenericController;
@@ -31,33 +32,38 @@ public class ArticleTagController implements GenericController<ArticleTagVo> {
     Logger logger = LoggerFactory.getLogger(ArticleTagController.class);
     @Autowired
     private ArticleTagTableService articleTagTableService;
+
     @Override
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        Page<ArticleTagVo> list = articleTagTableService.getList(body, principal);
-        Map<String, Object> map = new HashMap<>();
-        List<HashMap<String, Object>> listReturn = null;
-        if (list != null && list.iterator().hasNext()) {
-            listReturn = new ArrayList<>();
-            for (ArticleTagVo cv : list) {
-                HashMap<String, Object> mapTemp = new HashMap<>();
-                mapTemp.put("key", cv.getId());
-                List<Object> listTmp = new ArrayList<>();
-                listTmp.add(cv.getName());
-                listTmp.add(cv.getTagId());
-                mapTemp.put("value", listTmp);
-                listReturn.add(mapTemp);
-            }
-            map.put("rows", listReturn);
-            map.put("totalCount", list.getTotalElements());
+        Map filter = CommonMethods.generateInitFilter(body.getFilters(), httpServletRequest);
+        if (filter != null && filter.containsKey("websiteId")) {
+            Page<ArticleTagVo> list = articleTagTableService.getList(body, principal);
+            Map<String, Object> map = new HashMap<>();
+            List<HashMap<String, Object>> listReturn = null;
+            if (list != null && list.iterator().hasNext()) {
+                listReturn = new ArrayList<>();
+                for (ArticleTagVo cv : list) {
+                    HashMap<String, Object> mapTemp = new HashMap<>();
+                    mapTemp.put("key", cv.getId());
+                    List<Object> listTmp = new ArrayList<>();
+                    listTmp.add(cv.getName());
+                    listTmp.add(cv.getTagId());
+                    mapTemp.put("value", listTmp);
+                    listReturn.add(mapTemp);
+                }
+                map.put("rows", listReturn);
+                map.put("totalCount", list.getTotalElements());
 
-        } else {
-            map.put("rows", null);
-            map.put("totalCount", 0);
+            } else {
+                map.put("rows", null);
+                map.put("totalCount", 0);
+            }
+            map.put("pager", body.getPager());
+            map.put("sorts", body.getSorts());
+            return map;
         }
-        map.put("pager", body.getPager());
-        map.put("sorts", body.getSorts());
-        return map;
+        return null;
     }
 
     @Override
@@ -70,7 +76,7 @@ public class ArticleTagController implements GenericController<ArticleTagVo> {
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public VueResults.Result update(@RequestParam Long key, @RequestBody ArticleTagVo articleTagVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         articleTagVo.setId(key);
-        return articleTagTableService.update(articleTagVo,null,principal);
+        return articleTagTableService.update(articleTagVo, null, principal);
     }
 
     @Override
@@ -81,7 +87,12 @@ public class ArticleTagController implements GenericController<ArticleTagVo> {
     @Override
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestBody ArticleTagVo articleTagVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        return articleTagTableService.save(articleTagVo,null,principal);
+        Map<String, Long> keys = CommonMethods.generateKey(httpServletRequest);
+        if (keys.get("websiteId") != null) {
+            articleTagVo.setWebsiteId(keys.get("websiteId"));
+            return articleTagTableService.save(articleTagVo, null, principal);
+        }
+        return VueResults.generateError("创建失败", "模板必须和网站关联");
     }
 
     @Override

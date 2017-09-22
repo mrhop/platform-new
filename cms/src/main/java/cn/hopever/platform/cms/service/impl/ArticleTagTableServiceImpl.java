@@ -76,22 +76,22 @@ public class ArticleTagTableServiceImpl implements ArticleTagTableService {
     @Override
     public VueResults.Result update(ArticleTagVo articleTagVo, MultipartFile[] files, Principal principal) {
         ArticleTagTable articleTagTable = articleTagTableRepository.findOne(articleTagVo.getId());
-        articleTagVoAssembler.toDomain(articleTagVo,articleTagTable);
+        articleTagVoAssembler.toDomain(articleTagVo, articleTagTable);
         articleTagTableRepository.save(articleTagTable);
-        return VueResults.generateSuccess("更新成功", "更新成功");
+        return null;
     }
 
     @Override
     public VueResults.Result save(ArticleTagVo articleTagVo, MultipartFile[] files, Principal principal) {
-        if(articleTagTableRepository.findOneByTagId(articleTagVo.getTagId())!=null){
+        if (articleTagTableRepository.findOneByTagId(articleTagVo.getTagId()) != null) {
             return VueResults.generateError("创建失败", "tagID已存在");
         }
-        
         ArticleTagTable articleTagTable = new ArticleTagTable();
-        articleTagVoAssembler.toDomain(articleTagVo,articleTagTable);
+        articleTagVoAssembler.toDomain(articleTagVo, articleTagTable);
+        articleTagTable.setTagId(articleTagVo.getTagId());
         articleTagTable.setWebsiteTable(websiteTableRepository.findOne(articleTagVo.getWebsiteId()));
         articleTagTableRepository.save(articleTagTable);
-        return VueResults.generateSuccess("创建成功", "创建成功");
+        return null;
     }
 
     @Override

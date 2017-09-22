@@ -1,8 +1,12 @@
 package cn.hopever.platform.cms.web.controller;
 
+import cn.hopever.platform.cms.config.CommonMethods;
 import cn.hopever.platform.cms.service.TemplateTableService;
 import cn.hopever.platform.cms.vo.TemplateVo;
-import cn.hopever.platform.utils.web.*;
+import cn.hopever.platform.utils.web.GenericController;
+import cn.hopever.platform.utils.web.ModuleAuthorize;
+import cn.hopever.platform.utils.web.TableParameters;
+import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
@@ -34,53 +37,46 @@ public class TemplateController implements GenericController<TemplateVo> {
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     @ModuleAuthorize("templateList")
     public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        if (body.getFilters() == null) {
-            body.setFilters(new HashMap<>());
-        }
-        Cookie c = CookieUtil.getCookieByName("current-website", httpServletRequest.getCookies());
-        if (c != null) {
-            body.getFilters().put("websiteId", Long.valueOf(c.getValue()));
-        } else {
-            //目前先执行测试操作
-            c = CookieUtil.getCookieByName("current-theme", httpServletRequest.getCookies());
-            if (c == null) {
-                // flag 临时测试
-                // return null;
-            }
-            // 此处做临时测试
-            //body.getFilters().put("themeId", Long.valueOf(c.getValue()));
-            body.getFilters().put("themeId", 5L);
-        }
-        Page<TemplateVo> list = templateTableService.getList(body, principal);
-        Map<String, Object> map = new HashMap<>();
-        List<HashMap<String, Object>> listReturn = null;
-        if (list != null && list.iterator().hasNext()) {
-            listReturn = new ArrayList<>();
-            for (TemplateVo cv : list) {
-                HashMap<String, Object> mapTemp = new HashMap<>();
-                mapTemp.put("key", cv.getId());
-                List<Object> listTmp = new ArrayList<>();
-                listTmp.add(cv.getName());
-                listTmp.add(cv.getContentPosition());
-                mapTemp.put("value", listTmp);
-                listReturn.add(mapTemp);
-            }
-            map.put("rows", listReturn);
-            map.put("totalCount", list.getTotalElements());
+        Map filter = CommonMethods.generateInitFilter(body.getFilters(), httpServletRequest);
+        if (filter != null) {
+            body.setFilters(filter);
+            Page<TemplateVo> list = templateTableService.getList(body, principal);
+            Map<String, Object> map = new HashMap<>();
+            List<HashMap<String, Object>> listReturn = null;
+            if (list != null && list.iterator().hasNext()) {
+                listReturn = new ArrayList<>();
+                for (TemplateVo cv : list) {
+                    HashMap<String, Object> mapTemp = new HashMap<>();
+                    mapTemp.put("key", cv.getId());
+                    List<Object> listTmp = new ArrayList<>();
+                    listTmp.add(cv.getName());
+                    listTmp.add(cv.getContentPosition());
+                    mapTemp.put("value", listTmp);
+                    listReturn.add(mapTemp);
+                }
+                map.put("rows", listReturn);
+                map.put("totalCount", list.getTotalElements());
 
-        } else {
-            map.put("rows", null);
-            map.put("totalCount", 0);
+            } else {
+                map.put("rows", null);
+                map.put("totalCount", 0);
+            }
+            map.put("pager", body.getPager());
+            map.put("sorts", body.getSorts());
+            return map;
         }
-        map.put("pager", body.getPager());
-        map.put("sorts", body.getSorts());
-        return map;
+        return null;
     }
 
     @Override
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public TemplateVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return templateTableService.info(key, principal);
+    }
+
+    @RequestMapping(value = "/copy", method = {RequestMethod.GET})
+    public void copy(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        templateTableService.copy(key);
     }
 
     @Override
@@ -99,23 +95,13 @@ public class TemplateController implements GenericController<TemplateVo> {
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestBody TemplateVo templateVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         // 存储的时候只有save，更新的时候则是都有的
-        Cookie c = CookieUtil.getCookieByName("current-website", httpServletRequest.getCookies());
-        if (c != null) {
-            templateVo.setWebsiteId(Long.valueOf(c.getValue()));
-        } else {
-            //目前先执行测试操作
-            c = CookieUtil.getCookieByName("current-theme", httpServletRequest.getCookies());
-            if (c == null) {
-                // flag 临时测试
-                //            return VueResults.generateError("保存错误","请刷新页面,重新执行保存操作");
-
-            }
-            // 此处做临时测试
-            // templateVo.setThemeId(Long.valueOf(c.getValue()));
-            templateVo.setThemeId(5l);
+        Map<String, Long> keys = CommonMethods.generateKey(httpServletRequest);
+        if (keys.size() > 0) {
+            templateVo.setThemeId(keys.get("themeId"));
+            templateVo.setWebsiteId(keys.get("websiteId"));
+            return templateTableService.save(templateVo, null, principal);
         }
-        return templateTableService.save(templateVo, null, principal);
-
+        return VueResults.generateError("创建失败", "模板必须和主题或者网站关联");
     }
 
     @Override
