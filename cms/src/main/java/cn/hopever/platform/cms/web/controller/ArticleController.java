@@ -5,6 +5,7 @@ import cn.hopever.platform.cms.service.ArticleTableService;
 import cn.hopever.platform.cms.service.ArticleTagTableService;
 import cn.hopever.platform.cms.service.TemplateTableService;
 import cn.hopever.platform.cms.vo.ArticleVo;
+import cn.hopever.platform.utils.test.PrincipalSample;
 import cn.hopever.platform.utils.web.GenericController;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
@@ -42,7 +43,7 @@ public class ArticleController implements GenericController<ArticleVo> {
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Map filter = CommonMethods.generateInitFilter(body.getFilters(), httpServletRequest);
-        if (filter != null) {
+        if (filter != null && filter.containsKey("websiteId")) {
             body.setFilters(filter);
             Page<ArticleVo> list = articleTableService.getList(body, principal);
             Map<String, Object> map = new HashMap<>();
@@ -98,7 +99,14 @@ public class ArticleController implements GenericController<ArticleVo> {
     @Override
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestBody ArticleVo articleVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        return articleTableService.save(articleVo, null, principal);
+        // 临时测试 使用
+        principal = new PrincipalSample("test1");
+        Map<String, Long> keys = CommonMethods.generateKey(httpServletRequest);
+        if (keys.get("websiteId") != null) {
+            articleVo.setWebsiteId(keys.get("websiteId"));
+            return articleTableService.save(articleVo, null, principal);
+        }
+        return VueResults.generateError("创建错误", "无法找到正确从属网站");
     }
 
     @Override

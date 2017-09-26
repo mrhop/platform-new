@@ -43,7 +43,8 @@ public class ArticleTable {
     @Column(name = "click_times")
     private Integer clickTimes;
 
-    @ManyToMany(mappedBy = "articleTables")
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable(name = "platform_cms_article_article_tag", joinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"), indexes = {@Index(columnList = "article_id"), @Index(columnList = "tag_id")})
     private List<ArticleTagTable> articleTagTables;
 
     @Column(name = "publish_date")
@@ -64,6 +65,7 @@ public class ArticleTable {
     private TemplateTable templateTable;
 
     @OneToMany(mappedBy = "articleTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OrderBy("position asc")
     private List<BlockTable> blockTables;
 
     @OneToMany(mappedBy = "articleTable", cascade = {CascadeType.ALL}, orphanRemoval = true)

@@ -12,5 +12,8 @@ import java.util.List;
  */
 public interface BlockTableRepository extends PagingAndSortingRepository<BlockTable, Long> {
     public List<BlockTable> findByTemplateTableOrderByPositionAsc(TemplateTable templateTable);
+
     public List<BlockTable> findByArticleTableOrderByPositionAsc(ArticleTable articleTable);
+
+    public List<BlockTable> findByArticleTableAndTemplateTableOrderByPositionAsc(ArticleTable articleTable, TemplateTable templateTable);
 }

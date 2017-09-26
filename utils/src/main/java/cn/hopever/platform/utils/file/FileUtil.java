@@ -275,6 +275,10 @@ public class FileUtil {
             return "script";
         } else if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg") || filePath.endsWith(".png") || filePath.endsWith(".gif") || filePath.endsWith(".svg")) {
             return "image";
+        } else if (filePath.endsWith(".flv") || filePath.endsWith(".avi") || filePath.endsWith(".rmvb") || filePath.endsWith(".rm") || filePath.endsWith(".mpeg") || filePath.endsWith(".asf") || filePath.endsWith(".wmv")) {
+            return "video";
+        } else if (filePath.endsWith(".wav") || filePath.endsWith(".mp3") || filePath.endsWith(".wma")) {
+            return "audio";
         } else if (filePath.endsWith(".ttf") || filePath.endsWith(".eot") || filePath.endsWith(".woff") || filePath.endsWith(".woff2")) {
             return "font";
         } else if (filePath.endsWith(".css")) {
@@ -297,13 +301,10 @@ public class FileUtil {
     public static String getFileNameNoExtend(String filePath) {
         int dot = filePath.lastIndexOf('.');
         int separate = filePath.lastIndexOf("/");
-        if (separate < 0) {
-            separate = 0;
-        }
         if (dot < 0) {
             dot = filePath.length() - 1;
         }
-        return filePath.substring(separate+1, dot);
+        return filePath.substring(separate + 1, dot);
     }
 
     public static String getFileName(String filePath) {
@@ -311,7 +312,7 @@ public class FileUtil {
         if (separate < 0) {
             separate = 0;
         }
-        return filePath.substring(separate+1);
+        return filePath.substring(separate + 1);
     }
 
 }

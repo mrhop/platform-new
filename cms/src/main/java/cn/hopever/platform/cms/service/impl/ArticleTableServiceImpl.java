@@ -2,6 +2,7 @@ package cn.hopever.platform.cms.service.impl;
 
 import cn.hopever.platform.cms.domain.ArticleTable;
 import cn.hopever.platform.cms.domain.ArticleTagTable;
+import cn.hopever.platform.cms.domain.BlockTable;
 import cn.hopever.platform.cms.repository.*;
 import cn.hopever.platform.cms.service.ArticleTableService;
 import cn.hopever.platform.cms.vo.ArticleVo;
@@ -47,6 +48,9 @@ public class ArticleTableServiceImpl implements ArticleTableService {
     @Autowired
     private ArticleVoAssembler articleVoAssembler;
 
+    @Autowired
+    private BlockTableRepository blockTableRepository;
+
     @Override
     public Page<ArticleVo> getList(TableParameters body, Principal principal) {
         // website -- 该用户可用website
@@ -71,13 +75,13 @@ public class ArticleTableServiceImpl implements ArticleTableService {
     @Override
     public VueResults.Result update(ArticleVo articleVo, MultipartFile[] files, Principal principal) {
         this.internalSaveArticle(articleVo, "update", (short) 0, principal);
-        return VueResults.generateSuccess("更新成功", "更新文章成功");
+        return null;
     }
 
     @Override
     public VueResults.Result save(ArticleVo articleVo, MultipartFile[] files, Principal principal) {
         this.internalSaveArticle(articleVo, "save", (short) 0, principal);
-        return VueResults.generateSuccess("新增成功", "新增文章成功");
+        return null;
     }
 
     @Override
@@ -92,26 +96,26 @@ public class ArticleTableServiceImpl implements ArticleTableService {
 
     @Override
     public VueResults.Result saveNews(ArticleVo articleVo, Principal principal) {
-        internalSaveArticle(articleVo, "save", (short) 2, principal);
-        return VueResults.generateSuccess("新增成功", "新增新闻成功");
+        internalSaveArticle(articleVo, "save", (short) 1, principal);
+        return null;
     }
 
     @Override
     public VueResults.Result saveEvent(ArticleVo articleVo, Principal principal) {
         internalSaveArticle(articleVo, "save", (short) 2, principal);
-        return VueResults.generateSuccess("新增成功", "新增活动成功");
+        return null;
     }
 
     @Override
     public VueResults.Result updateNews(ArticleVo articleVo, Principal principal) {
         internalSaveArticle(articleVo, "update", (short) 1, principal);
-        return VueResults.generateSuccess("更新成功", "更新新闻成功");
+        return null;
     }
 
     @Override
     public VueResults.Result updateEvent(ArticleVo articleVo, Principal principal) {
         internalSaveArticle(articleVo, "update", (short) 2, principal);
-        return VueResults.generateSuccess("更新成功", "更新活动成功");
+        return null;
     }
 
     @Override
@@ -189,18 +193,31 @@ public class ArticleTableServiceImpl implements ArticleTableService {
         if (articleTable.isPublished() && articleTable.getPublishDate() == null) {
             articleTable.setPublishDate(new Date());
         }
+        if (articleVo.getTemplateId() != null) {
+            articleTable.setTemplateTable(templateTableRepository.findOne(articleVo.getTemplateId()));
+        }
         if ("save".equals(operation)) {
             articleTable.setCreatedDate(new Date());
             articleTable.setCreateUser(principal.getName());
-
             if (articleVo.getWebsiteId() != null) {
                 articleTable.setWebsiteTable(websiteTableRepository.findOne(articleVo.getWebsiteId()));
             }
-            if (articleVo.getTemplateId() != null) {
-                articleTable.setTemplateTable(templateTableRepository.findOne(articleVo.getTemplateId()));
+            if (articleVo.getBlocks() != null && articleVo.getBlocks().size() > 0) {
+                List<BlockTable> blockTables = new ArrayList<>();
+                for (List<String> list1 : articleVo.getBlocks()) {
+                    BlockTable blockTable = new BlockTable();
+                    blockTable.setName(list1.get(0));
+                    blockTable.setPosition(list1.get(1));
+                    blockTable.setContent(list1.get(2));
+                    blockTable.setScript(list1.get(3));
+                    blockTables.add(blockTable);
+                    blockTable.setArticleTable(articleTable);
+                    blockTable.setTemplateTable(articleTable.getTemplateTable());
+                    blockTables.add(blockTable);
+                }
+                blockTableRepository.save(blockTables);
             }
         }
-
         articleTableRepository.save(articleTable);
     }
 }

@@ -78,7 +78,7 @@ public class MediaTagTableServiceImpl implements MediaTagTableService {
         MediaTagTable mediaTagTable = mediaTagTableRepository.findOne(mediaTagVo.getId());
         mediaTagVoAssembler.toDomain(mediaTagVo, mediaTagTable);
         mediaTagTableRepository.save(mediaTagTable);
-        return VueResults.generateSuccess("更新成功", "更新成功");
+        return null;
     }
 
     @Override
@@ -86,11 +86,11 @@ public class MediaTagTableServiceImpl implements MediaTagTableService {
         if (mediaTagTableRepository.findOneByTagId(mediaTagVo.getTagId()) != null) {
             return VueResults.generateError("创建失败", "tagID已存在");
         }
-        MediaTagTable mediaTagTable = mediaTagTableRepository.findOne(mediaTagVo.getId());
+        MediaTagTable mediaTagTable = new MediaTagTable();
         mediaTagVoAssembler.toDomain(mediaTagVo, mediaTagTable);
         mediaTagTable.setWebsiteTable(websiteTableRepository.findOne(mediaTagVo.getWebsiteId()));
         mediaTagTableRepository.save(mediaTagTable);
-        return VueResults.generateSuccess("创建成功", "创建成功");
+        return null;
     }
 
     @Override

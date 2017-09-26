@@ -37,10 +37,12 @@ public class BlockController implements GenericController<BlockVo> {
         String templateKey = httpServletRequest.getParameter("templateKey");
         String articleKey = httpServletRequest.getParameter("articleKey");
         List<BlockVo> list = new ArrayList<>();
-        if (templateKey != null) {
+        if (templateKey != null && articleKey != null) {
+            list = blockTableService.getBlocksByArticleAndTemplate(Long.valueOf(articleKey), Long.valueOf(templateKey));
+        } else if (templateKey != null) {
             list = blockTableService.getBlocksByTemplate(Long.valueOf(templateKey));
         } else if (articleKey != null) {
-            list = blockTableService.getBlocksByArticle(Long.valueOf(articleKey));
+            list = blockTableService.getBlocksByArticleAndTemplate(Long.valueOf(articleKey),null);
         }
 
         Map<String, Object> map = new HashMap<>();
@@ -90,7 +92,7 @@ public class BlockController implements GenericController<BlockVo> {
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestBody BlockVo blockVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         String templateKey = httpServletRequest.getParameter("templateKey");
-        String articleKey = httpServletRequest.getParameter("templateKey");
+        String articleKey = httpServletRequest.getParameter("articleKey");
         blockVo.setTemplateId(templateKey != null ? Long.valueOf(templateKey) : null);
         blockVo.setArticleId(articleKey != null ? Long.valueOf(articleKey) : null);
         return blockTableService.save(blockVo, null, principal);

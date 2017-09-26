@@ -22,6 +22,8 @@ public class ArticleVo {
 
     private String script;
 
+    private List<List<String>> blocks;
+
     private boolean published;
 
     private Integer clickTimes;

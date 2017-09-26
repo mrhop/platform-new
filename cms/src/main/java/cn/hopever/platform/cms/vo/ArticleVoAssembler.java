@@ -24,7 +24,7 @@ public class ArticleVoAssembler implements GenericVoAssembler<ArticleVo, Article
         if (articleTable.getPublishDate() != null) {
             articleVo.setPublishDate(articleTable.getPublishDate().getTime());
         }
-        if (articleTable.getArticleTagTables() != null) {
+        if (articleTable.getArticleTagTables() != null && articleTable.getArticleTagTables().size() > 0) {
             List<Long> articleTagTables = new ArrayList<>();
             List<String> articleTagTablesStr = new ArrayList<>();
             for (ArticleTagTable articleTagTable : articleTable.getArticleTagTables()) {

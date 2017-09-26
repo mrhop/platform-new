@@ -1,5 +1,6 @@
 package cn.hopever.platform.cms.service.impl;
 
+import cn.hopever.platform.cms.domain.ArticleTable;
 import cn.hopever.platform.cms.domain.ArticleTagTable;
 import cn.hopever.platform.cms.repository.ArticleTagTableRepository;
 import cn.hopever.platform.cms.repository.CustomArticleTagTableRepository;
@@ -64,6 +65,13 @@ public class ArticleTagTableServiceImpl implements ArticleTagTableService {
 
     @Override
     public void delete(Long id, Principal principal) {
+        ArticleTagTable articleTagTable = articleTagTableRepository.findOne(id);
+        List<ArticleTable> articleTables = articleTagTable.getArticleTables();
+        if (articleTables != null && articleTables.size() > 0) {
+            for (ArticleTable articleTable : articleTables) {
+                articleTable.getArticleTagTables().remove(articleTagTable);
+            }
+        }
         this.articleTagTableRepository.delete(id);
     }
 

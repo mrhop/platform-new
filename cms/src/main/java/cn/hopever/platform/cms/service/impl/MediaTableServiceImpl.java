@@ -8,6 +8,8 @@ import cn.hopever.platform.cms.repository.WebsiteTableRepository;
 import cn.hopever.platform.cms.service.MediaTableService;
 import cn.hopever.platform.cms.vo.MediaVo;
 import cn.hopever.platform.cms.vo.MediaVoAssembler;
+import cn.hopever.platform.utils.file.FileUtil;
+import cn.hopever.platform.utils.moji.MojiUtils;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Donghui Huo on 2017/8/31.
@@ -30,18 +33,17 @@ import java.util.List;
 @Service
 @Transactional
 public class MediaTableServiceImpl implements MediaTableService {
+
+    @Autowired
+    private MojiUtils mojiUtils;
     @Autowired
     private MediaTableRepository mediaTableRepository;
-
     @Autowired
     private MediaTagTableRepository mediaTagTableRepository;
-
     @Autowired
     private CustomMediaTableRepository customMediaTableRepository;
-
     @Autowired
     private MediaVoAssembler mediaVoAssembler;
-
     @Autowired
     private WebsiteTableRepository websiteTableRepository;
 
@@ -91,13 +93,24 @@ public class MediaTableServiceImpl implements MediaTableService {
         if (mediaVo.getMediaTagId() != null) {
             mediaTable.setMediaTagTable(mediaTagTableRepository.findOne(mediaVo.getMediaTagId()));
         }
+        if (files != null && files.length > 0) {
+            mediaTable.setSize(files[0].getSize());
+            mediaTable.setFilename(files[0].getOriginalFilename());
+            try {
+                Map<String, List<String>> mapFiles = mojiUtils.uploadImg("cms/website/" + mediaTable.getWebsiteTable().getWebsiteId() + "/screenshots/", files);
+                List<String> list = mapFiles.get("fileKeys");
+                mediaTable.setUrl(list.get(0));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         mediaTableRepository.save(mediaTable);
-        return VueResults.generateSuccess("更新成功", "更新成功");
+        return null;
     }
 
     @Override
     public VueResults.Result save(MediaVo mediaVo, MultipartFile[] files, Principal principal) {
-        MediaTable mediaTable = mediaTableRepository.findOne(mediaVo.getId());
+        MediaTable mediaTable = new MediaTable();
         mediaVoAssembler.toDomain(mediaVo, mediaTable);
         mediaTable.setCreatedDate(new Date());
         mediaTable.setCreateUser(principal.getName());
@@ -110,7 +123,25 @@ public class MediaTableServiceImpl implements MediaTableService {
         if (mediaVo.getMediaTagId() != null) {
             mediaTable.setMediaTagTable(mediaTagTableRepository.findOne(mediaVo.getMediaTagId()));
         }
-        return VueResults.generateSuccess("创建成功", "创建成功");
+        // do with file
+        if (files != null && files.length > 0) {
+            mediaTable.setSize(files[0].getSize());
+            if (mediaTable.getName() == null || mediaTable.getName().length() == 0) {
+                mediaTable.setName(FileUtil.getFileNameNoExtend(files[0].getOriginalFilename()));
+            }
+            mediaTable.setFilename(files[0].getOriginalFilename());
+            mediaTable.setFileType(FileUtil.getExtensionName(files[0].getOriginalFilename()));
+            mediaTable.setType(FileUtil.getFileGeneralType(files[0].getOriginalFilename()));
+            try {
+                Map<String, List<String>> mapFiles = mojiUtils.uploadImg("cms/website/" + mediaTable.getWebsiteTable().getWebsiteId() + "/screenshots/", files);
+                List<String> list = mapFiles.get("fileKeys");
+                mediaTable.setUrl(list.get(0));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        mediaTableRepository.save(mediaTable);
+        return null;
     }
 
     @Override

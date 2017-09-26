@@ -17,9 +17,14 @@ import java.util.List;
  * 缺少一个formatblockContent的操作？？？？？？后续预览的时候添加
  **/
 public interface BlockTableService extends GenericService<BlockVo> {
+
     public List<BlockVo> getBlocksByTemplate(Long templateId);
 
+    public List<BlockVo> getBlocksByArticleAndTemplate(Long articleId,Long templateId);
+
     public List<BlockVo> getBlocksByArticle(Long articleId);
+
+    public List<BlockVo> getBlocksAllByArticle(Long articleId);
 
     public BlockVo deleteAndReturn(Long id, Principal principal);
 

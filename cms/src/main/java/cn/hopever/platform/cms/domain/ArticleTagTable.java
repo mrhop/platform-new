@@ -29,8 +29,7 @@ public class ArticleTagTable {
     @Column(name = "tag_id", length = 50, unique = true)
     private String tagId;
 
-    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinTable(name = "platform_cms_article_article_tag", joinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "article_id", referencedColumnName = "id"), indexes = {@Index(columnList = "article_id"), @Index(columnList = "tag_id")})
+    @ManyToMany(mappedBy = "articleTagTables")
     private List<ArticleTable> articleTables;
 
     @ManyToOne(optional = false)

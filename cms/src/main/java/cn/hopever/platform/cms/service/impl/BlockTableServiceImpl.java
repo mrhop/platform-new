@@ -2,6 +2,7 @@ package cn.hopever.platform.cms.service.impl;
 
 import cn.hopever.platform.cms.domain.ArticleTable;
 import cn.hopever.platform.cms.domain.BlockTable;
+import cn.hopever.platform.cms.domain.TemplateTable;
 import cn.hopever.platform.cms.repository.*;
 import cn.hopever.platform.cms.service.BlockTableService;
 import cn.hopever.platform.cms.vo.BlockVo;
@@ -121,9 +122,38 @@ public class BlockTableServiceImpl implements BlockTableService {
         return null;
     }
 
+    @Override
+    public List<BlockVo> getBlocksByArticleAndTemplate(Long articleId, Long templateId) {
+        ArticleTable articleTable = articleTableRepository.findOne(articleId);
+        TemplateTable templateTable = templateId == null ? articleTable.getTemplateTable() : templateTableRepository.findOne(templateId);
+        List<BlockTable> list = blockTableRepository.findByArticleTableAndTemplateTableOrderByPositionAsc(articleTable, templateTable);
+        if (list != null && list.size() > 0) {
+            List<BlockVo> listReturn = new ArrayList<>();
+            for (BlockTable blockTable : list) {
+                listReturn.add(blockVoAssembler.toResourceAll(blockTable));
+            }
+            return listReturn;
+        }
+        return null;
+    }
+
 
     @Override
     public List<BlockVo> getBlocksByArticle(Long articleId) {
+        ArticleTable articleTable = articleTableRepository.findOne(articleId);
+        List<BlockTable> list = articleTable.getBlockTables();
+        if (list != null && list.size() > 0) {
+            List<BlockVo> listReturn = new ArrayList<>();
+            for (BlockTable blockTable : list) {
+                listReturn.add(blockVoAssembler.toResourceAll(blockTable));
+            }
+            return listReturn;
+        }
+        return null;
+    }
+
+    @Override
+    public List<BlockVo> getBlocksAllByArticle(Long articleId) {
         ArticleTable articleTable = articleTableRepository.findOne(articleId);
         List<BlockVo> list = getBlocksByTemplate(articleTable.getTemplateTable().getId());
         if (list != null && list.size() > 0) {
