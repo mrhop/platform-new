@@ -52,7 +52,7 @@ public class NavigateTableServiceImpl implements NavigateTableService {
     public Page<NavigateVo> getList(TableParameters body, Principal principal) {
         PageRequest pageRequest;
         if (body.getSorts() == null || body.getSorts().isEmpty()) {
-            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "id");
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "navigateOrder");
         } else {
             String key = body.getSorts().keySet().iterator().next();
             pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
@@ -141,7 +141,7 @@ public class NavigateTableServiceImpl implements NavigateTableService {
         }
         navigateTable.setParent(navigateTableParent);
         navigateTableRepository.save(navigateTable);
-        return VueResults.generateSuccess("更新成功", "更新导航成功");
+        return null;
     }
 
     @Override
@@ -185,7 +185,7 @@ public class NavigateTableServiceImpl implements NavigateTableService {
         if (navigateTableAfter != null) {
             navigateTableRepository.save(navigateTableAfter);
         }
-        return VueResults.generateSuccess("保存成功", "保存导航成功");
+        return null;
     }
 
     @Override
@@ -234,6 +234,16 @@ public class NavigateTableServiceImpl implements NavigateTableService {
             }
         }
         return listReturn;
+    }
+
+    @Override
+    public VueResults.Result updateActivated(Long id, boolean activated) {
+        if (activated) {
+            navigateTableRepository.activateArticle(id);
+        } else {
+            navigateTableRepository.unActivateArticle(id);
+        }
+        return VueResults.generateSuccess("更新成功", "更新激活状态成功");
     }
 
 

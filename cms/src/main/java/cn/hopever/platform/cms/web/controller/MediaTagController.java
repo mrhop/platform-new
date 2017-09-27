@@ -36,7 +36,7 @@ public class MediaTagController implements GenericController<MediaTagVo> {
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Map filter = CommonMethods.generateInitFilter(body.getFilters(), httpServletRequest);
-        if (filter != null && filter.containsKey("websiteId")) {
+            if (filter != null && filter.containsKey("websiteId")) {
             Page<MediaTagVo> list = mediaTagTableService.getList(body, principal);
             Map<String, Object> map = new HashMap<>();
             List<HashMap<String, Object>> listReturn = null;

@@ -28,6 +28,9 @@ public class NavigateTable {
     @Column(name = "navigate_order", nullable = true)
     private Integer navigateOrder = 0;
 
+    @Column(name = "relate_type")
+    private Short relateType;
+
     // 用于和order一起来决定顺序
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "before_id")

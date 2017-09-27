@@ -21,6 +21,7 @@ public class NavigateVoAssembler implements GenericVoAssembler<NavigateVo, Navig
         }
         if (navigateTable.getBeforeNavigate() != null) {
             navigateVo.setBeforeId(navigateTable.getBeforeNavigate().getId());
+            navigateVo.setBeforeName(navigateTable.getBeforeNavigate().getName());
         }
 
         if (navigateTable.getParent() != null) {

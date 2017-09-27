@@ -2,11 +2,13 @@ package cn.hopever.platform.cms.service;
 
 import cn.hopever.platform.cms.vo.ArticleVo;
 import cn.hopever.platform.utils.web.GenericService;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.data.domain.Page;
 
 import java.security.Principal;
+import java.util.List;
 
 /**
  * Created by Donghui Huo on 2017/8/31.
@@ -28,5 +30,7 @@ public interface ArticleTableService extends GenericService<ArticleVo> {
     public Page<ArticleVo> getEventList(TableParameters body, Principal principal);
 
     public VueResults.Result updatePublished(Long id, boolean published, Principal principal);
+
+    public List<SelectOption> getArticleOptionsForNavigate(short relateType, Long websiteId);
 
 }

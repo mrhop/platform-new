@@ -16,6 +16,9 @@ public class NavigateVo {
 
     // 用于和order一起来决定顺序
     private Long beforeId;
+    private String beforeName;
+
+    private Short relateType;
 
     private Long articleId;
     private String articleTitle;

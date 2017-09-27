@@ -44,13 +44,13 @@ public class CustomNavigateTableRepositoryImpl extends SimpleJpaRepository<Navig
                 Predicate predicateReturn = null;
                 if (mapFilter != null && mapFilter.size() > 0) {
                     for (String key : mapFilter.keySet()) {
-                        if ("websiteTable".equals(key)||"parent".equals(key)) {
+                        if ("websiteTable".equals(key) || "parent".equals(key) || "activated".equals(key)) {
                             if (predicateReturn != null) {
                                 predicateReturn = builder.and(predicateReturn, builder.equal(root.get(key), mapFilter.get(key)));
                             } else {
                                 predicateReturn = builder.equal(root.get(key), mapFilter.get(key));
                             }
-                        }  else {
+                        } else {
                             if (predicateReturn != null) {
                                 predicateReturn = builder.and(predicateReturn, builder.like(root.get(key), "%" + StringEscapeUtils.escapeSql(mapFilter.get(key).toString()) + "%"));
                             } else {

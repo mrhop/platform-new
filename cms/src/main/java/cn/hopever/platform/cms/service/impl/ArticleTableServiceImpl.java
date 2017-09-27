@@ -7,6 +7,7 @@ import cn.hopever.platform.cms.repository.*;
 import cn.hopever.platform.cms.service.ArticleTableService;
 import cn.hopever.platform.cms.vo.ArticleVo;
 import cn.hopever.platform.cms.vo.ArticleVoAssembler;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,6 +137,16 @@ public class ArticleTableServiceImpl implements ArticleTableService {
             articleTableRepository.unpublishArticle(id);
         }
         return VueResults.generateSuccess("更新成功", "更新发布状态成功");
+    }
+
+    @Override
+    public List<SelectOption> getArticleOptionsForNavigate(short relateType, Long websiteId) {
+        List<ArticleTable> list = articleTableRepository.findByWebsiteTableAndType(websiteTableRepository.findOne(websiteId), relateType);
+        List<SelectOption> returnList = new ArrayList<>();
+        for (ArticleTable articleTable : list) {
+            returnList.add(new SelectOption(articleTable.getTitle(), articleTable.getId()));
+        }
+        return returnList;
     }
 
     private Page<ArticleVo> getInternalList(TableParameters body, short type) {
