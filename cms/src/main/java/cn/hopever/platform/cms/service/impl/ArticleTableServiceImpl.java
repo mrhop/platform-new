@@ -3,10 +3,12 @@ package cn.hopever.platform.cms.service.impl;
 import cn.hopever.platform.cms.domain.ArticleTable;
 import cn.hopever.platform.cms.domain.ArticleTagTable;
 import cn.hopever.platform.cms.domain.BlockTable;
+import cn.hopever.platform.cms.domain.StaticResourceTable;
 import cn.hopever.platform.cms.repository.*;
 import cn.hopever.platform.cms.service.ArticleTableService;
 import cn.hopever.platform.cms.vo.ArticleVo;
 import cn.hopever.platform.cms.vo.ArticleVoAssembler;
+import cn.hopever.platform.utils.tools.BeanUtils;
 import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
@@ -45,6 +47,9 @@ public class ArticleTableServiceImpl implements ArticleTableService {
 
     @Autowired
     private CustomArticleTableRepository customArticleTableRepository;
+
+    @Autowired
+    private StaticResourceTableRepository staticResourceTableRepository;
 
     @Autowired
     private ArticleVoAssembler articleVoAssembler;
@@ -149,6 +154,51 @@ public class ArticleTableServiceImpl implements ArticleTableService {
         return returnList;
     }
 
+    @Override
+    public void copy(Long id) {
+        ArticleTable articleTable = articleTableRepository.findOne(id);
+        List<BlockTable> list = blockTableRepository.findByArticleTableAndTemplateTableOrderByPositionAsc(articleTable, articleTable.getTemplateTable());
+        ArticleTable articleTable1 = new ArticleTable();
+        BeanUtils.copyNotNullProperties(articleTable, articleTable1, "id", "articleTagTables", "blockTables");
+        List<ArticleTagTable> articleTagTables = articleTable.getArticleTagTables();
+        if (articleTagTables != null && articleTagTables.size() > 0) {
+            List<ArticleTagTable> articleTagTables1 = new ArrayList<>();
+            articleTagTables1.addAll(articleTagTables);
+            articleTable1.setArticleTagTables(articleTagTables1);
+        }
+        if (articleTable.getStaticResourceTables() != null && articleTable.getStaticResourceTables().size() > 0) {
+            List<StaticResourceTable> staticResourceTables1 = new ArrayList<>();
+            for (StaticResourceTable staticResourceTable : articleTable.getStaticResourceTables()) {
+                if (!"script".equals(staticResourceTable.getType()) && !"stylesheet".equals(staticResourceTable.getType())) {
+                    StaticResourceTable staticResourceTable1 = new StaticResourceTable();
+                    BeanUtils.copyNotNullProperties(staticResourceTable, staticResourceTable1, "id", "articleTable", "beforeStaticResource");
+                    staticResourceTable1.setArticleTable(articleTable1);
+                    staticResourceTables1.add(staticResourceTable1);
+                }
+            }
+            StaticResourceTable staticResourceTableBottom = staticResourceTableRepository.findTopByArticleTableAndTypeOrderByResourceOrderDesc(articleTable, "stylesheet");
+            if (staticResourceTableBottom != null) {
+                staticResourceTables1.add(recursiveStaticResourceTables(staticResourceTableBottom, articleTable1));
+            }
+            staticResourceTableBottom = staticResourceTableRepository.findTopByArticleTableAndTypeOrderByResourceOrderDesc(articleTable, "script");
+            if (staticResourceTableBottom != null) {
+                staticResourceTables1.add(recursiveStaticResourceTables(staticResourceTableBottom, articleTable1));
+            }
+            articleTable1.setStaticResourceTables(staticResourceTables1);
+        }
+        if (list != null && list.size() > 0) {
+            List<BlockTable> list1 = new ArrayList<>();
+            for (BlockTable blockTable : list) {
+                BlockTable blockTable1 = new BlockTable();
+                BeanUtils.copyNotNullProperties(blockTable, blockTable1, "id", "articleTable");
+                blockTable1.setArticleTable(articleTable1);
+                list1.add(blockTable1);
+            }
+            articleTable1.setBlockTables(list1);
+        }
+        articleTableRepository.save(articleTable1);
+    }
+
     private Page<ArticleVo> getInternalList(TableParameters body, short type) {
         PageRequest pageRequest;
         if (body.getSorts() == null || body.getSorts().isEmpty()) {
@@ -230,5 +280,16 @@ public class ArticleTableServiceImpl implements ArticleTableService {
             }
         }
         articleTableRepository.save(articleTable);
+    }
+
+
+    private StaticResourceTable recursiveStaticResourceTables(StaticResourceTable staticResourceTable, ArticleTable articleTable) {
+        StaticResourceTable staticResourceTable1 = new StaticResourceTable();
+        BeanUtils.copyNotNullProperties(staticResourceTable, staticResourceTable1, "id", "articleTable", "beforeStaticResource");
+        staticResourceTable1.setArticleTable(articleTable);
+        if (staticResourceTable.getBeforeStaticResource() != null) {
+            staticResourceTable1.setBeforeStaticResource(recursiveStaticResourceTables(staticResourceTable.getBeforeStaticResource(), articleTable));
+        }
+        return staticResourceTable1;
     }
 }

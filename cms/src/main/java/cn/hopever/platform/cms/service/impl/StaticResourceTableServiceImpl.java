@@ -78,7 +78,7 @@ public class StaticResourceTableServiceImpl implements StaticResourceTableServic
             body.getFilters().remove("websiteId");
         }
         if (body.getFilters() != null && body.getFilters().containsKey("articleId")) {
-            body.getFilters().put("articleTable", themeTableRepository.findOne(Long.valueOf(body.getFilters().get("articleId").toString())));
+            body.getFilters().put("articleTable", articleTableRepository.findOne(Long.valueOf(body.getFilters().get("articleId").toString())));
             body.getFilters().remove("articleId");
         }
         Page<StaticResourceTable> page = customStaticResourceTableRepository.findByFilters(body.getFilters(), pageRequest);
@@ -196,7 +196,7 @@ public class StaticResourceTableServiceImpl implements StaticResourceTableServic
                 currentScriptStaticResourceTable = staticResourceTableRepository.findTopByWebsiteTableAndTypeOrderByResourceOrderDesc(websiteTable, "script");
             } else if (staticResourceVo.getArticleId() != null) {
                 articleTable = articleTableRepository.findOne(staticResourceVo.getArticleId());
-                globalPath = "acticle/" + articleTable.getWebsiteTable().getWebsiteId() + "/acticle_" + articleTable.getId();
+                globalPath = "website/" + articleTable.getWebsiteTable().getWebsiteId() + "/acticle/" + "acticle_" + articleTable.getId();
                 currentCssStaticResourceTable = staticResourceTableRepository.findTopByArticleTableAndTypeOrderByResourceOrderDesc(articleTable, "stylesheet");
                 currentScriptStaticResourceTable = staticResourceTableRepository.findTopByArticleTableAndTypeOrderByResourceOrderDesc(articleTable, "script");
             }

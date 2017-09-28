@@ -145,4 +145,9 @@ public class ArticleController implements GenericController<ArticleVo> {
     public VueResults.Result updatePublished(@RequestParam Long key, @RequestParam Boolean published) {
         return articleTableService.updatePublished(key, published);
     }
+
+    @RequestMapping(value = "/copy", method = {RequestMethod.GET})
+    public void copy(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        articleTableService.copy(key);
+    }
 }
