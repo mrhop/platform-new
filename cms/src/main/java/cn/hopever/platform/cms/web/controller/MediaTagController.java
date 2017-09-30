@@ -4,6 +4,7 @@ import cn.hopever.platform.cms.config.CommonMethods;
 import cn.hopever.platform.cms.service.MediaTagTableService;
 import cn.hopever.platform.cms.vo.MediaTagVo;
 import cn.hopever.platform.utils.web.GenericController;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public class MediaTagController implements GenericController<MediaTagVo> {
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Map filter = CommonMethods.generateInitFilter(body.getFilters(), httpServletRequest);
-            if (filter != null && filter.containsKey("websiteId")) {
+        if (filter != null && filter.containsKey("websiteId")) {
             Page<MediaTagVo> list = mediaTagTableService.getList(body, principal);
             Map<String, Object> map = new HashMap<>();
             List<HashMap<String, Object>> listReturn = null;
@@ -69,6 +70,15 @@ public class MediaTagController implements GenericController<MediaTagVo> {
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public MediaTagVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return mediaTagTableService.info(key, principal);
+    }
+
+    @RequestMapping(value = "/options", method = {RequestMethod.GET})
+    public List<SelectOption> options(Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        Map<String, Long> keys = CommonMethods.generateKey(httpServletRequest);
+        if (keys.get("websiteId") != null) {
+            return mediaTagTableService.getOptionsByWebsiteId(keys.get("websiteId"));
+        }
+        return null;
     }
 
     @Override

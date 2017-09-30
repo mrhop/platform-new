@@ -42,6 +42,9 @@ contact_form 和poll后续考虑
 所以不存在template的区分问题，到article的时候就是纯粹的block的处理了，关联到一个template作为基础，然后就是自定义的blocks的处理
 理清了思路，现在开始执行文章的模块的处理了
 template 应该有个复制处理，然后就是article里面的block只能新增未选中的，或者修改和自己关联的
-article 应该给出一个预览在里面，在list add，detail以及update里面都有，注意，继续addArticle 的addblock部分
+
+剩余article和template的预览操作
+开始考虑ckeditor的延展
 以后需要考虑的是，内置css的ckeditor， ckeditor上传图片和选择图片【website的图片库】，ckeditor使用block tag，个性化设置！！！！！！
-注意权限的问题【BeforeControllerAdvice】，当对其他资源或者根本的website以及theme进行处理时，除了判断该用户有没有module的权限，还要判断这个用户有没有对资源的处理权限，module通过前端的tree、进行遮盖，但是根本的处理还是需要进行后端的BeforeControllerAdvice控制
+注意权限的问题【BeforeControllerAdvice】，当对其他资源或者根本的website以及theme进行处理时，除了判断该用户有没有module的权限，还要判断这个用户有没有对资源的处理权限，
+module通过前端的tree、进行遮盖，但是根本的处理还是需要进行后端的BeforeControllerAdvice控制
