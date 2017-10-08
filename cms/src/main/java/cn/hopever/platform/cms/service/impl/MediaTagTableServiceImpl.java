@@ -88,6 +88,7 @@ public class MediaTagTableServiceImpl implements MediaTagTableService {
         }
         MediaTagTable mediaTagTable = new MediaTagTable();
         mediaTagVoAssembler.toDomain(mediaTagVo, mediaTagTable);
+        mediaTagTable.setTagId(mediaTagVo.getTagId());
         mediaTagTable.setWebsiteTable(websiteTableRepository.findOne(mediaTagVo.getWebsiteId()));
         mediaTagTableRepository.save(mediaTagTable);
         return null;

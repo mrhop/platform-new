@@ -25,7 +25,8 @@ public class MediaTagTable {
     @Column(name = "name", length = 50)
     private String name;
 
-    @Column(name = "tag_id", length = 50,unique = true)
+    // 预置 document image video audio 四种形式
+    @Column(name = "tag_id", length = 50, unique = true)
     private String tagId;
 
     @ManyToOne(optional = false)

@@ -100,13 +100,24 @@ public class MediaController implements GenericController<MediaVo> {
 
     @Override
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result save(@RequestParam(name = "files", required = false) MultipartFile[] files, MediaVo mediaVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public VueResults.Result save(@RequestParam(name = "files", required = true) MultipartFile[] files, MediaVo mediaVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         // 临时测试 使用
         principal = new PrincipalSample("test1");
         Map<String, Long> keys = CommonMethods.generateKey(httpServletRequest);
         if (keys.get("websiteId") != null) {
             mediaVo.setWebsiteId(keys.get("websiteId"));
             return mediaTableService.save(mediaVo, files, principal);
+        }
+        return VueResults.generateError("创建错误", "无法找到正确从属网站");
+    }
+
+    @RequestMapping(value = "/upload", method = {RequestMethod.POST})
+    public VueResults.Result upload(@RequestParam(name = "upload", required = true) MultipartFile[] files, @RequestParam(name = "type", required = false) String tagId, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        // 临时测试 使用
+        principal = new PrincipalSample("test1");
+        Map<String, Long> keys = CommonMethods.generateKey(httpServletRequest);
+        if (keys.get("websiteId") != null) {
+            return mediaTableService.upload(files, tagId, keys.get("websiteId"), principal);
         }
         return VueResults.generateError("创建错误", "无法找到正确从属网站");
     }

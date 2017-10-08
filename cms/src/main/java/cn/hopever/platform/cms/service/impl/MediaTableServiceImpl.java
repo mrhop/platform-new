@@ -1,6 +1,8 @@
 package cn.hopever.platform.cms.service.impl;
 
 import cn.hopever.platform.cms.domain.MediaTable;
+import cn.hopever.platform.cms.domain.MediaTagTable;
+import cn.hopever.platform.cms.domain.WebsiteTable;
 import cn.hopever.platform.cms.repository.CustomMediaTableRepository;
 import cn.hopever.platform.cms.repository.MediaTableRepository;
 import cn.hopever.platform.cms.repository.MediaTagTableRepository;
@@ -90,14 +92,11 @@ public class MediaTableServiceImpl implements MediaTableService {
         if (mediaTable.isPublished() && mediaTable.getPublishDate() == null) {
             mediaTable.setPublishDate(new Date());
         }
-        if (mediaVo.getMediaTagId() != null) {
-            mediaTable.setMediaTagTable(mediaTagTableRepository.findOne(mediaVo.getMediaTagId()));
-        }
         if (files != null && files.length > 0) {
             mediaTable.setSize(files[0].getSize());
             mediaTable.setFilename(files[0].getOriginalFilename());
             try {
-                Map<String, List<String>> mapFiles = mojiUtils.uploadImg("cms/website/" + mediaTable.getWebsiteTable().getWebsiteId() + "/screenshots/", files);
+                Map<String, List<String>> mapFiles = mojiUtils.uploadImg("cms/website/" + mediaTable.getWebsiteTable().getWebsiteId() + "/media/" + mediaTable.getMediaTagTable().getTagId() + "/", files);
                 List<String> list = mapFiles.get("fileKeys");
                 mediaTable.setUrl(list.get(0));
             } catch (Exception e) {
@@ -133,7 +132,7 @@ public class MediaTableServiceImpl implements MediaTableService {
             mediaTable.setFileType(FileUtil.getExtensionName(files[0].getOriginalFilename()));
             mediaTable.setType(FileUtil.getFileGeneralType(files[0].getOriginalFilename()));
             try {
-                Map<String, List<String>> mapFiles = mojiUtils.uploadImg("cms/website/" + mediaTable.getWebsiteTable().getWebsiteId() + "/screenshots/", files);
+                Map<String, List<String>> mapFiles = mojiUtils.uploadImg("cms/website/" + mediaTable.getWebsiteTable().getWebsiteId() + "/media/" + mediaTable.getMediaTagTable().getTagId() + "/", files);
                 List<String> list = mapFiles.get("fileKeys");
                 mediaTable.setUrl(list.get(0));
             } catch (Exception e) {
@@ -154,6 +153,46 @@ public class MediaTableServiceImpl implements MediaTableService {
             }
             return listReturn;
         }
+        return null;
+    }
+
+    @Override
+    public VueResults.Result upload(MultipartFile[] files, String tagId, Long websiteId, Principal principal) {
+        // 如果tagId是空，那么根据上传文件的类型，来判断出需要的tagId
+        WebsiteTable websiteTable = websiteTableRepository.findOne(websiteId);
+        MediaTable mediaTable = new MediaTable();
+        MediaTagTable mediaTagTable = mediaTagTableRepository.findOneByTagId(tagId);
+        if (mediaTagTable == null) {
+            mediaTagTable = new MediaTagTable();
+            mediaTagTable.setName(tagId);
+            mediaTagTable.setTagId(tagId);
+            mediaTagTable.setWebsiteTable(websiteTable);
+            mediaTagTableRepository.save(mediaTagTable);
+        }
+        mediaTable.setCreatedDate(new Date());
+        mediaTable.setCreateUser(principal.getName());
+        mediaTable.setPublished(true);
+        mediaTable.setPublishDate(new Date());
+        mediaTable.setWebsiteTable(websiteTable);
+        mediaTable.setMediaTagTable(mediaTagTable);
+        // do with file
+        if (files != null && files.length > 0) {
+            mediaTable.setSize(files[0].getSize());
+            if (mediaTable.getName() == null || mediaTable.getName().length() == 0) {
+                mediaTable.setName(FileUtil.getFileNameNoExtend(files[0].getOriginalFilename()));
+            }
+            mediaTable.setFilename(files[0].getOriginalFilename());
+            mediaTable.setFileType(FileUtil.getExtensionName(files[0].getOriginalFilename()));
+            mediaTable.setType(FileUtil.getFileGeneralType(files[0].getOriginalFilename()));
+            try {
+                Map<String, List<String>> mapFiles = mojiUtils.uploadImg("cms/website/" + mediaTable.getWebsiteTable().getWebsiteId() + "/media/" + mediaTagTable.getTagId() + "/", files);
+                List<String> list = mapFiles.get("fileKeys");
+                mediaTable.setUrl(list.get(0));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        mediaTableRepository.save(mediaTable);
         return null;
     }
 

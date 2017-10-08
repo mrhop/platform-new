@@ -22,7 +22,7 @@ public class MediaTagVoAssembler implements GenericVoAssembler<MediaTagVo, Media
 
     @Override
     public MediaTagTable toDomain(MediaTagVo mediaTagVo, MediaTagTable mediaTagTable) {
-        BeanUtils.copyNotNullProperties(mediaTagVo, mediaTagTable);
+        BeanUtils.copyNotNullProperties(mediaTagVo, mediaTagTable,"tagId");
         return mediaTagTable;
     }
 }
