@@ -43,8 +43,7 @@ contact_form 和poll后续考虑
 理清了思路，现在开始执行文章的模块的处理了
 template 应该有个复制处理，然后就是article里面的block只能新增未选中的，或者修改和自己关联的
 
-剩余article和template的预览操作
-开始考虑ckeditor的延展
-以后需要考虑的是，内置css的ckeditor， ckeditor上传图片和选择图片【website的图片库】，ckeditor使用block tag，个性化设置！！！！！！
+ckeditor基本完成
+剩余article和template的预览操作，以及权限操作，制作一个theme和website作为样例，一个简单的常用企业站点，同时关联一下微信公众号以及html5站点的处理，以及微信小程序！！稍后处理！！！
 注意权限的问题【BeforeControllerAdvice】，当对其他资源或者根本的website以及theme进行处理时，除了判断该用户有没有module的权限，还要判断这个用户有没有对资源的处理权限，
 module通过前端的tree、进行遮盖，但是根本的处理还是需要进行后端的BeforeControllerAdvice控制

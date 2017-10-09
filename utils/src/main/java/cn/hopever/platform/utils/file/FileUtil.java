@@ -269,13 +269,9 @@ public class FileUtil {
 
     public static String getFileGeneralType(String filePath) {
         filePath = filePath.toLowerCase();
-        if (filePath.endsWith(".css")) {
-            return "stylesheet";
-        } else if (filePath.endsWith(".js")) {
-            return "script";
-        } else if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg") || filePath.endsWith(".png") || filePath.endsWith(".gif") || filePath.endsWith(".svg")) {
+        if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg") || filePath.endsWith(".png") || filePath.endsWith(".gif") || filePath.endsWith(".svg")) {
             return "image";
-        } else if (filePath.endsWith(".flv") || filePath.endsWith(".avi") || filePath.endsWith(".rmvb") || filePath.endsWith(".rm") || filePath.endsWith(".mpeg") || filePath.endsWith(".asf") || filePath.endsWith(".wmv")) {
+        } else if (filePath.endsWith(".mp4") || filePath.endsWith(".ogv") || filePath.endsWith(".webm") || filePath.endsWith(".3gp") || filePath.endsWith(".flv") || filePath.endsWith(".avi") || filePath.endsWith(".rmvb") || filePath.endsWith(".rm") || filePath.endsWith(".mpeg") || filePath.endsWith(".asf") || filePath.endsWith(".wmv")) {
             return "video";
         } else if (filePath.endsWith(".wav") || filePath.endsWith(".mp3") || filePath.endsWith(".wma")) {
             return "audio";

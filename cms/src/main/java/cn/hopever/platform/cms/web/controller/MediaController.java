@@ -6,6 +6,7 @@ import cn.hopever.platform.cms.service.MediaTagTableService;
 import cn.hopever.platform.cms.vo.MediaVo;
 import cn.hopever.platform.utils.test.PrincipalSample;
 import cn.hopever.platform.utils.web.GenericController;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
@@ -58,6 +59,47 @@ public class MediaController implements GenericController<MediaVo> {
                     listTmp.add(cv.getFileType());
                     listTmp.add(cv.getSize());
                     listTmp.add(cv.isPublished());
+                    mapTemp.put("value", listTmp);
+                    listReturn.add(mapTemp);
+                }
+                map.put("rows", listReturn);
+                map.put("totalCount", list.getTotalElements());
+
+            } else {
+                map.put("rows", null);
+                map.put("totalCount", 0);
+            }
+            map.put("pager", body.getPager());
+            map.put("sorts", body.getSorts());
+            return map;
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/ckfile/list", method = {RequestMethod.POST})
+    public Map getFileList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        Map filter = CommonMethods.generateInitFilter(body.getFilters(), httpServletRequest);
+        if (filter != null && filter.containsKey("websiteId")) {
+            if (filter.get("fileLibId") != null) {
+                filter.put("mediaTagId", filter.remove("fileLibId"));
+            }
+            filter.put("published", true);
+            body.setFilters(filter);
+            Page<MediaVo> list = mediaTableService.getList(body, principal);
+            Map<String, Object> map = new HashMap<>();
+            List<HashMap<String, Object>> listReturn = null;
+            if (list != null && list.iterator().hasNext()) {
+                listReturn = new ArrayList<>();
+                for (MediaVo cv : list) {
+                    HashMap<String, Object> mapTemp = new HashMap<>();
+                    mapTemp.put("key", cv.getId());
+                    List<Object> listTmp = new ArrayList<>();
+                    listTmp.add(cv.getName());
+                    listTmp.add(cv.getType());
+                    listTmp.add(cv.getMediaTagId());
+                    listTmp.add(cv.getFileType());
+                    listTmp.add(cv.getSize());
+                    listTmp.add(cv.getUrl());
                     mapTemp.put("value", listTmp);
                     listReturn.add(mapTemp);
                 }
@@ -135,6 +177,26 @@ public class MediaController implements GenericController<MediaVo> {
         if (keys.get("websiteId") != null) {
             Map mapReturn = new HashMap<>();
             mapReturn.put("mediaTags", mediaTagTableService.getOptionsByWebsiteId(keys.get("websiteId")));
+            return mapReturn;
+        }
+        return null;
+    }
+
+    @RequestMapping(value = "/ckfile/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
+    public Map fileRuleChange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        Map<String, Long> keys = CommonMethods.generateKey(httpServletRequest);
+        if (keys.get("websiteId") != null) {
+            Map mapReturn = new HashMap<>();
+            mapReturn.put("fileLibs", mediaTagTableService.getOptionsByWebsiteId(keys.get("websiteId")));
+            List<SelectOption> list = new ArrayList<>();
+            list.add(new SelectOption("图片", "image"));
+            list.add(new SelectOption("视频", "video"));
+            list.add(new SelectOption("音频", "audio"));
+            list.add(new SelectOption("文档", "document"));
+            list.add(new SelectOption("字体文件", "font"));
+            list.add(new SelectOption("样式表", "stylesheet"));
+            list.add(new SelectOption("脚本", "script"));
+            mapReturn.put("types", list);
             return mapReturn;
         }
         return null;
