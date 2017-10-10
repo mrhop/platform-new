@@ -1,0 +1,41 @@
+package cn.hopever.platform.crm.domain;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import javax.persistence.*;
+import java.util.List;
+
+/**
+ * Created by Donghui Huo on 2017/8/30.
+ */
+@Entity
+@Table(name = "platform_crm_related_user")
+@Data
+@EqualsAndHashCode(of = {"id"})
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "hopever.crm.related_user")
+public class RelatedUserTable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(name = "custom_discount")
+    private boolean customDiscount = false;
+
+    @Column(name = "lower_limit")
+    private float lowerLimit;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "relatedUserTable")
+    private List<ClientRelatedUserTable> clientRelatedUserTables;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "trackUser")
+    private List<ClientTrackTable> clientTrackTables;
+
+    @OneToMany(mappedBy = "createdUser")
+    private List<OrderTable> orderTables;
+
+    @OneToMany(mappedBy = "createdUser")
+    private List<ClientTable> clientTables;
+}

@@ -1,0 +1,11 @@
+server:
+    port: 9093
+    contextPath: /
+config:
+    oauth2:
+        # as a sample to test
+        clientID: crm_client
+        clientSecret: crm_client
+        clientScopes:
+                  - internal_client
+        clientUseCurrentUri: true
