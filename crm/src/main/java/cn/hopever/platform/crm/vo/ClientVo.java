@@ -14,7 +14,7 @@ public class ClientVo {
 
     private String name;
 
-    private Boolean traded;
+    private boolean traded;
 
     private String contact;
 

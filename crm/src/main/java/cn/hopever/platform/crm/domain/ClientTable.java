@@ -30,7 +30,7 @@ public class ClientTable {
     private String name;
 
     @Column(name = "traded")
-    private Boolean traded = false;
+    private boolean traded = false;
 
     @Column(name = "contact", nullable = false)
     private String contact;
@@ -78,6 +78,10 @@ public class ClientTable {
 
     @Column(name = "created_date")
     private Date createdDate;
+
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "clientTable")
+    private List<OrderTable> orderTables;
 
 
     @ManyToOne

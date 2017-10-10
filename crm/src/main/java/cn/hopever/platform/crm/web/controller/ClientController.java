@@ -1,6 +1,9 @@
 package cn.hopever.platform.crm.web.controller;
 
+import cn.hopever.platform.crm.service.ClientLevelTableService;
+import cn.hopever.platform.crm.service.ClientOriginTableService;
 import cn.hopever.platform.crm.service.ClientTableService;
+import cn.hopever.platform.crm.service.CountryTableService;
 import cn.hopever.platform.crm.vo.ClientVo;
 import cn.hopever.platform.utils.web.GenericController;
 import cn.hopever.platform.utils.web.TableParameters;
@@ -32,8 +35,19 @@ public class ClientController implements GenericController<ClientVo> {
     @Autowired
     private ClientTableService clientTableService;
 
+    @Autowired
+    private ClientLevelTableService clientLevelTableService;
+
+    @Autowired
+    private ClientOriginTableService clientOriginTableService;
+
+    @Autowired
+    private CountryTableService countryTableService;
+
     // 根据当前用户的权限获取列表是所有的还是个人的
     // 过滤条件除了name code email cellphone  telephone clientOriginId clientLevelId  traded countryId  createdUserId
+   // 需要加上一个成交额
+    // action 需要跟上一个追踪和一个订单查询
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         //我们要根据session来判断user的
@@ -49,7 +63,7 @@ public class ClientController implements GenericController<ClientVo> {
                 listTmp.add(cv.getCode());
                 listTmp.add(cv.getName());
                 listTmp.add(cv.getContact());
-                listTmp.add(cv.getTraded());
+                listTmp.add(cv.isTraded());
                 listTmp.add(cv.getEmail());
                 listTmp.add(cv.getCellphone());
                 listTmp.add(cv.getTelephone());
@@ -74,13 +88,16 @@ public class ClientController implements GenericController<ClientVo> {
     }
 
     @Override
+    @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public ClientVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        return null;
+        return clientTableService.info(key, principal);
     }
 
     @Override
+    @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public VueResults.Result update(@RequestParam Long key, @RequestBody ClientVo clientVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        return null;
+        clientVo.setId(key);
+        return clientTableService.update(clientVo, null, principal);
     }
 
     @Override
@@ -89,8 +106,9 @@ public class ClientController implements GenericController<ClientVo> {
     }
 
     @Override
+    @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestBody ClientVo clientVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        return null;
+        return clientTableService.save(clientVo, null, principal);
     }
 
     @Override
@@ -98,13 +116,36 @@ public class ClientController implements GenericController<ClientVo> {
         return null;
     }
 
+    // 删除要慎重，当有成单的不可删除!!
     @Override
+    @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-
+        clientTableService.delete(key, principal);
     }
 
+    // 判断client是否已成单，才给出clientlevel的select列表，需要给出来源 country 其他的不需要给出，更新的时候可以更新来源/
     @Override
+    @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
     public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        return null;
+        Map mapReturn = new HashMap<>();
+        if (body != null) {
+
+            // 给出options
+            mapReturn.put("clientOrigins", clientOriginTableService.getClientOriginOptions(principal));
+            mapReturn.put("countries", countryTableService.getCountryOptions(principal));
+
+            if ("list".equals(body.get("type"))) {
+                mapReturn.put("clientLevels", clientLevelTableService.getClientLevelOptions(principal));
+            } else if ("form".equals(body.get("type"))) {
+                if(key ==null){
+                    mapReturn.put("clientLevels", clientLevelTableService.getClientLevelInitialOptions(principal));
+                } else{
+                    if(!clientTableService.info(key,principal).isTraded()){
+                        mapReturn.put("clientLevels", clientLevelTableService.getClientLevelInitialOptions(principal));
+                    }
+                }
+            }
+        }
+        return mapReturn;
     }
 }
