@@ -1,6 +1,6 @@
 package cn.hopever.platform.crm.web.controller;
 
-import cn.hopever.platform.crm.vo.ClientVo;
+import cn.hopever.platform.crm.vo.ClientTrackVo;
 import cn.hopever.platform.utils.web.GenericController;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
@@ -20,37 +20,37 @@ import java.util.Map;
 @RestController
 @CrossOrigin
 @RequestMapping(value = "/client", produces = "application/json")
-public class ClientController implements GenericController<ClientVo> {
-    Logger logger = LoggerFactory.getLogger(ClientController.class);
+public class ClientTrackController implements GenericController<ClientTrackVo> {
+    Logger logger = LoggerFactory.getLogger(ClientTrackController.class);
 
-    // 根据当前用户的权限获取列表是所有的还是个人的
-    // 过滤条件除了name code email cellphone  telephone clientOriginId clientLevelId  traded countryId  createdUserId
+
+    @Override
     public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
-    public ClientVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public ClientTrackVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
-    public VueResults.Result update(@RequestParam Long key, @RequestBody ClientVo clientVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public VueResults.Result update(@RequestParam Long key, @RequestBody ClientTrackVo clientTrackVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
-    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "files", required = false) MultipartFile[] files, ClientVo clientVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "files", required = false) MultipartFile[] files, ClientTrackVo clientTrackVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
-    public VueResults.Result save(@RequestBody ClientVo clientVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public VueResults.Result save(@RequestBody ClientTrackVo clientTrackVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
-    public VueResults.Result save(@RequestParam(name = "files", required = false) MultipartFile[] files, ClientVo clientVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public VueResults.Result save(@RequestParam(name = "files", required = false) MultipartFile[] files, ClientTrackVo clientTrackVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 

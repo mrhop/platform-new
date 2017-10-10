@@ -22,7 +22,8 @@ public class OrderDiscountTable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    // 折扣类型 节日折扣，，客户级别折扣 作为自动折扣存在，满额减免
+    // 折扣类型 日期折扣，，客户级别折扣 作为自动折扣存在，满额减免
+    // 日期折扣会过期
     @Column(name = "type", length = 50, nullable = false)
     private String type;
 
@@ -30,14 +31,14 @@ public class OrderDiscountTable {
     @Column(name = "quota")
     private float quota = 0.0f;
     //特殊日期折扣，起始日
-    @Column(name = "begin")
-    private Date begin;
+    @Column(name = "begin_date")
+    private Date beginDate;
     //特殊日期折扣，终止日
-    @Column(name = "end")
-    private Date end;
+    @Column(name = "end_date")
+    private Date endDate;
 
     //客户级别折扣
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "client_level_id")
     private ClientLevelTable clientLevelTable;
 

@@ -29,6 +29,9 @@ public class ClientTable {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "traded")
+    private Boolean traded = false;
+
     @Column(name = "contact", nullable = false)
     private String contact;
 

@@ -46,7 +46,7 @@ public class ProductTable {
     @Column(name = "color")
     private String color;
 
-    @Column(name = "pictures")
+    @Column(name = "pictures", length = 2000)
     private String pictures;
 
     @Column(name = "additional_msg", length = 2000)

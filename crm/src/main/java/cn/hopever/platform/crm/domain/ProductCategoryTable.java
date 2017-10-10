@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Created by Donghui Huo on 2017/8/30.
- * 目前不考虑产品多分类处理
+ * 目前不考虑产品多分类处理【用到tree】
  */
 @Entity
 @Table(name = "platform_crm_product_category")

@@ -33,7 +33,7 @@ public class ProductPriceHistoryTable {
     @Column(name = "sale_price")
     private float salePrice;
 
-    // 库存价
+    // 成本价
     @Column(name = "cost_price")
     private float costPrice;
 
