@@ -2,6 +2,7 @@ package cn.hopever.platform.crm.service.impl;
 
 import cn.hopever.platform.crm.service.RelatedUserTableService;
 import cn.hopever.platform.crm.vo.RelatedUserVo;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.util.List;
 
 /**
  * Created by Donghui Huo on 2017/10/10.
@@ -40,6 +42,16 @@ public class RelatedUserTableServiceImpl implements RelatedUserTableService {
 
     @Override
     public VueResults.Result save(RelatedUserVo relatedUserVo, MultipartFile[] files, Principal principal) {
+        return null;
+    }
+
+    @Override
+    public List<SelectOption> getRelatedUserOptions(Principal principal) {
+        return null;
+    }
+
+    @Override
+    public RelatedUserVo getOneByAccount(String account) {
         return null;
     }
 }

@@ -43,8 +43,8 @@ public class ClientVo {
     private Long countryId;
     private String countryName;
 
-    private String[] clientRelatedUserNames;
-    private Long[] clientRelatedUserIds;
+    private String[] relatedUserNames;
+    private Long[] relatedUserIds;
 
 
     private Long createdDate;

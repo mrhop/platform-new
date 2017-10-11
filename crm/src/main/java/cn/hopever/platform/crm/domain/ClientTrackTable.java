@@ -39,13 +39,13 @@ public class ClientTrackTable {
 
     // 沟通时间 10分钟内，30分钟，1个小时
     @Column(name = "duration")
-    private short duration;
+    private Short duration;
 
     @Column(name = "comment", length = 2000)
     private String comment;
 
     // 沟通结果，无法沟通，非常消极，消极，可以持续，积极，非常积极，有望成单
     @Column(name = "result")
-    private short result;
+    private Short result;
 
 }

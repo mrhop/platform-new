@@ -41,4 +41,9 @@ public class ClientTrackTableServiceImpl implements ClientTrackTableService {
     public VueResults.Result save(ClientTrackVo clientTrackVo, MultipartFile[] files, Principal principal) {
         return null;
     }
+
+    @Override
+    public Page<ClientTrackVo> getList(TableParameters body, Principal principal, Long clientId) {
+        return null;
+    }
 }

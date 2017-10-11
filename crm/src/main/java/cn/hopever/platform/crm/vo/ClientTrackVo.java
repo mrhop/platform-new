@@ -14,7 +14,7 @@ public class ClientTrackVo {
     private Long trackUserId;
     private String trackUserName;
     private Long trackDate;
-    private short duration;
+    private Short duration;
     private String comment;
-    private short result;
+    private Short result;
 }

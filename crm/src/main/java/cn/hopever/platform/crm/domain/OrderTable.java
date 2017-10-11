@@ -37,7 +37,7 @@ public class OrderTable {
 
     // 手动折扣时，提供的折扣值
     @Column(name = "discount")
-    private float discount;
+    private Float discount;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "client_id")
@@ -65,19 +65,19 @@ public class OrderTable {
 
     // 运费
     @Column(name = "freight")
-    private float freight;
+    private Float freight;
 
     // 实际销售总价
     @Column(name = "sale_price")
-    private float salePrice;
+    private Float salePrice;
 
     // 自动计算预估报价
     @Column(name = "pre_quotation")
-    private float preQuotation;
+    private Float preQuotation;
 
     // 自动计算成本价
     @Column(name = "cost_price")
-    private float costPrice;
+    private Float costPrice;
 
     // 创建日期 也可以叫做预报下单日期
     @Column(name = "created_date")

@@ -5,10 +5,8 @@ import cn.hopever.platform.cms.service.WebsiteTableService;
 import cn.hopever.platform.cms.vo.ThemeVo;
 import cn.hopever.platform.cms.vo.WebsiteVo;
 import cn.hopever.platform.utils.web.CookieUtil;
-import cn.hopever.platform.utils.web.ModuleAuthorize;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +36,8 @@ public class BeforeControllerAdvice {
     @Autowired
     private WebsiteTableService websiteTableService;
 
-    @Before("execution(public * cn.hopever.platform.cms.*.controller.*.*(..)) && @annotation(moduleAuthorize)")
-    public void packageTableAndForm(JoinPoint jp, ModuleAuthorize moduleAuthorize) {
+//    @Before("execution(public * cn.hopever.platform.cms.*.controller.*.*(..))")
+    public void testUserRelateWebsiteOrTheme(JoinPoint jp) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         Cookie c = CookieUtil.getCookieByName("current-website", request.getCookies());
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

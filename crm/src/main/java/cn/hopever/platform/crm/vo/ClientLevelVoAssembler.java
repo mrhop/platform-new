@@ -1,6 +1,7 @@
 package cn.hopever.platform.crm.vo;
 
 import cn.hopever.platform.crm.domain.ClientLevelTable;
+import cn.hopever.platform.utils.tools.BeanUtils;
 import cn.hopever.platform.utils.web.GenericVoAssembler;
 import org.springframework.stereotype.Component;
 
@@ -12,11 +13,14 @@ public class ClientLevelVoAssembler implements GenericVoAssembler<ClientLevelVo,
 
     @Override
     public ClientLevelVo toResource(ClientLevelTable clientLevelTable) {
-        return null;
+        ClientLevelVo clientLevelVo = new ClientLevelVo();
+        BeanUtils.copyNotNullProperties(clientLevelTable,clientLevelVo);
+        return clientLevelVo;
     }
 
     @Override
     public ClientLevelTable toDomain(ClientLevelVo clientLevelVo, ClientLevelTable clientLevelTable) {
-        return null;
+        BeanUtils.copyNotNullProperties(clientLevelVo,clientLevelTable,"id");
+        return clientLevelTable;
     }
 }

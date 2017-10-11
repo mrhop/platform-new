@@ -16,6 +16,6 @@ public interface ClientLevelTableService extends GenericService<ClientLevelVo> {
     public List<SelectOption> getClientLevelOptions(Principal principal);
 
     // 给出未交易的options
-    public List<SelectOption> getClientLevelInitialOptions(Principal principal);
+    public List<SelectOption> getClientLevelNoOrderAmountOptions(Principal principal);
 
 }

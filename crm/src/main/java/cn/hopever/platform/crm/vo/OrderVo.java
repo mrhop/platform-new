@@ -17,7 +17,7 @@ public class OrderVo {
 
     private String discountType;
 
-    private float discount;
+    private Float discount;
 
     private Long clientId;
     private String clientName;
@@ -35,13 +35,13 @@ public class OrderVo {
     private Long payTypeId;
     private String payTypeName;
 
-    private float freight;
+    private Float freight;
 
-    private float salePrice;
+    private Float salePrice;
 
-    private float preQuotation;
+    private Float preQuotation;
 
-    private float costPrice;
+    private Float costPrice;
 
     private Long createdDate;
     private Long createdUserId;

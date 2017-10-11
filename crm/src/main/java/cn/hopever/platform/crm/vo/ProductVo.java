@@ -15,9 +15,9 @@ public class ProductVo {
 
     private String code;
 
-    private float costPrice;
+    private Float costPrice;
 
-    private float salePrice;
+    private Float salePrice;
 
     private String unit;
 

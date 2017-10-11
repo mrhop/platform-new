@@ -10,9 +10,9 @@ import lombok.Data;
 public class ClientLevelVo {
     private Long id;
 
-    private String level;
+    private String name;
 
-    private float orderAmount;
+    private Float orderAmount;
 
     private String additionalMsg;
 }

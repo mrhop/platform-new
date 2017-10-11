@@ -31,11 +31,11 @@ public class ProductTable {
     private String code;
 
     @Column(name = "cost_price", nullable = false)
-    private float costPrice;
+    private Float costPrice;
 
     // 销售价
     @Column(name = "sale_price", nullable = false)
-    private float salePrice;
+    private Float salePrice;
 
     @Column(name = "unit", nullable = false)
     private String unit;

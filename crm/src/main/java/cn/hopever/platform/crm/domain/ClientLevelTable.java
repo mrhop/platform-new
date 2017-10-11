@@ -21,16 +21,12 @@ public class ClientLevelTable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    // 级别由高到低，当级别到 vip时，就不能更改了
-    @Column(name = "level")
-    private short level;
-
     @Column(name = "name", length = 50, nullable = false)
     private String name;
 
     // 设置vip用户的时候使用
     @Column(name = "order_amount")
-    private float orderAmount;
+    private Float orderAmount;
 
     @Column(name = "additional_msg", length = 2000)
     private String additionalMsg;

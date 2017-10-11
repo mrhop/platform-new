@@ -13,7 +13,7 @@ public class OrderDiscountVo {
 
     private String type;
 
-    private float quota;
+    private Float quota;
 
     private Long beginDate;
 
@@ -22,9 +22,9 @@ public class OrderDiscountVo {
     private Long clientLevelId;
     private String clientLevelName;
 
-    private float discount;
+    private Float discount;
 
-    private float reduce;
+    private Float reduce;
 
     private Long createdDate;
 

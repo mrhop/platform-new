@@ -19,5 +19,5 @@ public class OrderProductVo {
     private String productName;
     private String productCode;
 
-    private float num;
+    private Float num;
 }

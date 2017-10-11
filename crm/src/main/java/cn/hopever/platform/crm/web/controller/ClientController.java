@@ -1,9 +1,7 @@
 package cn.hopever.platform.crm.web.controller;
 
-import cn.hopever.platform.crm.service.ClientLevelTableService;
-import cn.hopever.platform.crm.service.ClientOriginTableService;
-import cn.hopever.platform.crm.service.ClientTableService;
-import cn.hopever.platform.crm.service.CountryTableService;
+import cn.hopever.platform.crm.config.CommonMethods;
+import cn.hopever.platform.crm.service.*;
 import cn.hopever.platform.crm.vo.ClientVo;
 import cn.hopever.platform.utils.web.GenericController;
 import cn.hopever.platform.utils.web.TableParameters;
@@ -44,13 +42,15 @@ public class ClientController implements GenericController<ClientVo> {
     @Autowired
     private CountryTableService countryTableService;
 
+    @Autowired
+    private RelatedUserTableService relatedUserTableService;
+
     // 根据当前用户的权限获取列表是所有的还是个人的
     // 过滤条件除了name code email cellphone  telephone clientOriginId clientLevelId  traded countryId  createdUserId
-   // 需要加上一个成交额
+    // 需要加上一个成交额
     // action 需要跟上一个追踪和一个订单查询
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        //我们要根据session来判断user的
         Page<ClientVo> list = clientTableService.getList(body, principal);
         Map<String, Object> map = new HashMap<>();
         List<HashMap<String, Object>> listReturn = null;
@@ -70,8 +70,8 @@ public class ClientController implements GenericController<ClientVo> {
                 listTmp.add(cv.getCountryId());
                 listTmp.add(cv.getClientOriginId());
                 listTmp.add(cv.getClientLevelId());
-                listTmp.add(cv.getCreatedUserName());
                 listTmp.add(cv.getCreatedDate());
+                listTmp.add(cv.getCreatedUserId());
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);
             }
@@ -129,19 +129,21 @@ public class ClientController implements GenericController<ClientVo> {
     public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Map mapReturn = new HashMap<>();
         if (body != null) {
-
             // 给出options
             mapReturn.put("clientOrigins", clientOriginTableService.getClientOriginOptions(principal));
             mapReturn.put("countries", countryTableService.getCountryOptions(principal));
-
             if ("list".equals(body.get("type"))) {
                 mapReturn.put("clientLevels", clientLevelTableService.getClientLevelOptions(principal));
+                if (CommonMethods.isAdmin(principal)) {
+                    // 进行用户列表的返回
+                    mapReturn.put("createdUsers", relatedUserTableService.getRelatedUserOptions(principal));
+                }
             } else if ("form".equals(body.get("type"))) {
-                if(key ==null){
-                    mapReturn.put("clientLevels", clientLevelTableService.getClientLevelInitialOptions(principal));
-                } else{
-                    if(!clientTableService.info(key,principal).isTraded()){
-                        mapReturn.put("clientLevels", clientLevelTableService.getClientLevelInitialOptions(principal));
+                if (key == null) {
+                    mapReturn.put("clientLevels", clientLevelTableService.getClientLevelNoOrderAmountOptions(principal));
+                } else {
+                    if (!clientTableService.info(key, principal).isTraded()) {
+                        mapReturn.put("clientLevels", clientLevelTableService.getClientLevelNoOrderAmountOptions(principal));
                     }
                 }
             }

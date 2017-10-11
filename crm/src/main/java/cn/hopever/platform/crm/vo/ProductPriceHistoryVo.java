@@ -14,8 +14,8 @@ public class ProductPriceHistoryVo {
 
     private Long endDate;
 
-    private float salePrice;
+    private Float salePrice;
 
-    private float costPrice;
+    private Float costPrice;
 
 }

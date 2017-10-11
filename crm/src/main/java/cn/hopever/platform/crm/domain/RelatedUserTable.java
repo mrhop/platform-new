@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,11 +22,20 @@ public class RelatedUserTable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "account", nullable = false)
+    private String account;
+
+    @Column(name = "name")
+    private String name;
+
     @Column(name = "custom_discount")
     private boolean customDiscount = false;
 
     @Column(name = "lower_limit")
-    private float lowerLimit;
+    private Float lowerLimit;
+
+    @Column(name = "created_date")
+    private Date createdDate;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "relatedUserTable")
     private List<ClientRelatedUserTable> clientRelatedUserTables;

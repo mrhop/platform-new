@@ -9,8 +9,14 @@ import lombok.Data;
 public class RelatedUserVo {
     private Long id;
 
+    private String account;
+
+    private String name;
+
     private boolean customDiscount;
 
-    private float lowerLimit;
+    private Float lowerLimit;
+
+    private Long createdDate;
 
 }

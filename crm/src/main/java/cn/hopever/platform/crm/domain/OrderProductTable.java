@@ -27,5 +27,5 @@ public class OrderProductTable {
 
     // 产品量
     @Column(name = "num")
-    private float num;
+    private Float num;
 }
