@@ -47,7 +47,7 @@ public class ControllerAdvice {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    @AfterReturning(pointcut = "cn.hopever.platform.oauth2client.security.RemoteOauth2AuthenticationProvider.authenticate(..)", returning = "authentication")
+    @AfterReturning(pointcut = "execution(public * cn.hopever.platform.oauth2client.security.RemoteOauth2AuthenticationProvider.authenticate(..))", returning = "authentication")
     public void afterAuthenticated(Authentication authentication) {
         // 目前做个临时性的测试
         if (authentication.getAuthorities() != null) {

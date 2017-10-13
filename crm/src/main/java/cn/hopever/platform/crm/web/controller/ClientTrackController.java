@@ -27,7 +27,7 @@ import java.util.Map;
  */
 @RestController
 @CrossOrigin
-@RequestMapping(value = "/client", produces = "application/json")
+@RequestMapping(value = "/clienttrack", produces = "application/json")
 public class ClientTrackController implements GenericController<ClientTrackVo> {
     Logger logger = LoggerFactory.getLogger(ClientTrackController.class);
 

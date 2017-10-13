@@ -37,6 +37,7 @@ public class OrderProductController implements GenericController<OrderProductVo>
         return null;
     }
 
+    @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestParam Long orderId, @RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         List<OrderProductVo> list = orderProductTableService.getListByOrderId(body, principal, orderId);
         Map<String, Object> map = new HashMap<>();
@@ -64,18 +65,16 @@ public class OrderProductController implements GenericController<OrderProductVo>
     }
 
     @Override
-    @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public OrderProductVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
     @Override
-    @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public VueResults.Result update(@RequestParam Long key, @RequestBody OrderProductVo orderProductVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
 
-    @RequestMapping(value = "/update", method = {RequestMethod.POST})
+    @RequestMapping(value = "/updatenum", method = {RequestMethod.POST})
     public VueResults.Result updateNum(@RequestParam Long key, @RequestParam float num, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return orderProductTableService.updateNumById(key, num);
     }
@@ -86,7 +85,6 @@ public class OrderProductController implements GenericController<OrderProductVo>
     }
 
     @Override
-    @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestBody OrderProductVo orderProductVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return null;
     }
