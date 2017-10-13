@@ -52,22 +52,22 @@ public class ClientTableServiceImpl implements ClientTableService {
         }
         // 根据用户的规格查看这个用户可以处理的client
         if (!CommonMethods.isAdmin(principal)) {
-            map.put("relatedUserId", relatedUserTableRepository.findOneByAccount(principal.getName()).getId());
+            map.put("relatedUserTable", relatedUserTableRepository.findOneByAccount(principal.getName()));
         }
-        if(map.get("clientOriginId")!=null){
-            map.put("clientOriginTable",clientOriginTableRepository.findOne(Long.valueOf(map.get("clientOriginId").toString())));
+        if (map.get("clientOriginId") != null) {
+            map.put("clientOriginTable", clientOriginTableRepository.findOne(Long.valueOf(map.get("clientOriginId").toString())));
             map.remove("clientOriginId");
         }
-        if(map.get("clientLevelId")!=null){
-            map.put("clientLevelTable",clientLevelTableRepository.findOne(Long.valueOf(map.get("clientLevelId").toString())));
+        if (map.get("clientLevelId") != null) {
+            map.put("clientLevelTable", clientLevelTableRepository.findOne(Long.valueOf(map.get("clientLevelId").toString())));
             map.remove("clientLevelId");
         }
-        if(map.get("countryId")!=null){
-            map.put("countryTable",countryTableRepository.findOne(Long.valueOf(map.get("countryId").toString())));
+        if (map.get("countryId") != null) {
+            map.put("countryTable", countryTableRepository.findOne(Long.valueOf(map.get("countryId").toString())));
             map.remove("countryId");
         }
-        if(map.get("createdUserId")!=null){
-            map.put("createdUser",relatedUserTableRepository.findOne(Long.valueOf(map.get("createdUserId").toString())));
+        if (map.get("createdUserId") != null) {
+            map.put("createdUser", relatedUserTableRepository.findOne(Long.valueOf(map.get("createdUserId").toString())));
             map.remove("createdUserId");
         }
         body.setFilters(map);
@@ -245,7 +245,7 @@ public class ClientTableServiceImpl implements ClientTableService {
                 list.add(new SelectOption(clientTable.getName(), clientTable.getId()));
             }
         } else {
-            List<ClientTable> clientTables = customClientTableRepository.findByRelatedUserId(relatedUserTableRepository.findOneByAccount(principal.getName()).getId());
+            List<ClientTable> clientTables = customClientTableRepository.findByRelatedUserTable(relatedUserTableRepository.findOneByAccount(principal.getName()));
             if (clientTables != null && clientTables.size() > 0) {
                 for (ClientTable clientTable : clientTables) {
                     list.add(new SelectOption(clientTable.getName(), clientTable.getId()));

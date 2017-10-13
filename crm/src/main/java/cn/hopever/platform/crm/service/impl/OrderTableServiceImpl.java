@@ -78,10 +78,6 @@ public class OrderTableServiceImpl implements OrderTableService {
             map.put("countryTable", countryTableRepository.findOne(Long.valueOf(map.get("countryId").toString())));
             map.remove("countryId");
         }
-        if (map.get("createdUserId") != null) {
-            map.put("createdUser", relatedUserTableRepository.findOne(Long.valueOf(map.get("createdUserId").toString())));
-            map.remove("createdUserId");
-        }
         body.setFilters(map);
         PageRequest pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "id");
         Page<OrderTable> page = customOrderTableRepository.findByFilters(body.getFilters(), pageRequest);
