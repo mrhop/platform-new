@@ -159,6 +159,9 @@ public class MediaTableServiceImpl implements MediaTableService {
     @Override
     public VueResults.Result upload(MultipartFile[] files, String tagId, Long websiteId, Principal principal) {
         // 如果tagId是空，那么根据上传文件的类型，来判断出需要的tagId
+        if (tagId == null) {
+            tagId = FileUtil.getFileGeneralType(files[0].getOriginalFilename());
+        }
         WebsiteTable websiteTable = websiteTableRepository.findOne(websiteId);
         MediaTable mediaTable = new MediaTable();
         MediaTagTable mediaTagTable = mediaTagTableRepository.findOneByTagId(tagId);

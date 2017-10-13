@@ -47,31 +47,59 @@ public class ClientLevelTableServiceImpl implements ClientLevelTableService {
 
     @Override
     public void delete(Long id, Principal principal) {
-
+        clientLevelTableRepository.delete(id);
     }
 
     @Override
     public ClientLevelVo info(Long id, Principal principal) {
-        return null;
+        ClientLevelTable clientLevelTable = clientLevelTableRepository.findOne(id);
+        return clientLevelVoAssembler.toResource(clientLevelTable);
     }
 
     @Override
     public VueResults.Result update(ClientLevelVo clientLevelVo, MultipartFile[] files, Principal principal) {
+        if (clientLevelVo.getOrderAmount() != null) {
+            ClientLevelTable clientLevelTableTmp = clientLevelTableRepository.findOneByOrderAmountAndIdNot(clientLevelVo.getOrderAmount(), clientLevelVo.getId());
+            if (clientLevelTableTmp != null) {
+                return VueResults.generateError("更新失败", "已有相同的订单金额限制");
+            }
+        }
+        ClientLevelTable clientLevelTable = clientLevelTableRepository.findOne(clientLevelVo.getId());
+        clientLevelVoAssembler.toDomain(clientLevelVo, clientLevelTable);
         return null;
     }
 
     @Override
     public VueResults.Result save(ClientLevelVo clientLevelVo, MultipartFile[] files, Principal principal) {
+        if (clientLevelVo.getOrderAmount() != null) {
+            ClientLevelTable clientLevelTableTmp = clientLevelTableRepository.findOneByOrderAmount(clientLevelVo.getOrderAmount());
+            if (clientLevelTableTmp != null) {
+                return VueResults.generateError("更新失败", "已有相同的订单金额限制");
+            }
+        }
+        ClientLevelTable clientLevelTable = new ClientLevelTable();
+        clientLevelVoAssembler.toDomain(clientLevelVo, clientLevelTable);
+        clientLevelTableRepository.save(clientLevelTable);
         return null;
     }
 
     @Override
     public List<SelectOption> getClientLevelOptions(Principal principal) {
-        return null;
+        Iterable<ClientLevelTable> clientLevelTables = clientLevelTableRepository.findAll(new Sort(Sort.Direction.ASC, "orderAmount", "id"));
+        List<SelectOption> list = new ArrayList<>();
+        for (ClientLevelTable clientLevelTable : clientLevelTables) {
+            list.add(new SelectOption(clientLevelTable.getName(), clientLevelTable.getId()));
+        }
+        return list;
     }
 
     @Override
     public List<SelectOption> getClientLevelNoOrderAmountOptions(Principal principal) {
-        return null;
+        List<ClientLevelTable> clientLevelTables = clientLevelTableRepository.findByOrderAmountIsNullOrderByIdAsc();
+        List<SelectOption> list = new ArrayList<>();
+        for (ClientLevelTable clientLevelTable : clientLevelTables) {
+            list.add(new SelectOption(clientLevelTable.getName(), clientLevelTable.getId()));
+        }
+        return list;
     }
 }

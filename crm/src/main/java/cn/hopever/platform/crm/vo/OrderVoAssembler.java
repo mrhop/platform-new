@@ -14,23 +14,43 @@ public class OrderVoAssembler implements GenericVoAssembler<OrderVo, OrderTable>
     @Override
     public OrderVo toResource(OrderTable orderTable) {
         OrderVo orderVo = new OrderVo();
-        BeanUtils.copyNotNullProperties(orderTable,orderVo);
+        BeanUtils.copyNotNullProperties(orderTable, orderVo);
         orderVo.setClientId(orderTable.getClientTable().getId());
         orderVo.setClientName(orderTable.getClientTable().getName());
-        if(orderTable.getContractSignDate()!=null){
+        if (orderTable.getContractSignDate() != null) {
             orderVo.setContractSignDate(orderTable.getContractSignDate().getTime());
         }
         orderVo.setCountryId(orderTable.getCountryTable().getId());
         orderVo.setCountryName(orderTable.getCountryTable().getName());
-        if(orderTable.getCreatedDate()!=null){
+        if (orderTable.getCreatedDate() != null) {
             orderVo.setCreatedDate(orderTable.getCreatedDate().getTime());
         }
-        // order继续后续的处理
-        return null;
+        orderVo.setCreatedUserId(orderTable.getCreatedUser().getId());
+        orderVo.setCreatedUserName(orderTable.getCreatedUser().getAccount());
+        if (orderTable.getDeliveryDate() != null) {
+            orderVo.setDeliveryDate(orderTable.getDeliveryDate().getTime());
+        }
+        if (orderTable.getOrderStatusTable() != null) {
+            orderVo.setOrderStatusId(orderTable.getOrderStatusTable().getId());
+            orderVo.setOrderStatusName(orderTable.getOrderStatusTable().getName());
+        }
+        if (orderTable.getDeliveryMethodTable() != null) {
+            orderVo.setDeliveryMethodId(orderTable.getDeliveryMethodTable().getId());
+            orderVo.setDeliveryMethodName(orderTable.getDeliveryMethodTable().getName());
+        }
+        if (orderTable.getFinishedDate() != null) {
+            orderVo.setFinishedDate(orderTable.getFinishedDate().getTime());
+        }
+        if (orderTable.getPayTypeTable() != null) {
+            orderVo.setPayTypeId(orderTable.getPayTypeTable().getId());
+            orderVo.setPayTypeName(orderTable.getPayTypeTable().getName());
+        }
+        return orderVo;
     }
 
     @Override
     public OrderTable toDomain(OrderVo orderVo, OrderTable orderTable) {
-        return null;
+        BeanUtils.copyNotNullProperties(orderVo, orderTable, "id", "code","salePrice","discountType","discount","tracingNumber","freight","preQuotation","costPrice");
+        return orderTable;
     }
 }

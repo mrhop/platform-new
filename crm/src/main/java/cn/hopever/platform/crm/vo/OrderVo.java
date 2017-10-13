@@ -13,7 +13,8 @@ public class OrderVo {
 
     private String code;
 
-    private String status;
+    private Long orderStatusId;
+    private String orderStatusName;
 
     private String discountType;
 

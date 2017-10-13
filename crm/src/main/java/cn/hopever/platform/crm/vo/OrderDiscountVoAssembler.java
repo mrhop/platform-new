@@ -35,7 +35,7 @@ public class OrderDiscountVoAssembler implements GenericVoAssembler<OrderDiscoun
 
     @Override
     public OrderDiscountTable toDomain(OrderDiscountVo orderDiscountVo, OrderDiscountTable orderDiscountTable) {
-        BeanUtils.copyNotNullProperties(orderDiscountVo, orderDiscountTable, "id");
+        BeanUtils.copyNotNullProperties(orderDiscountVo, orderDiscountTable, "id", "createdDate");
         if (orderDiscountVo.getBeginDate() != null) {
             orderDiscountTable.setBeginDate(new Date(orderDiscountVo.getBeginDate()));
         }

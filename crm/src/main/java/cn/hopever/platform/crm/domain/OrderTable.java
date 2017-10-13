@@ -28,8 +28,9 @@ public class OrderTable {
 
     // 已创建，报价中，预签合同，合同签订，备货中，已打款，已发货，已收货，已完成并归档
     // 不同的用户看到不同的状态和处理不同的状态，
-    @Column(name = "status", nullable = false)
-    private String status;
+    @ManyToOne
+    @JoinColumn(name = "order_status_id")
+    private OrderStatusTable orderStatusTable;
 
     // 自动折扣和手动折扣
     @Column(name = "discount_type", nullable = false)
@@ -45,7 +46,7 @@ public class OrderTable {
 
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "orderTable")
-    private List<OrderProductTable> orderProductTable;
+    private List<OrderProductTable> orderProductTables;
 
     @ManyToOne
     @JoinColumn(name = "country_id")

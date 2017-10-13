@@ -1,10 +1,13 @@
 package cn.hopever.platform.crm.domain;
 
+import cn.hopever.platform.utils.json.JacksonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -69,4 +72,28 @@ public class ProductTable {
     @ManyToOne
     @JoinColumn(name = "product_category_id")
     private ProductCategoryTable productCategoryTable;
+
+
+    public List<String> getPictures() {
+        if (this.pictures != null) {
+            try {
+                return JacksonUtil.mapper.readValue(this.pictures, List.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public void setPictures(List<String> screenshots) {
+        if (screenshots != null && screenshots.size() > 0) {
+            try {
+                this.pictures = JacksonUtil.mapper.writeValueAsString(screenshots);
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        } else {
+            this.pictures = null;
+        }
+    }
 }

@@ -50,6 +50,13 @@ public class ControllerAdvice {
     @AfterReturning(pointcut = "cn.hopever.platform.oauth2client.security.RemoteOauth2AuthenticationProvider.authenticate(..)", returning = "authentication")
     public void afterAuthenticated(Authentication authentication) {
         // 目前做个临时性的测试
+        if (authentication.getAuthorities() != null) {
+            for (GrantedAuthority authority : authentication.getAuthorities()) {
+                if ("ROLE_admin".equals(authority.getAuthority()) || "ROLE_super_admin".equals(authority.getAuthority())) {
+                    return;
+                }
+            }
+        }
         RelatedUserVo relatedUserVo = relatedUserTableService.getOneByAccount(authentication.getName());
         if (relatedUserVo == null) {
             relatedUserVo = new RelatedUserVo();

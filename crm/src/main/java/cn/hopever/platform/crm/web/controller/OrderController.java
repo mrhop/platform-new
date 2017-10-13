@@ -47,6 +47,8 @@ public class OrderController implements GenericController<OrderVo> {
 
     @Autowired
     private PayTypeTableService payTypeTableService;
+    @Autowired
+    private OrderStatusTableService orderStatusTableService;
 
     @Override
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
@@ -61,7 +63,7 @@ public class OrderController implements GenericController<OrderVo> {
                 mapTemp.put("key", cv.getId());
                 List<Object> listTmp = new ArrayList<>();
                 listTmp.add(cv.getCode());
-                listTmp.add(cv.getStatus());
+                listTmp.add(cv.getOrderStatusId());
                 listTmp.add(cv.getClientId());
                 listTmp.add(cv.getCostPrice());
                 listTmp.add(cv.getPreQuotation());
@@ -127,7 +129,9 @@ public class OrderController implements GenericController<OrderVo> {
         if (body != null) {
             // 给出options
             mapReturn.put("clients", clientTableService.getClientOptions(principal));
+
             mapReturn.put("countries", countryTableService.getCountryOptions(principal));
+            mapReturn.put("orderStatuses", orderStatusTableService.getOrderStatusOptions(principal));
             if ("list".equals(body.get("type"))) {
                 if (CommonMethods.isAdmin(principal)) {
                     // 进行用户列表的返回

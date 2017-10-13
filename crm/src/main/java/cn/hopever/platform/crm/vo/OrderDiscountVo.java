@@ -11,6 +11,8 @@ public class OrderDiscountVo {
 
     private Long id;
 
+    private String name;
+
     private String type;
 
     private Float quota;

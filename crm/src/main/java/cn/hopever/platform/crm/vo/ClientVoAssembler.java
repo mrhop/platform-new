@@ -29,7 +29,7 @@ public class ClientVoAssembler implements GenericVoAssembler<ClientVo, ClientTab
 
     @Override
     public ClientTable toDomain(ClientVo clientVo, ClientTable clientTable) {
-        BeanUtils.copyNotNullProperties(clientVo,clientTable,"id");
+        BeanUtils.copyNotNullProperties(clientVo,clientTable,"id","traded","code");
         return clientTable;
     }
 }

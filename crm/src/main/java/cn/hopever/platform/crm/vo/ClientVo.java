@@ -2,6 +2,8 @@ package cn.hopever.platform.crm.vo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * Created by Donghui Huo on 2017/8/30.
  */
@@ -43,13 +45,16 @@ public class ClientVo {
     private Long countryId;
     private String countryName;
 
-    private String[] relatedUserNames;
-    private Long[] relatedUserIds;
+    private List<String> relatedUserAccounts;
+    private List<Long> relatedUserIds;
 
 
     private Long createdDate;
 
     private Long createdUserId;
     private String createdUserName;
+
+    // 总成交额
+    private Float orderSum;
 
 }

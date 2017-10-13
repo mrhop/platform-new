@@ -66,14 +66,18 @@ public class OrderProductController implements GenericController<OrderProductVo>
     @Override
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public OrderProductVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        return orderProductTableService.info(key, principal);
+        return null;
     }
 
     @Override
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public VueResults.Result update(@RequestParam Long key, @RequestBody OrderProductVo orderProductVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        orderProductVo.setId(key);
-        return orderProductTableService.update(orderProductVo, null, principal);
+        return null;
+    }
+
+    @RequestMapping(value = "/update", method = {RequestMethod.POST})
+    public VueResults.Result updateNum(@RequestParam Long key, @RequestParam float num, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        return orderProductTableService.updateNumById(key, num);
     }
 
     @Override
@@ -84,7 +88,7 @@ public class OrderProductController implements GenericController<OrderProductVo>
     @Override
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestBody OrderProductVo orderProductVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        return orderProductTableService.save(orderProductVo, null, principal);
+        return null;
     }
 
     @Override
@@ -93,9 +97,12 @@ public class OrderProductController implements GenericController<OrderProductVo>
     }
 
     @Override
-    @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        orderProductTableService.delete(key, principal);
+    }
+
+    @RequestMapping(value = "/delete", method = {RequestMethod.GET})
+    public void deleteWithRestrict(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
+        orderProductTableService.deleteWithRestrict(key, principal);
     }
 
     @Override

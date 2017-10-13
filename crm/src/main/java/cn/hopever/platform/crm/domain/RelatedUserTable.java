@@ -22,7 +22,7 @@ public class RelatedUserTable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "account", nullable = false)
+    @Column(name = "account", nullable = false, unique = true)
     private String account;
 
     @Column(name = "name")

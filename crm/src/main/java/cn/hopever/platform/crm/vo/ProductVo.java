@@ -2,6 +2,8 @@ package cn.hopever.platform.crm.vo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * Created by Donghui Huo on 2017/8/30.
  * 注意商品有二维码的生成以及扫码识别方式
@@ -25,7 +27,7 @@ public class ProductVo {
 
     private String color;
 
-    private String[] pictures;
+    private List<String> pictures;
 
     private String additionalMsg;
 

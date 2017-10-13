@@ -22,6 +22,9 @@ public class OrderDiscountTable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "name", length = 50, nullable = false)
+    private String name;
+
     // 折扣类型 打折还是减免
     @Column(name = "type", length = 50, nullable = false)
     private String type;

@@ -5,6 +5,7 @@ import cn.hopever.platform.utils.web.GenericRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -12,4 +13,6 @@ import java.util.Map;
  */
 public interface CustomClientTableRepository extends GenericRepository<ClientTable> {
     public Page<ClientTable> findByFilters(Map<String, Object> mapFilter, Pageable pageable);
+
+    public List<ClientTable> findByRelatedUserId(Long relatedUserId);
 }
