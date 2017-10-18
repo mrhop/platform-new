@@ -13,6 +13,7 @@ public class ProductPriceHistoryVo {
     private String productName;
 
     private Long endDate;
+    private Long beginDate;
 
     private Float salePrice;
 

@@ -86,7 +86,14 @@ public class OrderProductController implements GenericController<OrderProductVo>
 
     @Override
     public VueResults.Result save(@RequestBody OrderProductVo orderProductVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        return null;
+        return orderProductTableService.save(orderProductVo, null, principal);
+    }
+    @RequestMapping(value = "/save", method = {RequestMethod.GET})
+    public VueResults.Result save(@RequestParam(name = "orderId") Long orderId, @RequestParam(name = "productId") Long productId, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        OrderProductVo orderProductVo = new OrderProductVo();
+        orderProductVo.setOrderId(orderId);
+        orderProductVo.setProductId(productId);
+        return orderProductTableService.save(orderProductVo, null, principal);
     }
 
     @Override

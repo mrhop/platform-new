@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class ClientOriginVo {
 
-    private long id;
+    private Long id;
 
     private String name;
 

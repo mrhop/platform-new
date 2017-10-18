@@ -46,6 +46,7 @@ public class RelatedUserController implements GenericController<RelatedUserVo> {
                 List<Object> listTmp = new ArrayList<>();
                 listTmp.add(cv.getAccount());
                 listTmp.add(cv.getName());
+                listTmp.add(cv.getCustomDiscountStr());
                 listTmp.add(cv.getLowerLimit());
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);

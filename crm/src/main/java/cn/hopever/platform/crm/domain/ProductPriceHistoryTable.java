@@ -19,12 +19,15 @@ import java.util.Date;
 public class ProductPriceHistoryTable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "product_id")
     private ProductTable productTable;
 
+    // 商品价格有效起始日期
+    @Column(name = "begin_date")
+    private Date beginDate;
     // 商品价格有效截止日期，之前，但是不包过 <，当没有截止日期时，为当前价格
     @Column(name = "end_date")
     private Date endDate;

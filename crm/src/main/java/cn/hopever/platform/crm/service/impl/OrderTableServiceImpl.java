@@ -79,7 +79,13 @@ public class OrderTableServiceImpl implements OrderTableService {
             map.remove("countryId");
         }
         body.setFilters(map);
-        PageRequest pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "id");
+        PageRequest pageRequest;
+        if (body.getSorts() == null || body.getSorts().isEmpty()) {
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.DESC, "createdDate");
+        } else {
+            String key = body.getSorts().keySet().iterator().next();
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
+        }
         Page<OrderTable> page = customOrderTableRepository.findByFilters(body.getFilters(), pageRequest);
         List<OrderVo> list = new ArrayList<>();
         for (OrderTable orderTable : page) {

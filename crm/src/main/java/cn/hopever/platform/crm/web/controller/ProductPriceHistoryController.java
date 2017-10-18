@@ -49,6 +49,7 @@ public class ProductPriceHistoryController implements GenericController<ProductP
                 List<Object> listTmp = new ArrayList<>();
                 listTmp.add(cv.getCostPrice());
                 listTmp.add(cv.getSalePrice());
+                listTmp.add(cv.getBeginDate());
                 listTmp.add(cv.getEndDate());
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);

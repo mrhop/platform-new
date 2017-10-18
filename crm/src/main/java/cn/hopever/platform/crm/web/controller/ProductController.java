@@ -47,14 +47,14 @@ public class ProductController implements GenericController<ProductVo> {
                 HashMap<String, Object> mapTemp = new HashMap<>();
                 mapTemp.put("key", cv.getId());
                 List<Object> listTmp = new ArrayList<>();
-                listTmp.add(cv.getCode());
                 listTmp.add(cv.getName());
+                listTmp.add(cv.getCode());
                 listTmp.add(cv.getProductCategoryId());
                 listTmp.add(cv.getCostPrice());
                 listTmp.add(cv.getSalePrice());
                 listTmp.add(cv.getSpecification());
                 listTmp.add(cv.getUnit());
-                listTmp.add(cv.getColor());
+                listTmp.add(cv.getPictures() != null && cv.getPictures().size() > 0 ? cv.getPictures().get(0) : null);
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);
             }
@@ -83,7 +83,7 @@ public class ProductController implements GenericController<ProductVo> {
 
     @Override
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
-    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "files", required = false) MultipartFile[] files, ProductVo productVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "pictureFiles", required = false) MultipartFile[] files, ProductVo productVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         productVo.setId(key);
         return productTableService.update(productVo, files, principal);
     }
@@ -95,7 +95,7 @@ public class ProductController implements GenericController<ProductVo> {
 
     @Override
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
-    public VueResults.Result save(@RequestParam(name = "files", required = false) MultipartFile[] files, ProductVo productVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public VueResults.Result save(@RequestParam(name = "pictureFiles", required = false) MultipartFile[] files, ProductVo productVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return productTableService.save(productVo, files, principal);
     }
 

@@ -15,6 +15,7 @@ public class RelatedUserVoAssembler implements GenericVoAssembler<RelatedUserVo,
     public RelatedUserVo toResource(RelatedUserTable relatedUserTable) {
         RelatedUserVo relatedUserVo = new RelatedUserVo();
         BeanUtils.copyNotNullProperties(relatedUserTable, relatedUserVo);
+        relatedUserVo.setCustomDiscountStr(relatedUserTable.isCustomDiscount() ? "是" : "否");
         relatedUserVo.setCreatedDate(relatedUserTable.getCreatedDate().getTime());
         return relatedUserVo;
     }

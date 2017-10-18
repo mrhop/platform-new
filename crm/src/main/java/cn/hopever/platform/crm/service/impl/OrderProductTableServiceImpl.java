@@ -4,6 +4,7 @@ import cn.hopever.platform.crm.domain.OrderProductTable;
 import cn.hopever.platform.crm.domain.OrderStatusTable;
 import cn.hopever.platform.crm.repository.OrderProductTableRepository;
 import cn.hopever.platform.crm.repository.OrderTableRepository;
+import cn.hopever.platform.crm.repository.ProductTableRepository;
 import cn.hopever.platform.crm.service.OrderProductTableService;
 import cn.hopever.platform.crm.vo.OrderProductVo;
 import cn.hopever.platform.crm.vo.OrderProductVoAssembler;
@@ -31,6 +32,8 @@ public class OrderProductTableServiceImpl implements OrderProductTableService {
 
     @Autowired
     private OrderTableRepository orderTableRepository;
+    @Autowired
+    private ProductTableRepository productTableRepository;
 
     @Autowired
     private OrderProductVoAssembler orderProductVoAssembler;
@@ -95,6 +98,11 @@ public class OrderProductTableServiceImpl implements OrderProductTableService {
 
     @Override
     public VueResults.Result save(OrderProductVo orderProductVo, MultipartFile[] files, Principal principal) {
+        OrderProductTable orderProductTable = new OrderProductTable();
+        orderProductTable.setOrderTable(orderTableRepository.findOne(orderProductVo.getOrderId()));
+        orderProductTable.setProductTable(productTableRepository.findOne(orderProductVo.getProductId()));
+        orderProductTable.setNum(1f);
+        orderProductTableRepository.save(orderProductTable);
         return null;
     }
 }

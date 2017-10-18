@@ -19,7 +19,7 @@ import java.util.List;
 public class CountryTable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "code", length = 50, nullable = false, unique = true)
     private String code;

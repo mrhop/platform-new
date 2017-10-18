@@ -50,7 +50,13 @@ public class OrderDiscountTableServiceImpl implements OrderDiscountTableService 
             map.put("clientLevelTable", clientLevelTableRepository.findOne(Long.valueOf(map.get("clientLevelId").toString())));
             map.remove("clientLevelId");
         }
-        PageRequest pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "id");
+        PageRequest pageRequest;
+        if (body.getSorts() == null || body.getSorts().isEmpty()) {
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.DESC, "createdDate");
+        } else {
+            String key = body.getSorts().keySet().iterator().next();
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
+        }
         Page<OrderDiscountTable> page = customOrderDiscountTableRepository.findByFilters(body.getFilters(), pageRequest);
         List<OrderDiscountVo> list = new ArrayList<>();
         for (OrderDiscountTable orderDiscountTable : page) {

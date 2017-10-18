@@ -19,7 +19,7 @@ import java.util.Date;
 public class ClientTrackTable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "client_id")

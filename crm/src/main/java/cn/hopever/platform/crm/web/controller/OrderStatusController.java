@@ -58,7 +58,8 @@ public class OrderStatusController implements GenericController<OrderStatusVo> {
         }
         map.put("pager", body.getPager());
         map.put("sorts", body.getSorts());
-        return map;    }
+        return map;
+    }
 
     @Override
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
@@ -70,7 +71,8 @@ public class OrderStatusController implements GenericController<OrderStatusVo> {
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public VueResults.Result update(@RequestParam Long key, @RequestBody OrderStatusVo orderStatusVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         orderStatusVo.setId(key);
-        return orderStatusTableService.update(orderStatusVo, null, principal);    }
+        return orderStatusTableService.update(orderStatusVo, null, principal);
+    }
 
     @Override
     public VueResults.Result update(@RequestParam(name = "key") Long key, @RequestParam(name = "files", required = false) MultipartFile[] files, OrderStatusVo orderStatusVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
@@ -89,8 +91,9 @@ public class OrderStatusController implements GenericController<OrderStatusVo> {
     }
 
     @Override
+    @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-
+        orderStatusTableService.delete(key, principal);
     }
 
     @Override

@@ -20,7 +20,7 @@ import java.util.List;
 public class ClientTable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     // 自动生成的客户码
     @Column(name = "code", nullable = false)

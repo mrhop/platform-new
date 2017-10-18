@@ -14,6 +14,7 @@ public class RelatedUserVo {
     private String name;
 
     private boolean customDiscount;
+    private String customDiscountStr;
 
     private Float lowerLimit;
 

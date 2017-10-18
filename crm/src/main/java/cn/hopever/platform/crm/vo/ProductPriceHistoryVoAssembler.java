@@ -16,6 +16,7 @@ public class ProductPriceHistoryVoAssembler implements GenericVoAssembler<Produc
         ProductPriceHistoryVo productPriceHistoryVo = new ProductPriceHistoryVo();
         BeanUtils.copyNotNullProperties(productPriceHistoryTable, productPriceHistoryVo);
         productPriceHistoryVo.setEndDate(productPriceHistoryTable.getEndDate().getTime());
+        productPriceHistoryVo.setBeginDate(productPriceHistoryTable.getBeginDate().getTime());
         productPriceHistoryVo.setProductId(productPriceHistoryTable.getProductTable().getId());
         productPriceHistoryVo.setProductName(productPriceHistoryTable.getProductTable().getName());
         return productPriceHistoryVo;

@@ -20,7 +20,7 @@ import java.util.List;
 public class OrderTable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     // 自动生成的订单码
     @Column(name = "code", nullable = false)

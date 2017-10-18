@@ -36,7 +36,7 @@ public class RelatedUserTableServiceImpl implements RelatedUserTableService {
 
     @Override
     public Page<RelatedUserVo> getList(TableParameters body, Principal principal) {
-        PageRequest pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "id");
+        PageRequest pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.DESC, "createdDate");
         Page<RelatedUserTable> page = relatedUserTableRepository.findAll(pageRequest);
         List<RelatedUserVo> list = new ArrayList<>();
         for (RelatedUserTable relatedUserTable : page) {
@@ -57,7 +57,11 @@ public class RelatedUserTableServiceImpl implements RelatedUserTableService {
 
     @Override
     public VueResults.Result update(RelatedUserVo relatedUserVo, MultipartFile[] files, Principal principal) {
-        relatedUserTableRepository.save(relatedUserVoAssembler.toDomain(relatedUserVo, relatedUserTableRepository.findOne(relatedUserVo.getId())));
+        RelatedUserTable relatedUserTable = relatedUserVoAssembler.toDomain(relatedUserVo, relatedUserTableRepository.findOne(relatedUserVo.getId()));
+        if (!relatedUserTable.isCustomDiscount()) {
+            relatedUserTable.setLowerLimit(null);
+        }
+        relatedUserTableRepository.save(relatedUserTable);
         return null;
     }
 

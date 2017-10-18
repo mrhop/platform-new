@@ -48,6 +48,7 @@ public class OrderDiscountController implements GenericController<OrderDiscountV
                 HashMap<String, Object> mapTemp = new HashMap<>();
                 mapTemp.put("key", cv.getId());
                 List<Object> listTmp = new ArrayList<>();
+                listTmp.add(cv.getName());
                 listTmp.add(cv.getType());
                 listTmp.add(cv.getQuota());
                 listTmp.add(cv.getDiscount());

@@ -20,7 +20,7 @@ import java.util.Date;
 public class OrderDiscountTable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name = "name", length = 50, nullable = false)
     private String name;

@@ -11,5 +11,6 @@ import java.util.List;
  */
 public interface ProductPriceHistoryTableRepository extends PagingAndSortingRepository<ProductPriceHistoryTable, Long> {
 
-    public List<ProductPriceHistoryTable> findByProductTable(ProductTable productTable);
+    public List<ProductPriceHistoryTable> findByProductTableOrderByBeginDateAsc(ProductTable productTable);
+    public ProductPriceHistoryTable findTopByProductTableOrderByBeginDateDesc(ProductTable productTable);
 }

@@ -71,7 +71,13 @@ public class ClientTableServiceImpl implements ClientTableService {
             map.remove("createdUserId");
         }
         body.setFilters(map);
-        PageRequest pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "id");
+        PageRequest pageRequest;
+        if (body.getSorts() == null || body.getSorts().isEmpty()) {
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.DESC, "createdDate");
+        } else {
+            String key = body.getSorts().keySet().iterator().next();
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
+        }
         Page<ClientTable> page = customClientTableRepository.findByFilters(body.getFilters(), pageRequest);
         List<ClientVo> list = new ArrayList<>();
         for (ClientTable clientTable : page) {

@@ -1,5 +1,6 @@
 package cn.hopever.platform.crm.service.impl;
 
+import cn.hopever.platform.crm.config.CommonMethods;
 import cn.hopever.platform.crm.domain.ProductPriceHistoryTable;
 import cn.hopever.platform.crm.domain.ProductTable;
 import cn.hopever.platform.crm.repository.*;
@@ -63,7 +64,13 @@ public class ProductTableServiceImpl implements ProductTableService {
             map.remove("productCategoryId");
         }
         body.setFilters(map);
-        PageRequest pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.ASC, "id");
+        PageRequest pageRequest;
+        if (body.getSorts() == null || body.getSorts().isEmpty()) {
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.DESC, "createdDate");
+        } else {
+            String key = body.getSorts().keySet().iterator().next();
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
+        }
         Page<ProductTable> page = customProductTableRepository.findByFilters(body.getFilters(), pageRequest);
         List<ProductVo> list = new ArrayList<>();
         for (ProductTable productTable : page) {
@@ -89,11 +96,14 @@ public class ProductTableServiceImpl implements ProductTableService {
             productTable.setProductCategoryTable(productCategoryTableRepository.findOne(productVo.getProductCategoryId()));
         }
         if (!productVo.getCostPrice().equals(productTable.getCostPrice()) || !productVo.getSalePrice().equals(productTable.getSalePrice())) {
+            ProductPriceHistoryTable productPriceHistoryTableTemp = productPriceHistoryTableRepository.findTopByProductTableOrderByBeginDateDesc(productTable);
             ProductPriceHistoryTable productPriceHistoryTable = new ProductPriceHistoryTable();
             productPriceHistoryTable.setCostPrice(productTable.getCostPrice());
             productPriceHistoryTable.setEndDate(new Date());
+            productPriceHistoryTable.setBeginDate(productPriceHistoryTableTemp != null ? new Date(productPriceHistoryTableTemp.getEndDate().getTime() + 1000) : productTable.getCreatedDate());
             productPriceHistoryTable.setProductTable(productTable);
             productPriceHistoryTable.setSalePrice(productTable.getSalePrice());
+            productPriceHistoryTableRepository.save(productPriceHistoryTable);
             if (productTable.getProductPriceHistoryTables() != null) {
                 productTable.getProductPriceHistoryTables().add(productPriceHistoryTable);
             } else {
@@ -135,7 +145,7 @@ public class ProductTableServiceImpl implements ProductTableService {
 
     @Override
     public VueResults.Result save(ProductVo productVo, MultipartFile[] files, Principal principal) {
-        ProductTable productTable = productTableRepository.findOne(productVo.getId());
+        ProductTable productTable = new ProductTable();
         if (productVo.getProductCategoryId() != null) {
             productTable.setProductCategoryTable(productCategoryTableRepository.findOne(productVo.getProductCategoryId()));
         }
@@ -153,13 +163,14 @@ public class ProductTableServiceImpl implements ProductTableService {
         productTable.setCreatedDate(new Date());
         productTable.setCreatedUser(relatedUserTableRepository.findOneByAccount(principal.getName()));
         productVoAssembler.toDomain(productVo, productTable);
+        productTable.setCode(CommonMethods.generateCode("product"));
         productTableRepository.save(productTable);
         return null;
     }
 
     @Override
     public List<ProductPriceHistoryVo> getHistoryListByProductId(TableParameters body, Principal principal, Long productId) {
-        List<ProductPriceHistoryTable> productPriceHistoryTables = productPriceHistoryTableRepository.findByProductTable(productTableRepository.findOne(productId));
+        List<ProductPriceHistoryTable> productPriceHistoryTables = productPriceHistoryTableRepository.findByProductTableOrderByBeginDateAsc(productTableRepository.findOne(productId));
         List<ProductPriceHistoryVo> list = null;
         if (productPriceHistoryTables != null) {
             list = new ArrayList<>();

@@ -27,7 +27,6 @@ public class ProductVoAssembler implements GenericVoAssembler<ProductVo, Product
     @Override
     public ProductTable toDomain(ProductVo productVo, ProductTable productTable) {
         BeanUtils.copyNotNullProperties(productVo, productTable, "id", "code");
-        productTable.setPictures(productVo.getPictures());
         return productTable;
     }
 }
