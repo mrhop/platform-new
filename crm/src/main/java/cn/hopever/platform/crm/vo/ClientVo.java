@@ -55,6 +55,6 @@ public class ClientVo {
     private String createdUserName;
 
     // 总成交额
-    private Float orderSum;
+    private Float orderAmount;
 
 }

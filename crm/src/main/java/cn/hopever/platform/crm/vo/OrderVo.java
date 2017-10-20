@@ -2,6 +2,8 @@ package cn.hopever.platform.crm.vo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * Created by Donghui Huo on 2017/8/30.
  */
@@ -10,11 +12,11 @@ import lombok.Data;
 public class OrderVo {
 
     private Long id;
-
     private String code;
 
     private Long orderStatusId;
     private String orderStatusName;
+    private String orderStatusCode;
 
     private String discountType;
 
@@ -22,7 +24,6 @@ public class OrderVo {
 
     private Long clientId;
     private String clientName;
-
 
     private Long countryId;
     private String countryName;
@@ -55,4 +56,6 @@ public class OrderVo {
     private Long finishedDate;
 
     private String additionalMsg;
+
+    private List<OrderProductVo> orderProducts;
 }

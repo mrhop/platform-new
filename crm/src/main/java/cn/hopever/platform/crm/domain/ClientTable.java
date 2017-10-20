@@ -78,6 +78,8 @@ public class ClientTable {
 
     @Column(name = "created_date")
     private Date createdDate;
+    @Column(name = "order_amount")
+    private Float orderAmount = 0.0f;
 
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "clientTable")

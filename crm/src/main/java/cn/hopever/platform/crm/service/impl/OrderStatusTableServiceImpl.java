@@ -1,7 +1,9 @@
 package cn.hopever.platform.crm.service.impl;
 
 import cn.hopever.platform.crm.domain.OrderStatusTable;
+import cn.hopever.platform.crm.domain.OrderTable;
 import cn.hopever.platform.crm.repository.OrderStatusTableRepository;
+import cn.hopever.platform.crm.repository.OrderTableRepository;
 import cn.hopever.platform.crm.service.OrderStatusTableService;
 import cn.hopever.platform.crm.vo.OrderStatusVo;
 import cn.hopever.platform.crm.vo.OrderStatusVoAssembler;
@@ -30,6 +32,8 @@ public class OrderStatusTableServiceImpl implements OrderStatusTableService {
 
     @Autowired
     private OrderStatusTableRepository orderStatusTableRepository;
+    @Autowired
+    private OrderTableRepository orderTableRepository;
 
     @Autowired
     private OrderStatusVoAssembler orderStatusVoAssembler;
@@ -40,6 +44,51 @@ public class OrderStatusTableServiceImpl implements OrderStatusTableService {
         Iterable<OrderStatusTable> orderStatusTables = orderStatusTableRepository.findAll(new Sort(Sort.Direction.ASC, "id"));
         List<SelectOption> list = new ArrayList<>();
         for (OrderStatusTable orderStatusTable : orderStatusTables) {
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+        }
+        return list;
+    }
+
+    @Override
+    public List<SelectOption> getOrderStatusOptions(Principal principal, Long orderId) {
+        OrderTable orderTable = orderTableRepository.findOne(orderId);
+        String code = orderTable.getOrderStatusTable().getCode();
+//        * 已创建created，报价中(quoting)，预签合同(precontract)，合同签订(contracted)，已收款(payed)，备货中(goodspreparing),暂无，，已发货(shipped)，已收货(received)，已完成并归档(finished).
+        List<SelectOption> list = new ArrayList<>();
+        if (code.equals("created") || code.equals("quoting")) {
+            OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("created");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+            orderStatusTable = orderStatusTableRepository.findOneByCode("quoting");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+            orderStatusTable = orderStatusTableRepository.findOneByCode("precontract");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+        } else if (code.equals("precontract")) {
+            OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("quoting");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+            orderStatusTable = orderStatusTableRepository.findOneByCode("contracted");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+        } else if (code.equals("contracted")) {
+            OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("precontract");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+            orderStatusTable = orderStatusTableRepository.findOneByCode("payed");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+        } else if (code.equals("payed")) {
+            OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("contracted");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+            orderStatusTable = orderStatusTableRepository.findOneByCode("shipped");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+        } else if (code.equals("shipped")) {
+            OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("payed");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+            orderStatusTable = orderStatusTableRepository.findOneByCode("received");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+        } else if (code.equals("received")) {
+            OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("shipped");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+            orderStatusTable = orderStatusTableRepository.findOneByCode("finished");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+        } else if (code.equals("finished")) {
+            OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("received");
             list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
         }
         return list;

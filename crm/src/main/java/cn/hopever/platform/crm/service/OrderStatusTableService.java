@@ -13,4 +13,6 @@ import java.util.List;
 public interface OrderStatusTableService extends GenericService<OrderStatusVo> {
     public List<SelectOption> getOrderStatusOptions(Principal principal);
 
+    public List<SelectOption> getOrderStatusOptions(Principal principal, Long orderId);
+
 }

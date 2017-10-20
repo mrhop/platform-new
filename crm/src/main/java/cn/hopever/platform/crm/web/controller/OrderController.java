@@ -3,6 +3,7 @@ package cn.hopever.platform.crm.web.controller;
 import cn.hopever.platform.crm.config.CommonMethods;
 import cn.hopever.platform.crm.service.*;
 import cn.hopever.platform.crm.vo.OrderVo;
+import cn.hopever.platform.crm.vo.RelatedUserVo;
 import cn.hopever.platform.utils.web.GenericController;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
@@ -63,13 +64,11 @@ public class OrderController implements GenericController<OrderVo> {
                 mapTemp.put("key", cv.getId());
                 List<Object> listTmp = new ArrayList<>();
                 listTmp.add(cv.getCode());
-                listTmp.add(cv.getOrderStatusId());
                 listTmp.add(cv.getClientId());
+                listTmp.add(cv.getOrderStatusId());
                 listTmp.add(cv.getCostPrice());
                 listTmp.add(cv.getPreQuotation());
                 listTmp.add(cv.getSalePrice());
-                listTmp.add(cv.getTracingNumber());
-                listTmp.add(cv.getCountryId());
                 listTmp.add(cv.getCreatedDate());
                 listTmp.add(cv.getCreatedUserId());
                 mapTemp.put("value", listTmp);
@@ -91,6 +90,11 @@ public class OrderController implements GenericController<OrderVo> {
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public OrderVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return orderTableService.info(key, principal);
+    }
+
+    @RequestMapping(value = "/status", method = {RequestMethod.GET})
+    public String status(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        return orderTableService.getStatusCode(key);
     }
 
     @Override
@@ -123,25 +127,46 @@ public class OrderController implements GenericController<OrderVo> {
     }
 
     @Override
-    @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
     public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        Map mapReturn = new HashMap<>();
-        if (body != null) {
-            // 给出options
-            mapReturn.put("clients", clientTableService.getClientOptions(principal));
+        return null;
+    }
 
-            mapReturn.put("countries", countryTableService.getCountryOptions(principal));
+    @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
+    public Map rulechange(@RequestParam(required = true) String type, @RequestParam(required = false) Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        Map mapReturn = new HashMap<>();
+        // 给出options
+        if ("list".equals(type)) {
+            if (CommonMethods.isAdmin(principal)) {
+                // 进行用户列表的返回
+                mapReturn.put("createdUsers", relatedUserTableService.getRelatedUserOptions(principal));
+            }
+            mapReturn.put("clients", clientTableService.getClientOptions(principal));
             mapReturn.put("orderStatuses", orderStatusTableService.getOrderStatusOptions(principal));
-            if ("list".equals(body.get("type"))) {
-                if (CommonMethods.isAdmin(principal)) {
-                    // 进行用户列表的返回
-                    mapReturn.put("createdUsers", relatedUserTableService.getRelatedUserOptions(principal));
+        } else if ("form".equals(type)) {
+            String statusCode = null;
+            if (key != null) {
+                statusCode = orderTableService.info(key, principal).getOrderStatusCode();
+            }
+            if (key == null || "created".equals(statusCode) || "quoting".equals(statusCode)) {
+                RelatedUserVo relatedUserVo = relatedUserTableService.getOneByAccount(principal.getName());
+                if (relatedUserVo != null && relatedUserVo.isCustomDiscount()) {
+                    mapReturn.put("customDiscount", relatedUserVo.getLowerLimit());
                 }
-            } else if ("form".equals(body.get("type"))) {
+                mapReturn.put("countries", countryTableService.getCountryOptions(principal));
+            } else if ("shipped".equals(statusCode)) {
                 mapReturn.put("deliveryMethods", deliveryMethodTableService.getDeliveryMethodOptions(principal));
+            } else if ("payed".equals(statusCode)) {
                 mapReturn.put("payTypes", payTypeTableService.getPayTypeOptions(principal));
+            }
+            if (key != null) {
+                mapReturn.put("orderStatuses", orderStatusTableService.getOrderStatusOptions(principal, key));
             }
         }
         return mapReturn;
+    }
+
+    @RequestMapping(value = "/price/estimate", method = {RequestMethod.GET, RequestMethod.POST})
+    public Float priceEstimate(@RequestParam(required = true) float price, @RequestParam(required = false) Long clientId, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        return orderTableService.estimatePrice(price, clientId);
     }
 }

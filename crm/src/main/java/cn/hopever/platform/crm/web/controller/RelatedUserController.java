@@ -1,5 +1,6 @@
 package cn.hopever.platform.crm.web.controller;
 
+import cn.hopever.platform.crm.config.CommonMethods;
 import cn.hopever.platform.crm.service.RelatedUserTableService;
 import cn.hopever.platform.crm.vo.RelatedUserVo;
 import cn.hopever.platform.utils.web.GenericController;
@@ -94,6 +95,15 @@ public class RelatedUserController implements GenericController<RelatedUserVo> {
     @Override
     public void delete(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 
+    }
+
+    @RequestMapping(value = "/validate", method = {RequestMethod.POST})
+    public int validate(Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        if (CommonMethods.isAdmin(principal)) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 
     @Override

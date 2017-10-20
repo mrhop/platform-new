@@ -1,10 +1,10 @@
 package cn.hopever.platform.crm.service.impl;
 
 import cn.hopever.platform.crm.config.CommonMethods;
-import cn.hopever.platform.crm.domain.OrderStatusTable;
-import cn.hopever.platform.crm.domain.OrderTable;
+import cn.hopever.platform.crm.domain.*;
 import cn.hopever.platform.crm.repository.*;
 import cn.hopever.platform.crm.service.OrderTableService;
+import cn.hopever.platform.crm.vo.OrderProductVo;
 import cn.hopever.platform.crm.vo.OrderVo;
 import cn.hopever.platform.crm.vo.OrderVoAssembler;
 import cn.hopever.platform.utils.web.TableParameters;
@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -33,6 +34,8 @@ public class OrderTableServiceImpl implements OrderTableService {
 
     @Autowired
     private CustomOrderTableRepository customOrderTableRepository;
+    @Autowired
+    private CustomOrderDiscountTableRepository customOrderDiscountTableRepository;
 
     @Autowired
     private RelatedUserTableRepository relatedUserTableRepository;
@@ -43,9 +46,15 @@ public class OrderTableServiceImpl implements OrderTableService {
     @Autowired
     private OrderStatusTableRepository orderStatusTableRepository;
     @Autowired
+    private OrderDiscountTableRepository orderDiscountTableRepository;
+    @Autowired
     private PayTypeTableRepository payTypeTableRepository;
     @Autowired
     private DeliveryMethodTableRepository deliveryMethodTableRepository;
+    @Autowired
+    private ProductTableRepository productTableRepository;
+    @Autowired
+    private OrderProductTableRepository orderProductTableRepository;
 
     @Autowired
     private OrderVoAssembler orderVoAssembler;
@@ -174,10 +183,52 @@ public class OrderTableServiceImpl implements OrderTableService {
             orderTable.setCountryTable(countryTableRepository.findOne(orderVo.getCountryId()));
         }
         orderTable.setDiscountType(orderVo.getDiscountType());
-        orderTable.setDiscount(orderVo.getDiscount());
+        if (orderTable.getDiscountType().equals("custom")) {
+            orderTable.setDiscount(orderVo.getDiscount());
+        }
         orderTable.setPreQuotation(orderVo.getPreQuotation());
         orderTable.setCostPrice(orderVo.getCostPrice());
+        orderTable.setOrderStatusTable(orderStatusTableRepository.findOneByCode("created"));
+        if (orderVo.getOrderProducts() != null) {
+            List<OrderProductTable> list = new ArrayList<>();
+            for (OrderProductVo orderProductVo : orderVo.getOrderProducts()) {
+                OrderProductTable orderProductTable = new OrderProductTable();
+                orderProductTable.setNum(orderProductVo.getNum());
+                orderProductTable.setProductTable(productTableRepository.findOne(orderProductVo.getProductId()));
+                orderProductTable.setOrderTable(orderTable);
+                list.add(orderProductTable);
+            }
+            orderTable.setOrderProductTables(list);
+        }
         orderTableRepository.save(orderTable);
         return null;
+    }
+
+    @Override
+    public Float estimatePrice(float prePrice, Long clientId) {
+        float returnPrice = prePrice;
+        ClientLevelTable clientLevelTable = null;
+        if (clientId != null) {
+            clientLevelTable = clientTableRepository.findOne(clientId).getClientLevelTable();
+        }
+        OrderDiscountTable orderDiscountTableReduce = customOrderDiscountTableRepository.findByFilters(clientLevelTable, prePrice, "reduce");
+        OrderDiscountTable orderDiscountTableDiscount = customOrderDiscountTableRepository.findByFilters(clientLevelTable, prePrice, "discount");
+        if (clientLevelTable != null && orderDiscountTableReduce == null && orderDiscountTableDiscount == null) {
+            orderDiscountTableReduce = customOrderDiscountTableRepository.findByFilters(null, prePrice, "reduce");
+            orderDiscountTableDiscount = customOrderDiscountTableRepository.findByFilters(null, prePrice, "discount");
+        }
+        if (orderDiscountTableReduce != null) {
+            returnPrice = prePrice - orderDiscountTableReduce.getReduce();
+        }
+        if (orderDiscountTableDiscount != null && prePrice * orderDiscountTableDiscount.getDiscount() < returnPrice) {
+            returnPrice = prePrice * orderDiscountTableDiscount.getDiscount();
+        }
+        DecimalFormat df = new DecimalFormat("#.##");
+        return Float.valueOf(df.format((double) returnPrice));
+    }
+
+    @Override
+    public String getStatusCode(long id) {
+        return orderTableRepository.findOne(id).getOrderStatusTable().getCode();
     }
 }

@@ -94,15 +94,6 @@ public class ClientTableServiceImpl implements ClientTableService {
                     clientVo.setRelatedUserAccounts(relatedUserAccounts);
                 }
             }
-            if (clientTable.getOrderTables() != null) {
-                float orderSum = 0.0f;
-                for (OrderTable orderTable : clientTable.getOrderTables()) {
-                    if (orderTable.equals("finished")) {
-                        orderSum += orderTable.getSalePrice();
-                    }
-                }
-                clientVo.setOrderSum(orderSum);
-            }
             list.add(clientVo);
         }
         return new PageImpl<>(list, pageRequest, page.getTotalElements());

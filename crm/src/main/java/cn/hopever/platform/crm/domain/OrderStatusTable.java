@@ -8,7 +8,8 @@ import javax.persistence.*;
 import java.util.List;
 
 /**
- * Created by Donghui Huo on 2017/8/30.
+ * Created by Donghui Huo on 2017/8/30
+ * 已创建created，报价中(quoting)，预签合同(pre-contract)，合同签订(contracted)，已收款(payed)，备货中(goods-preparing)，，已发货(shipped)，已收货(received)，已完成并归档(finished).
  */
 @Entity
 @Table(name = "platform_crm_order_status")

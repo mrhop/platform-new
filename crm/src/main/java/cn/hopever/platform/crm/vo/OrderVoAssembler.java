@@ -32,6 +32,7 @@ public class OrderVoAssembler implements GenericVoAssembler<OrderVo, OrderTable>
         }
         if (orderTable.getOrderStatusTable() != null) {
             orderVo.setOrderStatusId(orderTable.getOrderStatusTable().getId());
+            orderVo.setOrderStatusCode(orderTable.getOrderStatusTable().getCode());
             orderVo.setOrderStatusName(orderTable.getOrderStatusTable().getName());
         }
         if (orderTable.getDeliveryMethodTable() != null) {
@@ -50,7 +51,7 @@ public class OrderVoAssembler implements GenericVoAssembler<OrderVo, OrderTable>
 
     @Override
     public OrderTable toDomain(OrderVo orderVo, OrderTable orderTable) {
-        BeanUtils.copyNotNullProperties(orderVo, orderTable, "id", "code","salePrice","discountType","discount","tracingNumber","freight","preQuotation","costPrice");
+        BeanUtils.copyNotNullProperties(orderVo, orderTable, "id", "code", "salePrice", "discountType", "discount", "tracingNumber", "freight", "preQuotation", "costPrice");
         return orderTable;
     }
 }

@@ -7,6 +7,7 @@ import cn.hopever.platform.crm.repository.CustomClientTableRepository;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
@@ -75,7 +76,7 @@ public class CustomClientTableRepositoryImpl extends SimpleJpaRepository<ClientT
 
     @Override
     public List<ClientTable> findByRelatedUserTable(RelatedUserTable relatedUserTable) {
-        return super.findAll(filterConditions2(relatedUserTable));
+        return super.findAll(filterConditions2(relatedUserTable), new Sort(Sort.Direction.ASC, "orderAmount", "id"));
     }
 
     private Specification<ClientTable> filterConditions2(RelatedUserTable relatedUserTable) {
