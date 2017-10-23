@@ -65,30 +65,42 @@ public class OrderStatusTableServiceImpl implements OrderStatusTableService {
         } else if (code.equals("precontract")) {
             OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("quoting");
             list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+            orderStatusTable = orderStatusTableRepository.findOneByCode("precontract");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
             orderStatusTable = orderStatusTableRepository.findOneByCode("contracted");
             list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
         } else if (code.equals("contracted")) {
             OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("precontract");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+            orderStatusTable = orderStatusTableRepository.findOneByCode("contracted");
             list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
             orderStatusTable = orderStatusTableRepository.findOneByCode("payed");
             list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
         } else if (code.equals("payed")) {
             OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("contracted");
             list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+            orderStatusTable = orderStatusTableRepository.findOneByCode("payed");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
             orderStatusTable = orderStatusTableRepository.findOneByCode("shipped");
             list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
         } else if (code.equals("shipped")) {
             OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("payed");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+            orderStatusTable = orderStatusTableRepository.findOneByCode("shipped");
             list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
             orderStatusTable = orderStatusTableRepository.findOneByCode("received");
             list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
         } else if (code.equals("received")) {
             OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("shipped");
             list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+            orderStatusTable = orderStatusTableRepository.findOneByCode("received");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
             orderStatusTable = orderStatusTableRepository.findOneByCode("finished");
             list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
         } else if (code.equals("finished")) {
             OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("received");
+            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+            orderStatusTable = orderStatusTableRepository.findOneByCode("finished");
             list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
         }
         return list;

@@ -140,7 +140,6 @@ public class OrderController implements GenericController<OrderVo> {
                 // 进行用户列表的返回
                 mapReturn.put("createdUsers", relatedUserTableService.getRelatedUserOptions(principal));
             }
-            mapReturn.put("clients", clientTableService.getClientOptions(principal));
             mapReturn.put("orderStatuses", orderStatusTableService.getOrderStatusOptions(principal));
         } else if ("form".equals(type)) {
             String statusCode = null;
@@ -153,6 +152,7 @@ public class OrderController implements GenericController<OrderVo> {
                     mapReturn.put("customDiscount", relatedUserVo.getLowerLimit());
                 }
                 mapReturn.put("countries", countryTableService.getCountryOptions(principal));
+                mapReturn.put("clients", clientTableService.getClientOptions(principal));
             } else if ("shipped".equals(statusCode)) {
                 mapReturn.put("deliveryMethods", deliveryMethodTableService.getDeliveryMethodOptions(principal));
             } else if ("payed".equals(statusCode)) {

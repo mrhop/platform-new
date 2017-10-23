@@ -46,11 +46,13 @@ public class OrderProductController implements GenericController<OrderProductVo>
             listReturn = new ArrayList<>();
             for (OrderProductVo cv : list) {
                 HashMap<String, Object> mapTemp = new HashMap<>();
-                mapTemp.put("key", cv.getId());
+                mapTemp.put("key", cv.getProductId());
                 List<Object> listTmp = new ArrayList<>();
                 listTmp.add(cv.getProductCode());
                 listTmp.add(cv.getProductName());
                 listTmp.add(cv.getNum());
+                listTmp.add(cv.getProductSalePrice());
+                listTmp.add(cv.getProductCostPrice());
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);
             }
@@ -88,6 +90,7 @@ public class OrderProductController implements GenericController<OrderProductVo>
     public VueResults.Result save(@RequestBody OrderProductVo orderProductVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         return orderProductTableService.save(orderProductVo, null, principal);
     }
+
     @RequestMapping(value = "/save", method = {RequestMethod.GET})
     public VueResults.Result save(@RequestParam(name = "orderId") Long orderId, @RequestParam(name = "productId") Long productId, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         OrderProductVo orderProductVo = new OrderProductVo();

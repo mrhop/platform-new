@@ -120,6 +120,10 @@ public class OrderTableServiceImpl implements OrderTableService {
                 return null;
             }
         }
+
+        if (orderTable.getOrderStatusTable().getCode().equals("created") || orderTable.getOrderStatusTable().getCode().equals("quoting")) {
+            // info的时候要重新计算成本和预估销售价，当状态为创建完成和报价时
+        }
         return orderVoAssembler.toResource(orderTable);
     }
 
@@ -134,25 +138,33 @@ public class OrderTableServiceImpl implements OrderTableService {
         }
         orderVoAssembler.toDomain(orderVo, orderTable);
         OrderStatusTable orderStatusTable = orderStatusTableRepository.findOne(orderVo.getOrderStatusId());
-        if (orderStatusTable.getCode().equals("contract")) {
+        if (orderStatusTable.getCode().equals("contracted")) {
             orderTable.setSalePrice(orderVo.getSalePrice());
-            orderTable.setContractSignDate(new Date(orderVo.getContractSignDate()));
+            if (orderVo.getContractSignDate() != null) {
+                orderTable.setContractSignDate(new Date(orderVo.getContractSignDate()));
+            }
         }
         if (orderStatusTable.getCode().equals("finished")) {
             orderTable.setFinishedDate(new Date());
         }
 
         if (orderStatusTable.getCode().equals("payed")) {
-            orderTable.setPayTypeTable(payTypeTableRepository.findOne(orderVo.getPayTypeId()));
+            if (orderVo.getPayTypeId() != null) {
+                orderTable.setPayTypeTable(payTypeTableRepository.findOne(orderVo.getPayTypeId()));
+            }
         }
-        if (orderStatusTable.getCode().equals("delivered")) {
-            orderTable.setDeliveryDate(new Date(orderVo.getDeliveryDate()));
-            orderTable.setDeliveryMethodTable(deliveryMethodTableRepository.findOne(orderVo.getDeliveryMethodId()));
+        if (orderStatusTable.getCode().equals("shipped")) {
+            if (orderVo.getDeliveryDate() != null) {
+                orderTable.setDeliveryDate(new Date());
+            }
+            if (orderVo.getDeliveryMethodId() != null) {
+                orderTable.setDeliveryMethodTable(deliveryMethodTableRepository.findOne(orderVo.getDeliveryMethodId()));
+            }
             orderTable.setTracingNumber(orderVo.getTracingNumber());
             orderTable.setFreight(orderVo.getFreight());
         }
 
-        if (orderStatusTable.getCode().equals("created") || orderStatusTable.getCode().equals("offer") || orderStatusTable.getCode().equals("preContract")) {
+        if (orderStatusTable.getCode().equals("created") || orderStatusTable.getCode().equals("quoting")) {
             if (orderVo.getClientId() != null) {
                 orderTable.setClientTable(clientTableRepository.findOne(orderVo.getClientId()));
             }

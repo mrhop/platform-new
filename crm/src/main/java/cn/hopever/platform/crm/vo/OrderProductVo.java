@@ -18,6 +18,8 @@ public class OrderProductVo {
     private Long productId;
     private String productName;
     private String productCode;
+    private Float productCostPrice;
+    private Float productSalePrice;
 
     private Float num;
 }

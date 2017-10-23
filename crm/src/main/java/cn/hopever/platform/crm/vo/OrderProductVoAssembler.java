@@ -20,6 +20,8 @@ public class OrderProductVoAssembler implements GenericVoAssembler<OrderProductV
         orderProductVo.setProductCode(orderProductTable.getProductTable().getCode());
         orderProductVo.setProductId(orderProductTable.getProductTable().getId());
         orderProductVo.setProductName(orderProductTable.getProductTable().getName());
+        orderProductVo.setProductCostPrice(orderProductTable.getProductTable().getCostPrice());
+        orderProductVo.setProductSalePrice(orderProductTable.getProductTable().getSalePrice());
         return orderProductVo;
     }
 
