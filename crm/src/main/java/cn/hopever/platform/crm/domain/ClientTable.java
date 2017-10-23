@@ -38,20 +38,11 @@ public class ClientTable {
     @Column(name = "address")
     private String address;
 
-    @Column(name = "telephone", length = 50)
-    private String telephone;
-
     @Column(name = "cellphone", length = 50)
     private String cellphone;
 
     @Column(name = "email", length = 50)
     private String email;
-
-    @Column(name = "wechat", length = 50)
-    private String wechat;
-
-    @Column(name = "skype", length = 50)
-    private String skype;
 
     @Column(name = "additional_msg", length = 2000)
     private String additionalMsg;

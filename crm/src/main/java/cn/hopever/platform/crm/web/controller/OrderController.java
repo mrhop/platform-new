@@ -141,6 +141,7 @@ public class OrderController implements GenericController<OrderVo> {
                 mapReturn.put("createdUsers", relatedUserTableService.getRelatedUserOptions(principal));
             }
             mapReturn.put("orderStatuses", orderStatusTableService.getOrderStatusOptions(principal));
+            mapReturn.put("clients", clientTableService.getClientOptions(principal));
         } else if ("form".equals(type)) {
             String statusCode = null;
             if (key != null) {

@@ -62,12 +62,9 @@ public class ClientController implements GenericController<ClientVo> {
                 List<Object> listTmp = new ArrayList<>();
                 listTmp.add(cv.getCode());
                 listTmp.add(cv.getName());
-                listTmp.add(cv.getContact());
                 listTmp.add(cv.isTraded());
-                listTmp.add(cv.getEmail());
                 listTmp.add(cv.getCellphone());
-                listTmp.add(cv.getTelephone());
-                listTmp.add(cv.getCountryId());
+                listTmp.add(cv.getEmail());
                 listTmp.add(cv.getClientOriginId());
                 listTmp.add(cv.getClientLevelId());
                 listTmp.add(cv.getCreatedDate());
@@ -131,7 +128,6 @@ public class ClientController implements GenericController<ClientVo> {
         if (body != null) {
             // 给出options
             mapReturn.put("clientOrigins", clientOriginTableService.getClientOriginOptions(principal));
-            mapReturn.put("countries", countryTableService.getCountryOptions(principal));
             if ("list".equals(body.get("type"))) {
                 mapReturn.put("clientLevels", clientLevelTableService.getClientLevelOptions(principal));
                 if (CommonMethods.isAdmin(principal)) {
@@ -139,6 +135,10 @@ public class ClientController implements GenericController<ClientVo> {
                     mapReturn.put("createdUsers", relatedUserTableService.getRelatedUserOptions(principal));
                 }
             } else if ("form".equals(body.get("type"))) {
+                mapReturn.put("countries", countryTableService.getCountryOptions(principal));
+                if (CommonMethods.isAdmin(principal)) {
+                    mapReturn.put("relatedUsers", relatedUserTableService.getRelatedUserOptions(principal));
+                }
                 if (key == null) {
                     mapReturn.put("clientLevels", clientLevelTableService.getClientLevelNoOrderAmountOptions(principal));
                 } else {

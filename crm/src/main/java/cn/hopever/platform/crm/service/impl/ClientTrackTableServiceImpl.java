@@ -22,10 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Donghui Huo on 2017/10/10.
@@ -72,6 +69,7 @@ public class ClientTrackTableServiceImpl implements ClientTrackTableService {
     @Override
     public VueResults.Result update(ClientTrackVo clientTrackVo, MultipartFile[] files, Principal principal) {
         ClientTrackTable clientTrackTable = clientTrackTableRepository.findOne(clientTrackVo.getId());
+        clientTrackVoAssembler.toDomain(clientTrackVo, clientTrackTable);
         if (CommonMethods.isAdmin(principal) || clientTrackTable.getTrackUser().getAccount().equals(principal.getName())) {
             BeanUtils.copyNotNullProperties(clientTrackVo, clientTrackTable);
             clientTrackTableRepository.save(clientTrackTable);
@@ -84,7 +82,10 @@ public class ClientTrackTableServiceImpl implements ClientTrackTableService {
     @Override
     public VueResults.Result save(ClientTrackVo clientTrackVo, MultipartFile[] files, Principal principal) {
         ClientTrackTable clientTrackTable = new ClientTrackTable();
-        BeanUtils.copyNotNullProperties(clientTrackVo, clientTrackTable);
+        clientTrackVoAssembler.toDomain(clientTrackVo, clientTrackTable);
+        if (clientTrackTable.getTrackDate() == null) {
+            clientTrackTable.setTrackDate(new Date());
+        }
         clientTrackTable.setClientTable(clientTableRepository.findOne(clientTrackVo.getClientId()));
         clientTrackTable.setTrackUser(relatedUserTableRepository.findOneByAccount(principal.getName()));
         clientTrackTableRepository.save(clientTrackTable);
@@ -107,7 +108,13 @@ public class ClientTrackTableServiceImpl implements ClientTrackTableService {
             }
         }
         body.setFilters(map);
-        PageRequest pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.DESC, "trackDate");
+        PageRequest pageRequest;
+        if (body.getSorts() == null || body.getSorts().isEmpty()) {
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.DESC, "trackDate");
+        } else {
+            String key = body.getSorts().keySet().iterator().next();
+            pageRequest = new PageRequest(body.getPager().getCurrentPage() - 1, body.getPager().getPageSize(), Sort.Direction.fromString(body.getSorts().get(key)), key);
+        }
         Page<ClientTrackTable> page = customClientTrackTableRepository.findByFilters(body.getFilters(), pageRequest);
         List<ClientTrackVo> list = new ArrayList<>();
         for (ClientTrackTable clientTrackTable : page) {

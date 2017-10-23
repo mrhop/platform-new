@@ -22,15 +22,9 @@ public class ClientVo {
 
     private String address;
 
-    private String telephone;
-
     private String cellphone;
 
     private String email;
-
-    private String wechat;
-
-    private String skype;
 
     private String additionalMsg;
 

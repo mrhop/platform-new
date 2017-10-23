@@ -69,7 +69,7 @@ public class ClientOriginTableServiceImpl implements ClientOriginTableService {
 
     @Override
     public List<SelectOption> getClientOriginOptions(Principal principal) {
-        Iterable<ClientOriginTable> clientOriginTables = clientOriginTableRepository.findAll(new Sort(Sort.Direction.ASC, "orderAmount", "id"));
+        Iterable<ClientOriginTable> clientOriginTables = clientOriginTableRepository.findAll(new Sort(Sort.Direction.ASC, "id"));
         List<SelectOption> list = new ArrayList<>();
         for (ClientOriginTable clientOriginTable : clientOriginTables) {
             list.add(new SelectOption(clientOriginTable.getName(), clientOriginTable.getId()));
