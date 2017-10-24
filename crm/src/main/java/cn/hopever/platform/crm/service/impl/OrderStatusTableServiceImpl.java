@@ -98,10 +98,7 @@ public class OrderStatusTableServiceImpl implements OrderStatusTableService {
             orderStatusTable = orderStatusTableRepository.findOneByCode("finished");
             list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
         } else if (code.equals("finished")) {
-            OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("received");
-            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
-            orderStatusTable = orderStatusTableRepository.findOneByCode("finished");
-            list.add(new SelectOption(orderStatusTable.getName(), orderStatusTable.getId()));
+            return null;
         }
         return list;
     }

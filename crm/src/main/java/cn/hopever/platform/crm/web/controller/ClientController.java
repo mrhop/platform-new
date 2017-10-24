@@ -63,11 +63,9 @@ public class ClientController implements GenericController<ClientVo> {
                 listTmp.add(cv.getCode());
                 listTmp.add(cv.getName());
                 listTmp.add(cv.isTraded());
-                listTmp.add(cv.getCellphone());
-                listTmp.add(cv.getEmail());
+                listTmp.add(cv.getOrderAmount());
                 listTmp.add(cv.getClientOriginId());
                 listTmp.add(cv.getClientLevelId());
-                listTmp.add(cv.getCreatedDate());
                 listTmp.add(cv.getCreatedUserId());
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);

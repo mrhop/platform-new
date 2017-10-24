@@ -114,15 +114,35 @@ public class OrderTableServiceImpl implements OrderTableService {
     @Override
     public OrderVo info(Long id, Principal principal) {
         OrderTable orderTable = orderTableRepository.findOne(id);
+        if (orderTable.getOrderStatusTable().getCode().equals("created") || orderTable.getOrderStatusTable().getCode().equals("quoting")) {
+            DecimalFormat df = new DecimalFormat("#.##");
+            // 重新计算预估价和成本价
+            float preSalePrice = 0.0f;
+            float costPrice = 0.0f;
+            float preQuotation = 0.0f;
+            for (OrderProductTable orderProductTable : orderTable.getOrderProductTables()) {
+                preSalePrice += orderProductTable.getProductTable().getSalePrice() * orderProductTable.getNum();
+                costPrice += orderProductTable.getProductTable().getCostPrice() * orderProductTable.getNum();
+            }
+            preSalePrice = new Float(df.format(preSalePrice));
+            costPrice = new Float(df.format(costPrice));
+            if (orderTable.getDiscountType().equals("custom")) {
+                preQuotation = new Float(df.format(preSalePrice * orderTable.getDiscount()));
+            } else {
+                preQuotation = this.estimatePrice(preSalePrice, orderTable.getClientTable().getId());
+            }
+            if (!orderTable.getCostPrice().equals(costPrice) || !orderTable.getPreSalePrice().equals(preSalePrice) || !orderTable.getPreQuotation().equals(preQuotation)) {
+                orderTable.setCostPrice(costPrice);
+                orderTable.setPreSalePrice(preSalePrice);
+                orderTable.setPreQuotation(preQuotation);
+                orderTableRepository.save(orderTable);
+            }
+        }
         if (!CommonMethods.isAdmin(principal)) {
             // 判断是否有查看的权限
             if (!orderTable.getCreatedUser().getAccount().equals(principal.getName())) {
                 return null;
             }
-        }
-
-        if (orderTable.getOrderStatusTable().getCode().equals("created") || orderTable.getOrderStatusTable().getCode().equals("quoting")) {
-            // info的时候要重新计算成本和预估销售价，当状态为创建完成和报价时
         }
         return orderVoAssembler.toResource(orderTable);
     }
@@ -146,6 +166,8 @@ public class OrderTableServiceImpl implements OrderTableService {
         }
         if (orderStatusTable.getCode().equals("finished")) {
             orderTable.setFinishedDate(new Date());
+            ClientTable clientTable = orderTable.getClientTable();
+            clientTable.setOrderAmount(clientTable.getOrderAmount() + orderTable.getSalePrice());
         }
 
         if (orderStatusTable.getCode().equals("payed")) {

@@ -43,6 +43,8 @@ public class OrderVo {
 
     private Float preQuotation;
 
+    private Float preSalePrice;
+
     private Float costPrice;
 
     private Long createdDate;

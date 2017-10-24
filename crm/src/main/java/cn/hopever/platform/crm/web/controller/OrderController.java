@@ -66,9 +66,8 @@ public class OrderController implements GenericController<OrderVo> {
                 listTmp.add(cv.getCode());
                 listTmp.add(cv.getClientId());
                 listTmp.add(cv.getOrderStatusId());
-                listTmp.add(cv.getCostPrice());
-                listTmp.add(cv.getPreQuotation());
                 listTmp.add(cv.getSalePrice());
+                listTmp.add(cv.getTracingNumber());
                 listTmp.add(cv.getCreatedDate());
                 listTmp.add(cv.getCreatedUserId());
                 mapTemp.put("value", listTmp);

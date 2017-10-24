@@ -76,6 +76,10 @@ public class OrderTable {
     @Column(name = "pre_quotation")
     private Float preQuotation;
 
+    // 自动计算打折前价格
+    @Column(name = "pre_sale_price")
+    private Float preSalePrice;
+
     // 自动计算成本价
     @Column(name = "cost_price")
     private Float costPrice;
