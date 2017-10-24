@@ -305,7 +305,7 @@ public class ModuleTableServiceImpl implements ModuleTableService {
             }
         } else {
             List<ModuleRoleTable> listModuleRole = null;
-            if ((roleTable.getAuthority().equals("ROLE_super_admin") || roleTable.getAuthority().equals("ROLE_admin")) && userTable.getClients().contains(clientTable)) {
+            if (roleTable.getAuthority().equals("ROLE_super_admin") || roleTable.getAuthority().equals("ROLE_admin") && userTable.getClients().contains(clientTable)) {
                 listModuleRole = moduleRoleTableRepository.findByClient(clientTable);
             } else {
                 listModuleRole = customModuleRoleTableRepository.findByUserAndClient(userTable.getId(), clientTable);
@@ -323,7 +323,6 @@ public class ModuleTableServiceImpl implements ModuleTableService {
                     if (moduleTable.getParent() == null) {
                         listTop.add(moduleTable);
                     }
-                    i.remove();
                 }
                 for (ModuleTable moduleTable : listTop) {
                     listReturn.add(recursiveLeftMenuptions(moduleTable, list));

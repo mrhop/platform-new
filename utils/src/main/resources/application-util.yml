@@ -8,7 +8,6 @@ spring:
 config:
   common:
           pageSize: 10
-          relatedusers: http://localhost:9091/user/user/list/relatedusers/options
           imageUpload: http://utils.hopever.cn/upload/image
           fileUpload: http://utils.hopever.cn/upload/file
           docUpload: http://utils.hopever.cn/upload/doc
