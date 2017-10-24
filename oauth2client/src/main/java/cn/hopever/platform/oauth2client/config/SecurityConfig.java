@@ -44,8 +44,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-//        web.ignoring().antMatchers("/webjars/**", "/static/**", "/error/*.html", "/index.html", "/gettokenbycode", "/gettokenbyclient");
-        web.ignoring().antMatchers("/webjars/**", "/static/**", "/error/*.html","/**");
+        web.ignoring().antMatchers("/webjars/**", "/static/**", "/error/*.html", "/gettokenbycode", "/gettokenbyclient");
+//        web.ignoring().antMatchers("/webjars/**", "/static/**", "/error/*.html","/**");
     }
 
     @Override

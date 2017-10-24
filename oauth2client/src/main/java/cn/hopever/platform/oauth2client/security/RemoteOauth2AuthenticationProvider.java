@@ -44,8 +44,9 @@ public class RemoteOauth2AuthenticationProvider implements AuthenticationProvide
                     username, null,
                     list);
             Map details= new HashMap<>();
+            details.put("accesstoken",oa.getValue());
             if(oa.getAdditionalInformation().get("modules")!=null){
-                details.put("modules",details);
+                details.put("modules",oa.getAdditionalInformation().get("modules"));
             }
             result.setDetails(details);
             return result;

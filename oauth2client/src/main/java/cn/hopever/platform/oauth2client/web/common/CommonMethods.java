@@ -61,7 +61,7 @@ public class CommonMethods {
     public CommonResult getResource(HttpServletRequest request) throws Exception {
         Cookie c = CookieUtil.getCookieByName("accesstoken", request.getCookies());
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-       // headers.add("Authorization", "Bearer " + c.getValue());
+        headers.add("Authorization", "Bearer " + c.getValue());
         headers.add("Content-Type", "application/json;charset=UTF-8");
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
         HttpEntity<?> httpEntity = new HttpEntity<>(headers);
