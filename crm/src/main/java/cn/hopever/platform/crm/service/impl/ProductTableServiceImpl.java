@@ -149,6 +149,7 @@ public class ProductTableServiceImpl implements ProductTableService {
         if (productVo.getProductCategoryId() != null) {
             productTable.setProductCategoryTable(productCategoryTableRepository.findOne(productVo.getProductCategoryId()));
         }
+        productTable.setCode(CommonMethods.generateCode("product"));
         if (files != null && files.length > 0) {
             try {
                 Map<String, List<String>> mapPictures = mojiUtils.uploadImg("crm/product/" + productTable.getCode(), files);
@@ -163,7 +164,6 @@ public class ProductTableServiceImpl implements ProductTableService {
         productTable.setCreatedDate(new Date());
         productTable.setCreatedUser(relatedUserTableRepository.findOneByAccount(principal.getName()));
         productVoAssembler.toDomain(productVo, productTable);
-        productTable.setCode(CommonMethods.generateCode("product"));
         productTableRepository.save(productTable);
         return null;
     }

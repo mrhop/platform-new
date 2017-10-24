@@ -25,7 +25,7 @@ import java.util.Map;
  * Created by Donghui Huo on 2017/9/5.
  */
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping(value = "/relateduser", produces = "application/json")
 // 登陆的时候给予自动添加，但是可以查询list，不能删除，可以修改
 public class RelatedUserController implements GenericController<RelatedUserVo> {

@@ -24,7 +24,7 @@ import java.util.Map;
  */
 // 这个只有list，其他都是在更新的时候处理
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping(value = "/productpricehistory", produces = "application/json")
 public class ProductPriceHistoryController implements GenericController<ProductPriceHistoryVo> {
     Logger logger = LoggerFactory.getLogger(ProductPriceHistoryController.class);

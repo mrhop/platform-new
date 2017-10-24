@@ -24,7 +24,7 @@ import java.util.Map;
  * Created by Donghui Huo on 2017/9/5.
  */
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping(value = "/clientorigin", produces = "application/json")
 public class ClientOriginController implements GenericController<ClientOriginVo> {
     Logger logger = LoggerFactory.getLogger(ClientOriginController.class);

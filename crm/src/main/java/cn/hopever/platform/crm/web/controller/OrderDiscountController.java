@@ -25,7 +25,7 @@ import java.util.Map;
  * Created by Donghui Huo on 2017/9/5.
  */
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping(value = "/orderdiscount", produces = "application/json")
 public class OrderDiscountController implements GenericController<OrderDiscountVo> {
     Logger logger = LoggerFactory.getLogger(OrderDiscountController.class);

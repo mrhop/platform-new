@@ -24,7 +24,7 @@ import java.util.Map;
  * 订单的的商品必须提供orderid
  */
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping(value = "/orderproduct", produces = "application/json")
 public class OrderProductController implements GenericController<OrderProductVo> {
     Logger logger = LoggerFactory.getLogger(OrderProductController.class);

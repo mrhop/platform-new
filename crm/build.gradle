@@ -1,5 +1,5 @@
 war {
-    baseName = 'cms'
+    baseName = 'crm'
 }
 
 bootRepackage {

@@ -5,7 +5,6 @@ import cn.hopever.platform.crm.vo.RelatedUserVo;
 import cn.hopever.platform.utils.test.PrincipalSample;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
@@ -37,7 +36,7 @@ public class ControllerAdvice {
     @Autowired
     private RelatedUserTableService relatedUserTableService;
 
-    @Around("execution(public * cn.hopever.platform.crm.*.controller.*.*(..))")
+    //    @Around("execution(public * cn.hopever.platform.crm.*.controller.*.*(..))")
     public Object packageTableAndForm(ProceedingJoinPoint pjp) throws Throwable {
         // 目前做个临时性的测试
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();

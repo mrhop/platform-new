@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -67,6 +68,12 @@ public class RelatedUserTableServiceImpl implements RelatedUserTableService {
 
     @Override
     public VueResults.Result save(RelatedUserVo relatedUserVo, MultipartFile[] files, Principal principal) {
+        RelatedUserTable relatedUserTable = new RelatedUserTable();
+        relatedUserVoAssembler.toDomain(relatedUserVo, relatedUserTable);
+        relatedUserTable.setCreatedDate(new Date());
+        relatedUserTable.setAccount(relatedUserVo.getAccount());
+        relatedUserTable.setName(relatedUserVo.getAccount());
+        relatedUserTableRepository.save(relatedUserTable);
         return null;
     }
 
@@ -85,6 +92,12 @@ public class RelatedUserTableServiceImpl implements RelatedUserTableService {
 
     @Override
     public RelatedUserVo getOneByAccount(String account) {
-        return relatedUserVoAssembler.toResource(relatedUserTableRepository.findOneByAccount(account));
+        RelatedUserTable relatedUserTable = relatedUserTableRepository.findOneByAccount(account);
+
+        if (relatedUserTable != null) {
+            return relatedUserVoAssembler.toResource(relatedUserTable);
+        } else {
+            return null;
+        }
     }
 }

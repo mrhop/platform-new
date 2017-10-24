@@ -24,7 +24,7 @@ import java.util.Map;
  * Created by Donghui Huo on 2017/9/5.
  */
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping(value = "/paytype", produces = "application/json")
 public class PayTypeController implements GenericController<PayTypeVo> {
     Logger logger = LoggerFactory.getLogger(PayTypeController.class);

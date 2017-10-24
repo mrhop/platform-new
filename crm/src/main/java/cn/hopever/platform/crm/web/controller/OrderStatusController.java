@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,7 +26,7 @@ import java.util.Map;
  * Created by Donghui Huo on 2017/9/5.
  */
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping(value = "/orderstatus", produces = "application/json")
 public class OrderStatusController implements GenericController<OrderStatusVo> {
     Logger logger = LoggerFactory.getLogger(OrderStatusController.class);
@@ -64,6 +66,8 @@ public class OrderStatusController implements GenericController<OrderStatusVo> {
     @Override
     @RequestMapping(value = "/info", method = {RequestMethod.GET})
     public OrderStatusVo info(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         return orderStatusTableService.info(key, principal);
     }
 
