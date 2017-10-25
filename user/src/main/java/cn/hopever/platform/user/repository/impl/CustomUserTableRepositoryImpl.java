@@ -65,7 +65,7 @@ public class CustomUserTableRepositoryImpl extends SimpleJpaRepository<UserTable
         return super.findAll(filterConditions2(userTable, authority1, authority2, mapFilter), pageable);
     }
 
-    private Specification<UserTable> filterConditions2(UserTable userTable,String authority1, String authority2, Map<String, Object> mapFilter) {
+    private Specification<UserTable> filterConditions2(UserTable userTable, String authority1, String authority2, Map<String, Object> mapFilter) {
         return new Specification<UserTable>() {
             public Predicate toPredicate(Root<UserTable> root, CriteriaQuery<?> query,
                                          CriteriaBuilder builder) {
@@ -84,17 +84,18 @@ public class CustomUserTableRepositoryImpl extends SimpleJpaRepository<UserTable
                                 Join<UserTable, RoleTable> takeJoin = root.join("authorities");
                                 Expression<Long> roleId = takeJoin.get("id");
                                 if (predicateReturn != null) {
-                                    predicateReturn = builder.and(predicateReturn, roleId.in(mapFilter.get(key)));
+                                    predicateReturn = builder.and(predicateReturn, roleId.in((List)mapFilter.get(key)));
                                 } else {
-                                    predicateReturn = roleId.in(mapFilter.get(key));
+                                    predicateReturn = roleId.in((List) mapFilter.get(key));
                                 }
                             } else if (mapFilter.get(key) != null && key.equals("clientIds")) {
+                                Path<ClientTable> group = root.<ClientTable>get("clients");
                                 Join<UserTable, ClientTable> takeJoin = root.join("clients");
                                 Expression<Long> clientId = takeJoin.get("id");
                                 if (predicateReturn != null) {
-                                    predicateReturn = builder.and(predicateReturn, clientId.in(mapFilter.get(key)));
+                                    predicateReturn = builder.and(predicateReturn, clientId.in((List)mapFilter.get(key)));
                                 } else {
-                                    predicateReturn = clientId.in(mapFilter.get(key));
+                                    predicateReturn = clientId.in((List) mapFilter.get(key));
                                 }
                             } else {
                                 if (predicateReturn == null) {

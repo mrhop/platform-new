@@ -125,7 +125,7 @@ public class ModuleTableServiceImpl implements ModuleTableService {
             moduleTable.setModuleOrder(moduleTable1.getModuleOrder());
             recursiveModuleOrder(moduleTable1);
         } else {
-            ModuleTable moduleTable1 = moduleTableRepository.findTopByParentAndClientOrderByModuleOrderDesc(moduleTableParent, moduleTable.getClient());
+            ModuleTable moduleTable1 = moduleTableRepository.findTopByParentAndClientOrderByModuleOrderAsc(moduleTableParent, moduleTable.getClient());
             if (moduleTable1 != null) {
                 if (moduleTable.getId() != moduleTable1.getId()) {
                     ModuleTable moduleTableOld = moduleTableRepository.findOneByBeforeModule(moduleTable);
@@ -133,8 +133,9 @@ public class ModuleTableServiceImpl implements ModuleTableService {
                         moduleTableOld.setBeforeModule(moduleTable.getBeforeModule());
                         moduleTableRepository.save(moduleTableOld);
                     }
-                    moduleTable.setBeforeModule(moduleTable1);
-                    moduleTable.setModuleOrder(moduleTable1.getModuleOrder() + 1);
+                    moduleTable1.setBeforeModule(moduleTable);
+                    moduleTableRepository.save(moduleTable1);
+                    moduleTable.setModuleOrder(moduleTable1.getModuleOrder() - 1);
                 }
             } else {
                 moduleTable.setBeforeModule(null);
@@ -157,6 +158,7 @@ public class ModuleTableServiceImpl implements ModuleTableService {
         ClientTable clientTable = null;
         ModuleTable moduleTableParent = null;
         ModuleTable moduleTableAfter = null;
+        ModuleTable moduleTableFirst = null;
 
         if (moduleVo.getClientId() != null) {
             clientTable = clientTableRepository.findOne(moduleVo.getClientId());
@@ -176,10 +178,10 @@ public class ModuleTableServiceImpl implements ModuleTableService {
             moduleTable.setModuleOrder(moduleTable1.getModuleOrder());
             recursiveModuleOrder(moduleTable1);
         } else {
-            ModuleTable moduleTable1 = moduleTableRepository.findTopByParentAndClientOrderByModuleOrderDesc(moduleTableParent, clientTable);
-            if (moduleTable1 != null) {
-                moduleTable.setBeforeModule(moduleTable1);
-                moduleTable.setModuleOrder(moduleTable1.getModuleOrder() + 1);
+            moduleTableFirst = moduleTableRepository.findTopByParentAndClientOrderByModuleOrderAsc(moduleTableParent, clientTable);
+            if (moduleTableFirst != null) {
+                moduleTableFirst.setBeforeModule(moduleTable);
+                moduleTable.setModuleOrder(moduleTableFirst.getModuleOrder() - 1);
             } else {
                 moduleTable.setModuleOrder(0);
             }
@@ -187,6 +189,9 @@ public class ModuleTableServiceImpl implements ModuleTableService {
         moduleTableRepository.save(moduleTable);
         if (moduleTableAfter != null) {
             moduleTableRepository.save(moduleTableAfter);
+        }
+        if (moduleTableFirst != null) {
+            moduleTableRepository.save(moduleTableFirst);
         }
         return VueResults.generateSuccess("保存成功", "保存模块成功");
     }

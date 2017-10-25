@@ -35,7 +35,10 @@ public class ModuleVoAssembler {
             //resource.setAuthorities(list);
             resource.setAuthoritiesStr(listStr.toString());
         }
-        resource.setBeforeId(moduleTable.getBeforeModule() != null ? moduleTable.getBeforeModule().getId() : null);
+        if(moduleTable.getBeforeModule()!=null){
+            resource.setBeforeId(moduleTable.getBeforeModule().getId());
+            resource.setBeforeName(moduleTable.getBeforeModule().getModuleName());
+        }
         if (moduleTable.getParent() != null) {
             resource.setParentId(moduleTable.getParent().getId());
             resource.setParentName(moduleTable.getParent().getModuleName());

@@ -18,6 +18,7 @@ public class ModuleVo {
     private String moduleName; // list   // add text
     private String moduleId; // list   // add text
     private Long beforeId; // add 联动 parent tree form element
+    private String beforeName; // add 联动 parent tree form element
     private String moduleUrl; // add nullable
 
     private String iconClass; // add nullable
