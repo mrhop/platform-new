@@ -123,4 +123,9 @@ public class ClientTrackTableServiceImpl implements ClientTrackTableService {
         }
         return new PageImpl<>(list, pageRequest, page.getTotalElements());
     }
+
+    @Override
+    public List<Object[]> analyzeClientTrackFromTrackUser(Date beginDate, Date endDate, Long clientId, Long userId) {
+        return customClientTrackTableRepository.findClientTrackFromTrackUser(beginDate, endDate, clientId, userId);
+    }
 }

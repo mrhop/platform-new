@@ -265,4 +265,24 @@ public class OrderTableServiceImpl implements OrderTableService {
     public String getStatusCode(long id) {
         return orderTableRepository.findOne(id).getOrderStatusTable().getCode();
     }
+
+    @Override
+    public List<Object[]> analyzeOrderFromCountry(Date beginDate, Date endDate) {
+        return customOrderTableRepository.findCountOrderByCountry(beginDate, endDate);
+    }
+
+    @Override
+    public List<Object[]> analyzeOrderAmountFromUser(Date beginDate, Date endDate) {
+        return null;
+    }
+
+    @Override
+    public List<Object[]> analyzeOrderFromClient(Date beginDate, Date endDate, Long clientId) {
+        return customOrderTableRepository.findOrderFromClient(beginDate, endDate, clientId);
+    }
+
+    @Override
+    public List<Object[]> analyzeOrderFromCreatedUser(Date beginDate, Date endDate, Long userId) {
+        return customOrderTableRepository.findOrderFromCreatedUser(beginDate, endDate, userId);
+    }
 }

@@ -11,10 +11,13 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,6 +37,106 @@ public class CustomOrderTableRepositoryImpl extends SimpleJpaRepository<OrderTab
     @Override
     public Page<OrderTable> findByFilters(Map<String, Object> mapFilter, Pageable pageable) {
         return super.findAll(filterConditions1(mapFilter), pageable);
+    }
+
+    @Override
+    public List<Object[]> findCountOrderByCountry(Date beginDate, Date endDate) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("select country.id, sum(o.sale_price) as total_quantity, count(o.id) from platform_crm_order o inner join platform_crm_country country on o.country_id = country.id ");
+        if (beginDate != null) {
+            stringBuilder.append(" and o.finished_date >= :beginDate ");
+        }
+        if (endDate != null) {
+            stringBuilder.append(" and o.finished_date <= :endDate ");
+        }
+        stringBuilder.append(" group by country.id order by total_quantity desc ");
+
+        Query query = this.entityManager.createNativeQuery(stringBuilder.toString());
+        if (beginDate != null) {
+            query.setParameter("beginDate", beginDate);
+        }
+        if (endDate != null) {
+            query.setParameter("endDate", endDate);
+        }
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Object[]> findOrderAmountFromUser(Date beginDate, Date endDate) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("select user.account, sum(o.sale_price) as total_quantity from platform_crm_order o inner join platform_crm_related_user user on o.created_user_id = user.id ");
+        if (beginDate != null) {
+            stringBuilder.append(" and o.finished_date >= :beginDate ");
+        }
+        if (endDate != null) {
+            stringBuilder.append(" and o.finished_date <= :endDate ");
+        }
+        stringBuilder.append(" group by user.id order by total_quantity desc ");
+
+        Query query = this.entityManager.createNativeQuery(stringBuilder.toString());
+        if (beginDate != null) {
+            query.setParameter("beginDate", beginDate);
+        }
+        if (endDate != null) {
+            query.setParameter("endDate", endDate);
+        }
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Object[]> findOrderFromClient(Date beginDate, Date endDate, Long clientId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("select o.finished_date, sum(o.sale_price) as total_quantity,count(o.id) from platform_crm_order o where 1=1 ");
+        if (clientId != null) {
+            stringBuilder.append(" and o.client_id = :clientId ");
+        }
+        if (beginDate != null) {
+            stringBuilder.append(" and o.finished_date >= :beginDate ");
+        }
+        if (endDate != null) {
+            stringBuilder.append(" and o.finished_date <= :endDate ");
+        }
+        stringBuilder.append(" group by o.finished_date order by o.finished_date desc ");
+
+        Query query = this.entityManager.createNativeQuery(stringBuilder.toString());
+        if (beginDate != null) {
+            query.setParameter("beginDate", beginDate);
+        }
+        if (endDate != null) {
+            query.setParameter("endDate", endDate);
+        }
+        if (clientId != null) {
+            query.setParameter("clientId", clientId);
+        }
+        return query.getResultList();
+    }
+
+    @Override
+    public List<Object[]> findOrderFromCreatedUser(Date beginDate, Date endDate, Long userId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("select o.finished_date, sum(o.sale_price) as total_quantity,count(o.id) from platform_crm_order o where 1=1 ");
+        if (userId != null) {
+            stringBuilder.append(" and o.created_user_id = :userId ");
+        }
+        if (beginDate != null) {
+            stringBuilder.append(" and o.finished_date >= :beginDate ");
+        }
+        if (endDate != null) {
+            stringBuilder.append(" and o.finished_date <= :endDate ");
+        }
+        stringBuilder.append(" group by o.finished_date order by o.finished_date desc ");
+
+        Query query = this.entityManager.createNativeQuery(stringBuilder.toString());
+        if (beginDate != null) {
+            query.setParameter("beginDate", beginDate);
+        }
+        if (endDate != null) {
+            query.setParameter("endDate", endDate);
+        }
+        if (userId != null) {
+            query.setParameter("userId", userId);
+        }
+        return query.getResultList();
     }
 
     private Specification<OrderTable> filterConditions1(Map<String, Object> mapFilter) {

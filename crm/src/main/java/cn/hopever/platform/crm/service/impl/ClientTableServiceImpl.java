@@ -251,4 +251,30 @@ public class ClientTableServiceImpl implements ClientTableService {
         }
         return list;
     }
+
+    @Override
+    public List<Object[]> analyzeClientOrigin(Float orderAmount) {
+        // GROUP BY origin,判断条件为orderAmount
+        if (orderAmount != null) {
+            return clientTableRepository.findByOrderAmountGroupByOrigin(orderAmount);
+        } else {
+            return clientTableRepository.findGroupByOrigin();
+        }
+    }
+
+    @Override
+    public List<Object[]> analyzeClientFromCountry(Date beginDate, Date endDate) {
+        // 按照启动
+        return customClientTableRepository.findCountClientByCountry(beginDate, endDate);
+    }
+
+    @Override
+    public List<Object[]> analyzeOrderAmountFromClient(Date beginDate, Date endDate) {
+        return customClientTableRepository.findOrderAmountFromClient(beginDate, endDate);
+    }
+
+    @Override
+    public List<Object[]> analyzeClientFromCreatedUser(Date beginDate, Date endDate, Long clientLevelId, Long userId) {
+        return customClientTableRepository.findClientFromCreatedUser(beginDate, endDate, clientLevelId, userId);
+    }
 }

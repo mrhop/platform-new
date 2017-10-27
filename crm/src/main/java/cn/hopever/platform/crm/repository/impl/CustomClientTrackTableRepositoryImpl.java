@@ -10,10 +10,13 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,6 +36,40 @@ public class CustomClientTrackTableRepositoryImpl extends SimpleJpaRepository<Cl
     @Override
     public Page<ClientTrackTable> findByFilters(Map<String, Object> mapFilter, Pageable pageable) {
         return super.findAll(filterConditions1(mapFilter), pageable);
+    }
+
+    @Override
+    public List<Object[]> findClientTrackFromTrackUser(Date beginDate, Date endDate, Long clientId, Long userId) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("select c.track_date,count(c.id) from platform_crm_client_track c where 1=1 ");
+        if (userId != null) {
+            stringBuilder.append(" and c.related_user_id = :userId ");
+        }
+        if (clientId != null) {
+            stringBuilder.append(" and c.client_id = :clientId ");
+        }
+        if (beginDate != null) {
+            stringBuilder.append(" and c.track_date >= :beginDate ");
+        }
+        if (endDate != null) {
+            stringBuilder.append(" and c.track_date <= :endDate ");
+        }
+        stringBuilder.append(" group by c.track_date order by c.track_date asc ");
+
+        Query query = this.entityManager.createNativeQuery(stringBuilder.toString());
+        if (userId != null) {
+            query.setParameter("userId", userId);
+        }
+        if (clientId != null) {
+            query.setParameter("clientId", clientId);
+        }
+        if (beginDate != null) {
+            query.setParameter("beginDate", beginDate);
+        }
+        if (endDate != null) {
+            query.setParameter("endDate", endDate);
+        }
+        return query.getResultList();
     }
 
     private Specification<ClientTrackTable> filterConditions1(Map<String, Object> mapFilter) {
