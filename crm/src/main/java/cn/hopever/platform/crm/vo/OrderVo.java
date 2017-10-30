@@ -18,7 +18,7 @@ public class OrderVo {
     private String orderStatusName;
     private String orderStatusCode;
 
-    private String discountType;
+    private String discountType = "auto";
 
     private Float discount;
 

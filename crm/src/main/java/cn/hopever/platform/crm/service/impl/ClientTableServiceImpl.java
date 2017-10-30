@@ -6,6 +6,7 @@ import cn.hopever.platform.crm.repository.*;
 import cn.hopever.platform.crm.service.ClientTableService;
 import cn.hopever.platform.crm.vo.ClientVo;
 import cn.hopever.platform.crm.vo.ClientVoAssembler;
+import cn.hopever.platform.utils.tools.DateFormat;
 import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -225,7 +227,11 @@ public class ClientTableServiceImpl implements ClientTableService {
             list.add(clientRelatedUserTable);
         }
         clientTable.setClientRelatedUserTables(list);
-        clientTable.setCreatedDate(new Date());
+        try {
+            clientTable.setCreatedDate(DateFormat.sdfDate.parse(DateFormat.sdfDate.format(new Date())));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         clientTable.setCreatedUser(relatedUserTable);
         clientTable.setCode(CommonMethods.generateCode("client"));
         clientTableRepository.save(clientTable);

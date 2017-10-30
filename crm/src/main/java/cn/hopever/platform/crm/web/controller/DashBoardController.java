@@ -92,17 +92,17 @@ public class DashBoardController {
                     boolean flagClient = false;
                     boolean flagOrder = false;
                     for (Object[] oArr : countryClients) {
-                        if (selectOption.getValue().equals(oArr[0])) {
+                        if (selectOption.getValue().toString().equals(oArr[0].toString())) {
                             flagClient = true;
                             listClients.add(Integer.valueOf(oArr[1].toString()));
                             break;
                         }
                     }
                     for (Object[] oArr : countryOrderAnalyze) {
-                        if (selectOption.getValue().equals(oArr[0])) {
+                        if (selectOption.getValue().toString().equals(oArr[0].toString())) {
                             flagOrder = true;
                             if (oArr[1] != null) {
-                                listOrderAmount.add(Float.valueOf(oArr[1].toString()));
+                                listOrderAmount.add(11f);
                             } else {
                                 listOrderAmount.add(0f);
                             }

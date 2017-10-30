@@ -7,6 +7,7 @@ import cn.hopever.platform.crm.service.OrderTableService;
 import cn.hopever.platform.crm.vo.OrderProductVo;
 import cn.hopever.platform.crm.vo.OrderVo;
 import cn.hopever.platform.crm.vo.OrderVoAssembler;
+import cn.hopever.platform.utils.tools.DateFormat;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -157,15 +159,20 @@ public class OrderTableServiceImpl implements OrderTableService {
             }
         }
         orderVoAssembler.toDomain(orderVo, orderTable);
-        OrderStatusTable orderStatusTable = orderStatusTableRepository.findOne(orderVo.getOrderStatusId());
+        OrderStatusTable orderStatusTable = orderTable.getOrderStatusTable();
+        OrderStatusTable orderStatusTableTemp = orderStatusTableRepository.findOne(orderVo.getOrderStatusId());
         if (orderStatusTable.getCode().equals("contracted")) {
             orderTable.setSalePrice(orderVo.getSalePrice());
             if (orderVo.getContractSignDate() != null) {
                 orderTable.setContractSignDate(new Date(orderVo.getContractSignDate()));
             }
         }
-        if (orderStatusTable.getCode().equals("finished")) {
-            orderTable.setFinishedDate(new Date());
+        if (orderStatusTableTemp.getCode().equals("finished")) {
+            try {
+                orderTable.setFinishedDate(DateFormat.sdfDate.parse(DateFormat.sdfDate.format(new Date())));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
             ClientTable clientTable = orderTable.getClientTable();
             clientTable.setOrderAmount(clientTable.getOrderAmount() + orderTable.getSalePrice());
         }
@@ -198,7 +205,7 @@ public class OrderTableServiceImpl implements OrderTableService {
             orderTable.setPreQuotation(orderVo.getPreQuotation());
             orderTable.setCostPrice(orderVo.getCostPrice());
         }
-        orderTable.setOrderStatusTable(orderStatusTable);
+        orderTable.setOrderStatusTable(orderStatusTableTemp);
         orderTableRepository.save(orderTable);
         return null;
     }
@@ -268,21 +275,25 @@ public class OrderTableServiceImpl implements OrderTableService {
 
     @Override
     public List<Object[]> analyzeOrderFromCountry(Date beginDate, Date endDate) {
-        return customOrderTableRepository.findCountOrderByCountry(beginDate, endDate);
+        OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("finished");
+        return customOrderTableRepository.findCountOrderByCountry(orderStatusTable.getId(), beginDate, endDate);
     }
 
     @Override
     public List<Object[]> analyzeOrderAmountFromUser(Date beginDate, Date endDate) {
-        return null;
+        OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("finished");
+        return customOrderTableRepository.findOrderAmountFromUser(orderStatusTable.getId(), beginDate, endDate);
     }
 
     @Override
     public List<Object[]> analyzeOrderFromClient(Date beginDate, Date endDate, Long clientId) {
-        return customOrderTableRepository.findOrderFromClient(beginDate, endDate, clientId);
+        OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("finished");
+        return customOrderTableRepository.findOrderFromClient(orderStatusTable.getId(), beginDate, endDate, clientId);
     }
 
     @Override
     public List<Object[]> analyzeOrderFromCreatedUser(Date beginDate, Date endDate, Long userId) {
-        return customOrderTableRepository.findOrderFromCreatedUser(beginDate, endDate, userId);
+        OrderStatusTable orderStatusTable = orderStatusTableRepository.findOneByCode("finished");
+        return customOrderTableRepository.findOrderFromCreatedUser(orderStatusTable.getId(), beginDate, endDate, userId);
     }
 }

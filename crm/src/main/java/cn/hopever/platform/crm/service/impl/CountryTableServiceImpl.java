@@ -1,6 +1,8 @@
 package cn.hopever.platform.crm.service.impl;
 
+import cn.hopever.platform.crm.domain.ClientTable;
 import cn.hopever.platform.crm.domain.CountryTable;
+import cn.hopever.platform.crm.domain.OrderTable;
 import cn.hopever.platform.crm.repository.CountryTableRepository;
 import cn.hopever.platform.crm.service.CountryTableService;
 import cn.hopever.platform.crm.vo.CountryVo;
@@ -46,7 +48,14 @@ public class CountryTableServiceImpl implements CountryTableService {
 
     @Override
     public void delete(Long id, Principal principal) {
-        countryTableRepository.delete(id);
+        CountryTable countryTable = countryTableRepository.findOne(id);
+        for (ClientTable clientTable : countryTable.getClientTables()) {
+            clientTable.setCountryTable(null);
+        }
+        for (OrderTable orderTable : countryTable.getOrderTables()) {
+            orderTable.setCountryTable(null);
+        }
+        countryTableRepository.delete(countryTable);
     }
 
     @Override

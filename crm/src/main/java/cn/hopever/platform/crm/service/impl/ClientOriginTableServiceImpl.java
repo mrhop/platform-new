@@ -1,6 +1,7 @@
 package cn.hopever.platform.crm.service.impl;
 
 import cn.hopever.platform.crm.domain.ClientOriginTable;
+import cn.hopever.platform.crm.domain.ClientTable;
 import cn.hopever.platform.crm.repository.ClientOriginTableRepository;
 import cn.hopever.platform.crm.service.ClientOriginTableService;
 import cn.hopever.platform.crm.vo.ClientOriginVo;
@@ -47,7 +48,11 @@ public class ClientOriginTableServiceImpl implements ClientOriginTableService {
 
     @Override
     public void delete(Long id, Principal principal) {
-        clientOriginTableRepository.delete(id);
+        ClientOriginTable clientOriginTable = clientOriginTableRepository.findOne(id);
+        for (ClientTable clientTable : clientOriginTable.getClientTables()) {
+            clientTable.setClientOriginTable(null);
+        }
+        clientOriginTableRepository.delete(clientOriginTable);
     }
 
     @Override

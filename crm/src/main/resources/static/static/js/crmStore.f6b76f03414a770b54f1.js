@@ -1,0 +1,2 @@
+webpackJsonp([10],{177:function(t,e,r){"use strict";Object.defineProperty(e,"__esModule",{value:!0}),e.default={state:{crm:{orderStatusCode:null,userStatus:{isAdmin:!0,firstPage:void 0}}},getters:{getOrderStatusCode:function(t){return t.crm.orderStatusCode},getUserStatus:function(t){return t.crm.userStatus}},mutations:{setOrderStatusCode:function(t,e){var r=e.code;t.crm.orderStatusCode=r},setUserStatus:function(t,e){var r=e.userStatus;t.crm.userStatus=r}}}}},[177]);
+//# sourceMappingURL=crmStore.f6b76f03414a770b54f1.js.map

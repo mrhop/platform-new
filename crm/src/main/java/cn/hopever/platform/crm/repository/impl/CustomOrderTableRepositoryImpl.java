@@ -40,9 +40,9 @@ public class CustomOrderTableRepositoryImpl extends SimpleJpaRepository<OrderTab
     }
 
     @Override
-    public List<Object[]> findCountOrderByCountry(Date beginDate, Date endDate) {
+    public List<Object[]> findCountOrderByCountry(Long orderStatusId, Date beginDate, Date endDate) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("select country.id, sum(o.sale_price) as total_quantity, count(o.id) from platform_crm_order o inner join platform_crm_country country on o.country_id = country.id ");
+        stringBuilder.append("select country.id, sum(o.sale_price) as total_quantity, count(o.id) from platform_crm_order o inner join platform_crm_country country on o.order_status_id = :orderStatusId and o.country_id = country.id ");
         if (beginDate != null) {
             stringBuilder.append(" and o.finished_date >= :beginDate ");
         }
@@ -52,6 +52,7 @@ public class CustomOrderTableRepositoryImpl extends SimpleJpaRepository<OrderTab
         stringBuilder.append(" group by country.id order by total_quantity desc ");
 
         Query query = this.entityManager.createNativeQuery(stringBuilder.toString());
+        query.setParameter("orderStatusId", orderStatusId);
         if (beginDate != null) {
             query.setParameter("beginDate", beginDate);
         }
@@ -62,18 +63,19 @@ public class CustomOrderTableRepositoryImpl extends SimpleJpaRepository<OrderTab
     }
 
     @Override
-    public List<Object[]> findOrderAmountFromUser(Date beginDate, Date endDate) {
+    public List<Object[]> findOrderAmountFromUser(Long orderStatusId, Date beginDate, Date endDate) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("select user.account, sum(o.sale_price) as total_quantity from platform_crm_order o inner join platform_crm_related_user user on o.created_user_id = user.id ");
+        stringBuilder.append("select user1.account, sum(o.sale_price) as total_quantity from platform_crm_order o inner join platform_crm_related_user user1 on o.order_status_id = :orderStatusId and o.created_user_id = user1.id ");
         if (beginDate != null) {
             stringBuilder.append(" and o.finished_date >= :beginDate ");
         }
         if (endDate != null) {
             stringBuilder.append(" and o.finished_date <= :endDate ");
         }
-        stringBuilder.append(" group by user.id order by total_quantity desc ");
+        stringBuilder.append(" group by user1.id order by total_quantity desc ");
 
         Query query = this.entityManager.createNativeQuery(stringBuilder.toString());
+        query.setParameter("orderStatusId", orderStatusId);
         if (beginDate != null) {
             query.setParameter("beginDate", beginDate);
         }
@@ -84,9 +86,9 @@ public class CustomOrderTableRepositoryImpl extends SimpleJpaRepository<OrderTab
     }
 
     @Override
-    public List<Object[]> findOrderFromClient(Date beginDate, Date endDate, Long clientId) {
+    public List<Object[]> findOrderFromClient(Long orderStatusId, Date beginDate, Date endDate, Long clientId) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("select o.finished_date, sum(o.sale_price) as total_quantity,count(o.id) from platform_crm_order o where 1=1 ");
+        stringBuilder.append("select o.finished_date, sum(o.sale_price) as total_quantity,count(o.id) from platform_crm_order o where o.order_status_id = :orderStatusId ");
         if (clientId != null) {
             stringBuilder.append(" and o.client_id = :clientId ");
         }
@@ -99,6 +101,7 @@ public class CustomOrderTableRepositoryImpl extends SimpleJpaRepository<OrderTab
         stringBuilder.append(" group by o.finished_date order by o.finished_date desc ");
 
         Query query = this.entityManager.createNativeQuery(stringBuilder.toString());
+        query.setParameter("orderStatusId", orderStatusId);
         if (beginDate != null) {
             query.setParameter("beginDate", beginDate);
         }
@@ -112,9 +115,9 @@ public class CustomOrderTableRepositoryImpl extends SimpleJpaRepository<OrderTab
     }
 
     @Override
-    public List<Object[]> findOrderFromCreatedUser(Date beginDate, Date endDate, Long userId) {
+    public List<Object[]> findOrderFromCreatedUser(Long orderStatusId, Date beginDate, Date endDate, Long userId) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("select o.finished_date, sum(o.sale_price) as total_quantity,count(o.id) from platform_crm_order o where 1=1 ");
+        stringBuilder.append("select o.finished_date, sum(o.sale_price) as total_quantity,count(o.id) from platform_crm_order o where o.order_status_id = :orderStatusId ");
         if (userId != null) {
             stringBuilder.append(" and o.created_user_id = :userId ");
         }
@@ -127,6 +130,7 @@ public class CustomOrderTableRepositoryImpl extends SimpleJpaRepository<OrderTab
         stringBuilder.append(" group by o.finished_date order by o.finished_date desc ");
 
         Query query = this.entityManager.createNativeQuery(stringBuilder.toString());
+        query.setParameter("orderStatusId", orderStatusId);
         if (beginDate != null) {
             query.setParameter("beginDate", beginDate);
         }

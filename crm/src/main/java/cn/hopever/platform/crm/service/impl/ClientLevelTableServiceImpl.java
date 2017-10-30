@@ -1,6 +1,7 @@
 package cn.hopever.platform.crm.service.impl;
 
 import cn.hopever.platform.crm.domain.ClientLevelTable;
+import cn.hopever.platform.crm.domain.ClientTable;
 import cn.hopever.platform.crm.repository.ClientLevelTableRepository;
 import cn.hopever.platform.crm.service.ClientLevelTableService;
 import cn.hopever.platform.crm.vo.ClientLevelVo;
@@ -47,7 +48,11 @@ public class ClientLevelTableServiceImpl implements ClientLevelTableService {
 
     @Override
     public void delete(Long id, Principal principal) {
-        clientLevelTableRepository.delete(id);
+        ClientLevelTable clientLevelTable = clientLevelTableRepository.findOne(id);
+        for (ClientTable clientTable : clientLevelTable.getClientTables()) {
+            clientTable.setClientLevelTable(null);
+        }
+        clientLevelTableRepository.delete(clientLevelTable);
     }
 
     @Override

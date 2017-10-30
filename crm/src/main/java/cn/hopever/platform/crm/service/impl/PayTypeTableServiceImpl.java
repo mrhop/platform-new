@@ -1,5 +1,6 @@
 package cn.hopever.platform.crm.service.impl;
 
+import cn.hopever.platform.crm.domain.OrderTable;
 import cn.hopever.platform.crm.domain.PayTypeTable;
 import cn.hopever.platform.crm.repository.PayTypeTableRepository;
 import cn.hopever.platform.crm.service.PayTypeTableService;
@@ -47,7 +48,11 @@ public class PayTypeTableServiceImpl implements PayTypeTableService {
 
     @Override
     public void delete(Long id, Principal principal) {
-        payTypeTableRepository.delete(id);
+        PayTypeTable payTypeTable = payTypeTableRepository.findOne(id);
+        for (OrderTable orderTable : payTypeTable.getOrderTables()) {
+            orderTable.setPayTypeTable(null);
+        }
+        payTypeTableRepository.delete(payTypeTable);
     }
 
     @Override

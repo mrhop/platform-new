@@ -1,6 +1,7 @@
 package cn.hopever.platform.crm.service.impl;
 
 import cn.hopever.platform.crm.domain.DeliveryMethodTable;
+import cn.hopever.platform.crm.domain.OrderTable;
 import cn.hopever.platform.crm.repository.DeliveryMethodTableRepository;
 import cn.hopever.platform.crm.service.DeliveryMethodTableService;
 import cn.hopever.platform.crm.vo.DeliveryMethodVo;
@@ -47,7 +48,11 @@ public class DeliveryMethodTableServiceImpl implements DeliveryMethodTableServic
 
     @Override
     public void delete(Long id, Principal principal) {
-        deliveryMethodTableRepository.delete(id);
+        DeliveryMethodTable deliveryMethodTable = deliveryMethodTableRepository.findOne(id);
+        for(OrderTable orderTable:deliveryMethodTable.getOrderTables()){
+            orderTable.setDeliveryMethodTable(null);
+        }
+        deliveryMethodTableRepository.delete(deliveryMethodTable);
     }
 
     @Override

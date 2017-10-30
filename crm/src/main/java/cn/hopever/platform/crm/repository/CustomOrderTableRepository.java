@@ -16,12 +16,12 @@ public interface CustomOrderTableRepository extends GenericRepository<OrderTable
 
     public Page<OrderTable> findByFilters(Map<String, Object> mapFilter, Pageable pageable);
 
-    public List<Object[]> findCountOrderByCountry(Date beginDate, Date endDate);
+    public List<Object[]> findCountOrderByCountry(Long orderStatusId, Date beginDate, Date endDate);
 
-    public List<Object[]> findOrderAmountFromUser(Date beginDate, Date endDate);
+    public List<Object[]> findOrderAmountFromUser(Long orderStatusId, Date beginDate, Date endDate);
 
-    public List<Object[]> findOrderFromClient(Date beginDate, Date endDate, Long clientId);
+    public List<Object[]> findOrderFromClient(Long orderStatusId, Date beginDate, Date endDate, Long clientId);
 
-    public List<Object[]> findOrderFromCreatedUser(Date beginDate, Date endDate, Long userId);
+    public List<Object[]> findOrderFromCreatedUser(Long orderStatusId, Date beginDate, Date endDate, Long userId);
 
 }

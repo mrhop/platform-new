@@ -10,6 +10,7 @@ import cn.hopever.platform.crm.service.ClientTrackTableService;
 import cn.hopever.platform.crm.vo.ClientTrackVo;
 import cn.hopever.platform.crm.vo.ClientTrackVoAssembler;
 import cn.hopever.platform.utils.tools.BeanUtils;
+import cn.hopever.platform.utils.tools.DateFormat;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
+import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -84,7 +86,11 @@ public class ClientTrackTableServiceImpl implements ClientTrackTableService {
         ClientTrackTable clientTrackTable = new ClientTrackTable();
         clientTrackVoAssembler.toDomain(clientTrackVo, clientTrackTable);
         if (clientTrackTable.getTrackDate() == null) {
-            clientTrackTable.setTrackDate(new Date());
+            try {
+                clientTrackTable.setTrackDate(DateFormat.sdfDate.parse(DateFormat.sdfDate.format(new Date())));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
         clientTrackTable.setClientTable(clientTableRepository.findOne(clientTrackVo.getClientId()));
         clientTrackTable.setTrackUser(relatedUserTableRepository.findOneByAccount(principal.getName()));

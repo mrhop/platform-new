@@ -1,6 +1,7 @@
 package cn.hopever.platform.crm.service.impl;
 
 import cn.hopever.platform.crm.domain.ProductCategoryTable;
+import cn.hopever.platform.crm.domain.ProductTable;
 import cn.hopever.platform.crm.repository.ProductCategoryTableRepository;
 import cn.hopever.platform.crm.service.ProductCategoryTableService;
 import cn.hopever.platform.crm.vo.ProductCategoryVo;
@@ -46,7 +47,11 @@ public class ProductCategoryTableServiceImpl implements ProductCategoryTableServ
 
     @Override
     public void delete(Long id, Principal principal) {
-        productCategoryTableRepository.delete(id);
+        ProductCategoryTable productCategoryTable = productCategoryTableRepository.findOne(id);
+        for (ProductTable productTable : productCategoryTable.getProductTables()) {
+            productTable.setProductCategoryTable(null);
+        }
+        productCategoryTableRepository.delete(productCategoryTable);
     }
 
     @Override
@@ -56,13 +61,13 @@ public class ProductCategoryTableServiceImpl implements ProductCategoryTableServ
 
     @Override
     public VueResults.Result update(ProductCategoryVo productCategoryVo, MultipartFile[] files, Principal principal) {
-        productCategoryTableRepository.save(productCategoryVoAssembler.toDomain(productCategoryVo,productCategoryTableRepository.findOne(productCategoryVo.getId())));
+        productCategoryTableRepository.save(productCategoryVoAssembler.toDomain(productCategoryVo, productCategoryTableRepository.findOne(productCategoryVo.getId())));
         return null;
     }
 
     @Override
     public VueResults.Result save(ProductCategoryVo productCategoryVo, MultipartFile[] files, Principal principal) {
-        productCategoryTableRepository.save(productCategoryVoAssembler.toDomain(productCategoryVo,new ProductCategoryTable()));
+        productCategoryTableRepository.save(productCategoryVoAssembler.toDomain(productCategoryVo, new ProductCategoryTable()));
         return null;
     }
 

@@ -20,8 +20,10 @@ public class OrderVoAssembler implements GenericVoAssembler<OrderVo, OrderTable>
         if (orderTable.getContractSignDate() != null) {
             orderVo.setContractSignDate(orderTable.getContractSignDate().getTime());
         }
-        orderVo.setCountryId(orderTable.getCountryTable().getId());
-        orderVo.setCountryName(orderTable.getCountryTable().getName());
+        if (orderTable.getCountryTable() != null) {
+            orderVo.setCountryId(orderTable.getCountryTable().getId());
+            orderVo.setCountryName(orderTable.getCountryTable().getName());
+        }
         if (orderTable.getCreatedDate() != null) {
             orderVo.setCreatedDate(orderTable.getCreatedDate().getTime());
         }

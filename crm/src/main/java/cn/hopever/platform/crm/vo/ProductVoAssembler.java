@@ -19,8 +19,10 @@ public class ProductVoAssembler implements GenericVoAssembler<ProductVo, Product
         productVo.setCreatedUserId(productTable.getCreatedUser().getId());
         productVo.setCreatedUserName(productTable.getCreatedUser().getAccount());
         productVo.setCreatedDate(productTable.getCreatedDate().getTime());
-        productVo.setProductCategoryId(productTable.getProductCategoryTable().getId());
-        productVo.setProductCategoryName(productTable.getProductCategoryTable().getName());
+        if (productTable.getProductCategoryTable() != null) {
+            productVo.setProductCategoryId(productTable.getProductCategoryTable().getId());
+            productVo.setProductCategoryName(productTable.getProductCategoryTable().getName());
+        }
         return productVo;
     }
 

@@ -117,7 +117,11 @@ public class OrderStatusTableServiceImpl implements OrderStatusTableService {
 
     @Override
     public void delete(Long id, Principal principal) {
-        orderStatusTableRepository.delete(id);
+        OrderStatusTable orderStatusTable = orderStatusTableRepository.findOne(id);
+        for(OrderTable orderTable:orderStatusTable.getOrderTables()){
+            orderTable.setOrderStatusTable(null);
+        }
+        orderStatusTableRepository.delete(orderStatusTable);
     }
 
     @Override
