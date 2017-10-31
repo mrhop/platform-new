@@ -3,6 +3,7 @@ package cn.hopever.platform.crm.web.controller;
 import cn.hopever.platform.oauth2client.config.Oauth2Properties;
 import cn.hopever.platform.oauth2client.web.common.CommonMethods;
 import cn.hopever.platform.utils.web.CommonResult;
+import org.jboss.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ import java.util.Map;
 //@CrossOrigin
 @RequestMapping(value = "/", produces = "application/json")
 public class TopController {
+    private Logger logger = Logger.getLogger(TopController.class);
 
     @Autowired
     private Oauth2Properties oauth2Properties;
@@ -34,12 +36,9 @@ public class TopController {
     public List<Map> leftmenu(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Principal principal, Authentication authentication) throws Exception {
         if (httpServletRequest.getSession(true).getAttribute("leftMenu") != null) {
             return (List) httpServletRequest.getSession(true).getAttribute("leftMenu");
+        } else {
+            return this.getLeftMenu(httpServletRequest);
         }
-        httpServletRequest.setAttribute("resourceUrl", oauth2Properties.getLeftMenu());
-        CommonResult commonResult = commonMethods.getResource(httpServletRequest);
-        List<Map> list = (List<Map>) commonResult.getResponseData().get("data");
-        httpServletRequest.getSession(true).setAttribute("leftMenu", list);
-        return list;
     }
 
     @RequestMapping(value = "/userstatus", method = {RequestMethod.GET})
@@ -54,6 +53,19 @@ public class TopController {
         }
         map.put("isAdmin", cn.hopever.platform.crm.config.CommonMethods.isAdmin(principal));
         return map;
+    }
+
+    private List<Map> getLeftMenu(HttpServletRequest httpServletRequest) throws Exception {
+        synchronized (this) {
+            if (httpServletRequest.getSession(true).getAttribute("leftMenu") != null) {
+                return (List) httpServletRequest.getSession(true).getAttribute("leftMenu");
+            }
+            httpServletRequest.setAttribute("resourceUrl", oauth2Properties.getLeftMenu());
+            CommonResult commonResult = commonMethods.getResource(httpServletRequest);
+            List<Map> list = (List<Map>) commonResult.getResponseData().get("data");
+            httpServletRequest.getSession(true).setAttribute("leftMenu", list);
+            return list;
+        }
     }
 
     private String getFirstPage(List<Map> list) {

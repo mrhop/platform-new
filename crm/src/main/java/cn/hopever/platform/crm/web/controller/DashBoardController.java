@@ -102,7 +102,7 @@ public class DashBoardController {
                         if (selectOption.getValue().toString().equals(oArr[0].toString())) {
                             flagOrder = true;
                             if (oArr[1] != null) {
-                                listOrderAmount.add(11f);
+                                listOrderAmount.add(Float.valueOf(oArr[1].toString()));
                             } else {
                                 listOrderAmount.add(0f);
                             }
