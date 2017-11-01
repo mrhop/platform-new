@@ -56,8 +56,9 @@ public class MediaTable {
     @Column(name = "created_date")
     private Date createdDate;
 
-    @Column(name = "create_user")
-    private String createUser;
+    @ManyToOne
+    @JoinColumn(name = "created_user_id")
+    private RelatedUserTable createdUser;
 
     @Column(name = "published")
     private boolean published = true;

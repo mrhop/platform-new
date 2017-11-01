@@ -1,7 +1,9 @@
 package cn.hopever.platform.cms.web.controller;
 
+import cn.hopever.platform.cms.service.RelatedUserTableService;
 import cn.hopever.platform.cms.service.ThemeTableService;
 import cn.hopever.platform.cms.vo.ThemeVo;
+import cn.hopever.platform.utils.security.CommonMethods;
 import cn.hopever.platform.utils.web.GenericController;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
@@ -30,6 +32,8 @@ public class ThemeController implements GenericController<ThemeVo> {
     Logger logger = LoggerFactory.getLogger(ThemeController.class);
     @Autowired
     private ThemeTableService themeTableService;
+    @Autowired
+    private RelatedUserTableService relatedUserTableService;
 
     @Override
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
@@ -45,7 +49,7 @@ public class ThemeController implements GenericController<ThemeVo> {
                 List<Object> listTmp = new ArrayList<>();
                 listTmp.add(cv.getName());
                 listTmp.add(cv.getThemeId());
-                listTmp.add(cv.getRelatedUsers());
+                listTmp.add(cv.getRelatedUserAccounts());
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);
             }
@@ -106,7 +110,14 @@ public class ThemeController implements GenericController<ThemeVo> {
     @Override
     @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
     public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        // 需要关联用户的处理
-        return null;
+        Map mapReturn = new HashMap<>();
+        try {
+            if (CommonMethods.isAdmin(principal)) {
+                mapReturn.put("relatedUsers", relatedUserTableService.getRelatedUserOptions(principal));
+            }
+        } catch (Exception e) {
+            logger.error("theme rulechange:" + e);
+        }
+        return mapReturn;
     }
 }

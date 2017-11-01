@@ -1,14 +1,12 @@
 package cn.hopever.platform.cms.service.impl;
 
-import cn.hopever.platform.cms.domain.BlockTable;
-import cn.hopever.platform.cms.domain.TemplateTable;
-import cn.hopever.platform.cms.domain.ThemeTable;
-import cn.hopever.platform.cms.domain.WebsiteTable;
+import cn.hopever.platform.cms.domain.*;
 import cn.hopever.platform.cms.repository.*;
 import cn.hopever.platform.cms.service.WebsiteTableService;
 import cn.hopever.platform.cms.vo.WebsiteVo;
 import cn.hopever.platform.cms.vo.WebsiteVoAssembler;
 import cn.hopever.platform.utils.moji.MojiUtils;
+import cn.hopever.platform.utils.security.CommonMethods;
 import cn.hopever.platform.utils.tools.BeanUtils;
 import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
@@ -26,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -50,6 +49,8 @@ public class WebsiteTableServiceImpl implements WebsiteTableService {
     @Autowired
     private ThemeTableRepository themeTableRepository;
     @Autowired
+    private RelatedUserTableRepository relatedUserTableRepository;
+    @Autowired
     private WebsiteVoAssembler websiteVoAssembler;
     @Autowired
     private TemplateTableRepository templateTableRepository;
@@ -73,7 +74,20 @@ public class WebsiteTableServiceImpl implements WebsiteTableService {
         Page<WebsiteTable> page = customWebsiteTableRepository.findByFilters(body.getFilters(), pageRequest);
         List<WebsiteVo> list = new ArrayList<>();
         for (WebsiteTable websiteTable : page) {
-            list.add(websiteVoAssembler.toResource(websiteTable));
+            WebsiteVo websiteVo = websiteVoAssembler.toResource(websiteTable);
+            if (CommonMethods.isAdmin(principal)) {
+                if (websiteTable.getWebsiteRelatedUserTables() != null) {
+                    List<Long> relatedUserIds = new ArrayList<>();
+                    List<String> relatedUserAccounts = new ArrayList<>();
+                    for (WebsiteRelatedUserTable websiteRelatedUserTable : websiteTable.getWebsiteRelatedUserTables()) {
+                        relatedUserIds.add(websiteRelatedUserTable.getRelatedUserTable().getId());
+                        relatedUserAccounts.add(websiteRelatedUserTable.getRelatedUserTable().getAccount());
+                    }
+                    websiteVo.setRelatedUserIds(relatedUserIds);
+                    websiteVo.setRelatedUserAccounts(relatedUserAccounts);
+                }
+            }
+            list.add(websiteVo);
         }
         return new PageImpl<WebsiteVo>(list, pageRequest, page.getTotalElements());
     }
@@ -86,7 +100,20 @@ public class WebsiteTableServiceImpl implements WebsiteTableService {
     @Override
     public WebsiteVo info(Long id, Principal principal) {
         WebsiteTable websiteTable = websiteTableRepository.findOne(id);
-        return websiteVoAssembler.toResource(websiteTable);
+        WebsiteVo websiteVo = websiteVoAssembler.toResource(websiteTable);
+        if (CommonMethods.isAdmin(principal)) {
+            if (websiteTable.getWebsiteRelatedUserTables() != null) {
+                List<Long> relatedUserIds = new ArrayList<>();
+                List<String> relatedUserAccounts = new ArrayList<>();
+                for (WebsiteRelatedUserTable websiteRelatedUserTable : websiteTable.getWebsiteRelatedUserTables()) {
+                    relatedUserIds.add(websiteRelatedUserTable.getRelatedUserTable().getId());
+                    relatedUserAccounts.add(websiteRelatedUserTable.getRelatedUserTable().getAccount());
+                }
+                websiteVo.setRelatedUserIds(relatedUserIds);
+                websiteVo.setRelatedUserAccounts(relatedUserAccounts);
+            }
+        }
+        return websiteVo;
     }
 
     @Override
@@ -119,6 +146,23 @@ public class WebsiteTableServiceImpl implements WebsiteTableService {
                 logger.error("update theme screemshots failed", e);
             }
         }
+        if (CommonMethods.isAdmin(principal)) {
+            List<WebsiteRelatedUserTable> list = websiteTable.getWebsiteRelatedUserTables();
+            if (list != null) {
+                list.clear();
+            } else {
+                list = new ArrayList<>();
+            }
+            if (websiteVo.getRelatedUserIds() != null) {
+                for (Long relatedUserId : websiteVo.getRelatedUserIds()) {
+                    WebsiteRelatedUserTable websiteRelatedUserTable = new WebsiteRelatedUserTable();
+                    websiteRelatedUserTable.setWebsiteTable(websiteTable);
+                    websiteRelatedUserTable.setRelatedUserTable(relatedUserTableRepository.findOne(relatedUserId));
+                    list.add(websiteRelatedUserTable);
+                }
+            }
+            websiteTable.setWebsiteRelatedUserTables(list);
+        }
         websiteTableRepository.save(websiteTable);
         return null;
     }
@@ -141,6 +185,26 @@ public class WebsiteTableServiceImpl implements WebsiteTableService {
                 logger.error("save theme screenshots failed", e);
             }
         }
+        RelatedUserTable relatedUserTable = relatedUserTableRepository.findOneByAccount(principal.getName());
+        List<WebsiteRelatedUserTable> websiteRelatedUserTables = new ArrayList<>();
+        if (CommonMethods.isAdmin(principal)) {
+            if (websiteVo.getRelatedUserIds() != null) {
+                for (Long relatedUserId : websiteVo.getRelatedUserIds()) {
+                    WebsiteRelatedUserTable websiteRelatedUserTable = new WebsiteRelatedUserTable();
+                    websiteRelatedUserTable.setWebsiteTable(websiteTable);
+                    websiteRelatedUserTable.setRelatedUserTable(relatedUserTableRepository.findOne(relatedUserId));
+                    websiteRelatedUserTables.add(websiteRelatedUserTable);
+                }
+            }
+        } else {
+            WebsiteRelatedUserTable websiteRelatedUserTable = new WebsiteRelatedUserTable();
+            websiteRelatedUserTable.setWebsiteTable(websiteTable);
+            websiteRelatedUserTable.setRelatedUserTable(relatedUserTable);
+            websiteRelatedUserTables.add(websiteRelatedUserTable);
+        }
+        websiteTable.setWebsiteRelatedUserTables(websiteRelatedUserTables);
+        websiteTable.setCreatedDate(new Date());
+        websiteTable.setCreatedUser(relatedUserTableRepository.findOneByAccount(principal.getName()));
         websiteTableRepository.save(websiteTable);
         if (themeTable.getTemplateTables() != null) {
             List<TemplateTable> templateTables = new ArrayList<>();
@@ -179,11 +243,11 @@ public class WebsiteTableServiceImpl implements WebsiteTableService {
 
     @Override
     public List<SelectOption> getOptions(Principal principal) {
-        Iterable<WebsiteTable> list = websiteTableRepository.findAll();
         List<SelectOption> listReturn = new ArrayList<>();
-        for (WebsiteTable websiteTable : list) {
-            if (websiteTable.getRelatedUsers().contains(principal.getName())) {
-                listReturn.add(new SelectOption(websiteTable.getName(), websiteTable.getId()));
+        List<WebsiteRelatedUserTable> websiteRelatedUserTables = relatedUserTableRepository.findOneByAccount(principal.getName()).getWebsiteRelatedUserTables();
+        if (websiteRelatedUserTables != null && websiteRelatedUserTables.size() > 0) {
+            for (WebsiteRelatedUserTable websiteRelatedUserTable : websiteRelatedUserTables) {
+                listReturn.add(new SelectOption(websiteRelatedUserTable.getWebsiteTable().getName(), websiteRelatedUserTable.getWebsiteTable().getId()));
             }
         }
         return listReturn;

@@ -1,11 +1,14 @@
 package cn.hopever.platform.cms.web.controller;
 
+import cn.hopever.platform.cms.service.RelatedUserTableService;
 import cn.hopever.platform.cms.service.ThemeTableService;
 import cn.hopever.platform.cms.service.WebsiteTableService;
 import cn.hopever.platform.cms.vo.WebsiteVo;
 import cn.hopever.platform.oauth2client.config.Oauth2Properties;
-import cn.hopever.platform.oauth2client.web.common.CommonMethods;
-import cn.hopever.platform.utils.web.*;
+import cn.hopever.platform.utils.security.CommonMethods;
+import cn.hopever.platform.utils.web.GenericController;
+import cn.hopever.platform.utils.web.TableParameters;
+import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +37,10 @@ public class WebsiteController implements GenericController<WebsiteVo> {
     private Oauth2Properties oauth2Properties;
 
     @Autowired
-    private CommonMethods commonMethods;
+    private WebsiteTableService websiteTableService;
 
     @Autowired
-    private WebsiteTableService websiteTableService;
+    private RelatedUserTableService relatedUserTableService;
 
     @Autowired
     private ThemeTableService themeTableService;
@@ -61,7 +64,7 @@ public class WebsiteController implements GenericController<WebsiteVo> {
                 listTmp.add(cv.getThemeId());
                 listTmp.add(cv.getUrl());
                 listTmp.add(cv.getEmail());
-                listTmp.add(cv.getRelatedUsers());
+                listTmp.add(cv.getRelatedUserAccounts());
                 mapTemp.put("value", listTmp);
                 listReturn.add(mapTemp);
             }
@@ -123,16 +126,9 @@ public class WebsiteController implements GenericController<WebsiteVo> {
     @RequestMapping(value = "/form/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
     public Map rulechange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Map mapReturn = new HashMap<>();
-        httpServletRequest.setAttribute("resourceUrl", oauth2Properties.getRelatedUsers());
         try {
-            CommonResult commonResult = commonMethods.getResource(httpServletRequest);
-            List<String> list = (List<String>) commonResult.getResponseData().get("data");
-            if (list != null && list.size() > 0) {
-                List<SelectOption> list1 = new ArrayList<>();
-                for (String relateUser : list) {
-                    list1.add(new SelectOption(relateUser, relateUser));
-                }
-                mapReturn.put("relatedUsers", list1);
+            if (CommonMethods.isAdmin(principal)) {
+                mapReturn.put("relatedUsers", relatedUserTableService.getRelatedUserOptions(principal));
             }
             if (key == null) {
                 mapReturn.put("themes", themeTableService.getOptions());

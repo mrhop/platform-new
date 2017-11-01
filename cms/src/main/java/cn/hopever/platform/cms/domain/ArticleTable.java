@@ -53,8 +53,9 @@ public class ArticleTable {
     @Column(name = "created_date")
     private Date createdDate;
 
-    @Column(name = "create_user")
-    private String createUser;
+    @ManyToOne
+    @JoinColumn(name = "created_user_id")
+    private RelatedUserTable createdUser;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "website_id")

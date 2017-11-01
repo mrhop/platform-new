@@ -1,5 +1,6 @@
 package cn.hopever.platform.cms.web.controller;
 
+import cn.hopever.platform.cms.service.RelatedUserTableService;
 import cn.hopever.platform.cms.service.ThemeTableService;
 import cn.hopever.platform.cms.service.WebsiteTableService;
 import cn.hopever.platform.cms.vo.WebsiteVo;
@@ -37,6 +38,8 @@ public class TopController {
     private ThemeTableService themeTableService;
     @Autowired
     private WebsiteTableService websiteTableService;
+    @Autowired
+    private RelatedUserTableService relatedUserTableService;
     @Autowired
     private Oauth2Properties oauth2Properties;
     @Autowired
@@ -161,17 +164,9 @@ public class TopController {
     // cms部分应该包含2部分 theme， website ，剩下的对website和theme本身的处理，应该在admin管理权限里面
     @RequestMapping(value = "/relatedusers", method = {RequestMethod.GET})
     public List<SelectOption> relateduser(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Principal principal, Authentication authentication) throws Exception {
-        httpServletRequest.setAttribute("resourceUrl", oauth2Properties.getRelatedUsers());
-        CommonResult commonResult = commonMethods.getResource(httpServletRequest);
-        List<String> list = (List<String>) commonResult.getResponseData().get("data");
-        if (list != null && list.size() > 0) {
-            List<SelectOption> list1 = new ArrayList<>();
-            for (String relateUser : list) {
-                list1.add(new SelectOption(relateUser, relateUser));
-            }
-            return list1;
+        if (cn.hopever.platform.utils.security.CommonMethods.isAdmin(principal)) {
+            return relatedUserTableService.getRelatedUserOptions(principal);
         }
-
         return null;
     }
 

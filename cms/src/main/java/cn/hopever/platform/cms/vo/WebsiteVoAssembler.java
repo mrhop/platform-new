@@ -18,9 +18,6 @@ public class WebsiteVoAssembler implements GenericVoAssembler<WebsiteVo, Website
         if(websiteTable.getScreenshots()!=null){
             websiteVo.setScreenshots(websiteTable.getScreenshots());
         }
-        if(websiteTable.getRelatedUsers()!=null){
-            websiteVo.setRelatedUsers(websiteTable.getRelatedUsers());
-        }
         websiteVo.setThemeId(websiteTable.getThemeTable().getId());
         websiteVo.setThemeName(websiteTable.getThemeTable().getName());
         return websiteVo;
@@ -29,9 +26,6 @@ public class WebsiteVoAssembler implements GenericVoAssembler<WebsiteVo, Website
     @Override
     public WebsiteTable toDomain(WebsiteVo websiteVo, WebsiteTable websiteTable) {
         BeanUtils.copyNotNullProperties(websiteVo, websiteTable);
-        if (websiteVo.getRelatedUsers() != null) {
-            websiteTable.setRelatedUsers(websiteVo.getRelatedUsers());
-        }
         return websiteTable;
     }
 }

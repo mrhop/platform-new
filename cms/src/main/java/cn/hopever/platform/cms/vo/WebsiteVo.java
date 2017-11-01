@@ -26,7 +26,14 @@ public class WebsiteVo {
 
     private String phone;
 
-    private List<String> relatedUsers;
+    private List<String> relatedUserAccounts;
+    private List<Long> relatedUserIds;
+
+
+    private Long createdDate;
+
+    private Long createdUserId;
+    private String createdUserName;
 
     private boolean enabled;
 

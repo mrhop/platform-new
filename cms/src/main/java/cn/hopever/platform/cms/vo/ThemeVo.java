@@ -18,7 +18,14 @@ public class ThemeVo {
 
     private List<String> screenshots;
 
-    private List<String> relatedUsers;
+    private List<String> relatedUserAccounts;
+    private List<Long> relatedUserIds;
+
+
+    private Long createdDate;
+
+    private Long createdUserId;
+    private String createdUserName;
 
     private String description;
 

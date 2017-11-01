@@ -13,4 +13,9 @@ public class ArticleTagVo {
     private String tagId;
     private String websiteName;
     private Long websiteId;
+
+    private Long createdDate;
+
+    private Long createdUserId;
+    private String createdUserName;
 }

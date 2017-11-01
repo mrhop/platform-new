@@ -26,4 +26,9 @@ public class TemplateVo {
 
     private String description;
 
+    private Long createdDate;
+
+    private Long createdUserId;
+    private String createdUserName;
+
 }

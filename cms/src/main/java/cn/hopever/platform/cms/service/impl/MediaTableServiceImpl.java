@@ -3,10 +3,7 @@ package cn.hopever.platform.cms.service.impl;
 import cn.hopever.platform.cms.domain.MediaTable;
 import cn.hopever.platform.cms.domain.MediaTagTable;
 import cn.hopever.platform.cms.domain.WebsiteTable;
-import cn.hopever.platform.cms.repository.CustomMediaTableRepository;
-import cn.hopever.platform.cms.repository.MediaTableRepository;
-import cn.hopever.platform.cms.repository.MediaTagTableRepository;
-import cn.hopever.platform.cms.repository.WebsiteTableRepository;
+import cn.hopever.platform.cms.repository.*;
 import cn.hopever.platform.cms.service.MediaTableService;
 import cn.hopever.platform.cms.vo.MediaVo;
 import cn.hopever.platform.cms.vo.MediaVoAssembler;
@@ -42,6 +39,8 @@ public class MediaTableServiceImpl implements MediaTableService {
     private MediaTableRepository mediaTableRepository;
     @Autowired
     private MediaTagTableRepository mediaTagTableRepository;
+    @Autowired
+    private RelatedUserTableRepository relatedUserTableRepository;
     @Autowired
     private CustomMediaTableRepository customMediaTableRepository;
     @Autowired
@@ -112,7 +111,7 @@ public class MediaTableServiceImpl implements MediaTableService {
         MediaTable mediaTable = new MediaTable();
         mediaVoAssembler.toDomain(mediaVo, mediaTable);
         mediaTable.setCreatedDate(new Date());
-        mediaTable.setCreateUser(principal.getName());
+        mediaTable.setCreatedUser(relatedUserTableRepository.findOneByAccount(principal.getName()));
         if (mediaTable.isPublished() && mediaTable.getPublishDate() == null) {
             mediaTable.setPublishDate(new Date());
         }
@@ -173,7 +172,7 @@ public class MediaTableServiceImpl implements MediaTableService {
             mediaTagTableRepository.save(mediaTagTable);
         }
         mediaTable.setCreatedDate(new Date());
-        mediaTable.setCreateUser(principal.getName());
+        mediaTable.setCreatedUser(relatedUserTableRepository.findOneByAccount(principal.getName()));
         mediaTable.setPublished(true);
         mediaTable.setPublishDate(new Date());
         mediaTable.setWebsiteTable(websiteTable);

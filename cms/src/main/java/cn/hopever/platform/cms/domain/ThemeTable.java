@@ -8,6 +8,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -34,8 +35,8 @@ public class ThemeTable {
     @Column(name = "screenshots", length = 510)
     private String screenshots;
 
-    @Column(name = "related_users")
-    private String relatedUsers;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "themeTable")
+    private List<ThemeRelatedUserTable> themeRelatedUserTables;
 
     @Column(name = "description")
     private String description;
@@ -48,6 +49,13 @@ public class ThemeTable {
 
     @OneToMany(mappedBy = "themeTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<WebsiteTable> websiteTables;
+
+    @Column(name = "created_date")
+    private Date createdDate;
+
+    @ManyToOne
+    @JoinColumn(name = "created_user_id")
+    private RelatedUserTable createdUser;
 
     public List<String> getScreenshots() {
         if (this.screenshots != null) {
@@ -71,28 +79,4 @@ public class ThemeTable {
             this.screenshots = null;
         }
     }
-
-    public List<String> getRelatedUsers() {
-        if (this.relatedUsers != null) {
-            try {
-                return JacksonUtil.mapper.readValue(this.relatedUsers, List.class);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
-
-    public void setRelatedUsers(List<String> relatedUsers) {
-        if (relatedUsers != null && relatedUsers.size() > 0) {
-            try {
-                this.relatedUsers = JacksonUtil.mapper.writeValueAsString(relatedUsers);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-        } else {
-            this.relatedUsers = null;
-        }
-    }
-
 }

@@ -5,7 +5,6 @@ import cn.hopever.platform.cms.service.ArticleTableService;
 import cn.hopever.platform.cms.service.ArticleTagTableService;
 import cn.hopever.platform.cms.service.TemplateTableService;
 import cn.hopever.platform.cms.vo.ArticleVo;
-import cn.hopever.platform.utils.test.PrincipalSample;
 import cn.hopever.platform.utils.web.GenericController;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
@@ -100,7 +99,6 @@ public class ArticleController implements GenericController<ArticleVo> {
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestBody ArticleVo articleVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         // 临时测试 使用
-        principal = new PrincipalSample("test1");
         Map<String, Long> keys = CommonMethods.generateKey(httpServletRequest);
         if (keys.get("websiteId") != null) {
             articleVo.setWebsiteId(keys.get("websiteId"));

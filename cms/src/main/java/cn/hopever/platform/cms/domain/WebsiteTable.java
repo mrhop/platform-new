@@ -8,6 +8,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public class WebsiteTable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "website_id", length = 50,unique = true)
+    @Column(name = "website_id", length = 50, unique = true)
     private String websiteId;
 
     @Column(name = "name", length = 50)
@@ -46,8 +47,8 @@ public class WebsiteTable {
     @Column(name = "phone", length = 50)
     private String phone;
 
-    @Column(name = "related_users")
-    private String relatedUsers;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "websiteTable")
+    private List<WebsiteRelatedUserTable> websiteRelatedUserTables;
 
     @Column(name = "enabled")
     private boolean enabled;
@@ -82,6 +83,13 @@ public class WebsiteTable {
     @OneToMany(mappedBy = "websiteTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<NavigateTable> navigateTables;
 
+    @Column(name = "created_date")
+    private Date createdDate;
+
+    @ManyToOne
+    @JoinColumn(name = "created_user_id")
+    private RelatedUserTable createdUser;
+
 
     public List<String> getScreenshots() {
         if (this.screenshots != null) {
@@ -105,28 +113,4 @@ public class WebsiteTable {
             this.screenshots = null;
         }
     }
-
-    public List<String> getRelatedUsers() {
-        if (this.relatedUsers != null) {
-            try {
-                return JacksonUtil.mapper.readValue(this.relatedUsers, List.class);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return null;
-    }
-
-    public void setRelatedUsers(List<String> relatedUsers) {
-        if (relatedUsers != null && relatedUsers.size() > 0) {
-            try {
-                this.relatedUsers = JacksonUtil.mapper.writeValueAsString(relatedUsers);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
-        } else {
-            this.relatedUsers = null;
-        }
-    }
-
 }

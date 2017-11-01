@@ -1,11 +1,15 @@
 package cn.hopever.platform.cms.service.impl;
 
+import cn.hopever.platform.cms.domain.RelatedUserTable;
+import cn.hopever.platform.cms.domain.ThemeRelatedUserTable;
 import cn.hopever.platform.cms.domain.ThemeTable;
+import cn.hopever.platform.cms.repository.RelatedUserTableRepository;
 import cn.hopever.platform.cms.repository.ThemeTableRepository;
 import cn.hopever.platform.cms.service.ThemeTableService;
 import cn.hopever.platform.cms.vo.ThemeVo;
 import cn.hopever.platform.cms.vo.ThemeVoAssembler;
 import cn.hopever.platform.utils.moji.MojiUtils;
+import cn.hopever.platform.utils.security.CommonMethods;
 import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
@@ -22,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +46,8 @@ public class ThemeTableServiceImpl implements ThemeTableService {
     @Autowired
     private ThemeTableRepository themeTableRepository;
     @Autowired
+    private RelatedUserTableRepository relatedUserTableRepository;
+    @Autowired
     private ThemeVoAssembler themeVoAssembler;
 
     @Override
@@ -56,7 +63,20 @@ public class ThemeTableServiceImpl implements ThemeTableService {
         Page<ThemeTable> page = themeTableRepository.findAll(pageRequest);
         List<ThemeVo> list = new ArrayList<>();
         for (ThemeTable themeTable : page) {
-            list.add(themeVoAssembler.toResource(themeTable));
+            ThemeVo themeVo = themeVoAssembler.toResource(themeTable);
+            if (CommonMethods.isAdmin(principal)) {
+                if (themeTable.getThemeRelatedUserTables() != null) {
+                    List<Long> relatedUserIds = new ArrayList<>();
+                    List<String> relatedUserAccounts = new ArrayList<>();
+                    for (ThemeRelatedUserTable themeRelatedUserTable : themeTable.getThemeRelatedUserTables()) {
+                        relatedUserIds.add(themeRelatedUserTable.getRelatedUserTable().getId());
+                        relatedUserAccounts.add(themeRelatedUserTable.getRelatedUserTable().getAccount());
+                    }
+                    themeVo.setRelatedUserIds(relatedUserIds);
+                    themeVo.setRelatedUserAccounts(relatedUserAccounts);
+                }
+            }
+            list.add(themeVo);
         }
         return new PageImpl<ThemeVo>(list, pageRequest, page.getTotalElements());
     }
@@ -69,7 +89,20 @@ public class ThemeTableServiceImpl implements ThemeTableService {
     @Override
     public ThemeVo info(Long id, Principal principal) {
         ThemeTable themeTable = themeTableRepository.findOne(id);
-        return themeVoAssembler.toResource(themeTable);
+        ThemeVo themeVo = themeVoAssembler.toResource(themeTable);
+        if (CommonMethods.isAdmin(principal)) {
+            if (themeTable.getThemeRelatedUserTables() != null) {
+                List<Long> relatedUserIds = new ArrayList<>();
+                List<String> relatedUserAccounts = new ArrayList<>();
+                for (ThemeRelatedUserTable themeRelatedUserTable : themeTable.getThemeRelatedUserTables()) {
+                    relatedUserIds.add(themeRelatedUserTable.getRelatedUserTable().getId());
+                    relatedUserAccounts.add(themeRelatedUserTable.getRelatedUserTable().getAccount());
+                }
+                themeVo.setRelatedUserIds(relatedUserIds);
+                themeVo.setRelatedUserAccounts(relatedUserAccounts);
+            }
+        }
+        return themeVo;
     }
 
     @Override
@@ -104,6 +137,23 @@ public class ThemeTableServiceImpl implements ThemeTableService {
                 logger.error("update theme screemshots failed", e);
             }
         }
+        if (CommonMethods.isAdmin(principal)) {
+            List<ThemeRelatedUserTable> list = themeTable.getThemeRelatedUserTables();
+            if (list != null) {
+                list.clear();
+            } else {
+                list = new ArrayList<>();
+            }
+            if (themeVo.getRelatedUserIds() != null) {
+                for (Long relatedUserId : themeVo.getRelatedUserIds()) {
+                    ThemeRelatedUserTable themeRelatedUserTable = new ThemeRelatedUserTable();
+                    themeRelatedUserTable.setThemeTable(themeTable);
+                    themeRelatedUserTable.setRelatedUserTable(relatedUserTableRepository.findOne(relatedUserId));
+                    list.add(themeRelatedUserTable);
+                }
+            }
+            themeTable.setThemeRelatedUserTables(list);
+        }
         themeTableRepository.save(themeTable);
         return null;
     }
@@ -124,6 +174,26 @@ public class ThemeTableServiceImpl implements ThemeTableService {
                 logger.error("save theme screemshots failed", e);
             }
         }
+        RelatedUserTable relatedUserTable = relatedUserTableRepository.findOneByAccount(principal.getName());
+        List<ThemeRelatedUserTable> themeRelatedUserTables = new ArrayList<>();
+        if (CommonMethods.isAdmin(principal)) {
+            if (themeVo.getRelatedUserIds() != null) {
+                for (Long relatedUserId : themeVo.getRelatedUserIds()) {
+                    ThemeRelatedUserTable themeRelatedUserTable = new ThemeRelatedUserTable();
+                    themeRelatedUserTable.setThemeTable(themeTable);
+                    themeRelatedUserTable.setRelatedUserTable(relatedUserTableRepository.findOne(relatedUserId));
+                    themeRelatedUserTables.add(themeRelatedUserTable);
+                }
+            }
+        } else {
+            ThemeRelatedUserTable themeRelatedUserTable = new ThemeRelatedUserTable();
+            themeRelatedUserTable.setThemeTable(themeTable);
+            themeRelatedUserTable.setRelatedUserTable(relatedUserTable);
+            themeRelatedUserTables.add(themeRelatedUserTable);
+        }
+        themeTable.setThemeRelatedUserTables(themeRelatedUserTables);
+        themeTable.setCreatedDate(new Date());
+        themeTable.setCreatedUser(relatedUserTableRepository.findOneByAccount(principal.getName()));
         themeTableRepository.save(themeTable);
         return null;
     }
@@ -140,11 +210,12 @@ public class ThemeTableServiceImpl implements ThemeTableService {
 
     @Override
     public List<SelectOption> getOptions(Principal principal) {
-        Iterable<ThemeTable> list = themeTableRepository.findAll();
         List<SelectOption> listReturn = new ArrayList<>();
-        for (ThemeTable themeTable : list) {
-            if (themeTable.getRelatedUsers().contains(principal.getName()))
-                listReturn.add(new SelectOption(themeTable.getName(), themeTable.getId()));
+        List<ThemeRelatedUserTable> themeRelatedUserTables = relatedUserTableRepository.findOneByAccount(principal.getName()).getThemeRelatedUserTables();
+        if (themeRelatedUserTables != null && themeRelatedUserTables.size() > 0) {
+            for (ThemeRelatedUserTable themeRelatedUserTable : themeRelatedUserTables) {
+                listReturn.add(new SelectOption(themeRelatedUserTable.getThemeTable().getName(), themeRelatedUserTable.getThemeTable().getId()));
+            }
         }
         return listReturn;
     }

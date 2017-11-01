@@ -52,6 +52,9 @@ public class ArticleTableServiceImpl implements ArticleTableService {
     private StaticResourceTableRepository staticResourceTableRepository;
 
     @Autowired
+    private RelatedUserTableRepository relatedUserTableRepository;
+
+    @Autowired
     private ArticleVoAssembler articleVoAssembler;
 
     @Autowired
@@ -159,7 +162,7 @@ public class ArticleTableServiceImpl implements ArticleTableService {
         ArticleTable articleTable = articleTableRepository.findOne(id);
         List<BlockTable> list = blockTableRepository.findByArticleTableAndTemplateTableOrderByPositionAsc(articleTable, articleTable.getTemplateTable());
         ArticleTable articleTable1 = new ArticleTable();
-        BeanUtils.copyNotNullProperties(articleTable, articleTable1, "id", "articleTagTables", "blockTables");
+        BeanUtils.copyNotNullProperties(articleTable, articleTable1, "id", "articleTagTables", "blockTables","staticResourceTables");
         List<ArticleTagTable> articleTagTables = articleTable.getArticleTagTables();
         if (articleTagTables != null && articleTagTables.size() > 0) {
             List<ArticleTagTable> articleTagTables1 = new ArrayList<>();
@@ -259,7 +262,7 @@ public class ArticleTableServiceImpl implements ArticleTableService {
         }
         if ("save".equals(operation)) {
             articleTable.setCreatedDate(new Date());
-            articleTable.setCreateUser(principal.getName());
+            articleTable.setCreatedUser(relatedUserTableRepository.findOneByAccount(principal.getName()));
             if (articleVo.getWebsiteId() != null) {
                 articleTable.setWebsiteTable(websiteTableRepository.findOne(articleVo.getWebsiteId()));
             }

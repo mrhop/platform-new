@@ -32,7 +32,8 @@ public class MediaVo {
 
     private Long createdDate;
 
-    private String createUser;
+    private Long createdUserId;
+    private String createdUserName;
 
     private boolean published;
 
