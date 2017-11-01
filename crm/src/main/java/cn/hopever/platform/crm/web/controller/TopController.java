@@ -51,7 +51,7 @@ public class TopController {
         if (map.get("firstPage") == null) {
             map.put("firstPage", "/404");
         }
-        map.put("isAdmin", cn.hopever.platform.crm.config.CommonMethods.isAdmin(principal));
+        map.put("isAdmin", cn.hopever.platform.utils.security.CommonMethods.isAdmin(principal));
         return map;
     }
 

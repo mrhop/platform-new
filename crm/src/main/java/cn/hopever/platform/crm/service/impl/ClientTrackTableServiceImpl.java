@@ -1,6 +1,6 @@
 package cn.hopever.platform.crm.service.impl;
 
-import cn.hopever.platform.crm.config.CommonMethods;
+import cn.hopever.platform.utils.security.CommonMethods;
 import cn.hopever.platform.crm.domain.ClientTrackTable;
 import cn.hopever.platform.crm.repository.ClientTableRepository;
 import cn.hopever.platform.crm.repository.ClientTrackTableRepository;

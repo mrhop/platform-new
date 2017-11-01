@@ -1,6 +1,6 @@
 package cn.hopever.platform.crm.web.controller;
 
-import cn.hopever.platform.crm.config.CommonMethods;
+import cn.hopever.platform.utils.security.CommonMethods;
 import cn.hopever.platform.crm.service.RelatedUserTableService;
 import cn.hopever.platform.crm.vo.RelatedUserVo;
 import cn.hopever.platform.utils.web.GenericController;

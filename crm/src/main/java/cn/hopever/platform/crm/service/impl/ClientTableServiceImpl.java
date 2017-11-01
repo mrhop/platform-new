@@ -1,11 +1,13 @@
 package cn.hopever.platform.crm.service.impl;
 
-import cn.hopever.platform.crm.config.CommonMethods;
-import cn.hopever.platform.crm.domain.*;
+import cn.hopever.platform.crm.domain.ClientRelatedUserTable;
+import cn.hopever.platform.crm.domain.ClientTable;
+import cn.hopever.platform.crm.domain.RelatedUserTable;
 import cn.hopever.platform.crm.repository.*;
 import cn.hopever.platform.crm.service.ClientTableService;
 import cn.hopever.platform.crm.vo.ClientVo;
 import cn.hopever.platform.crm.vo.ClientVoAssembler;
+import cn.hopever.platform.utils.security.CommonMethods;
 import cn.hopever.platform.utils.tools.DateFormat;
 import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;

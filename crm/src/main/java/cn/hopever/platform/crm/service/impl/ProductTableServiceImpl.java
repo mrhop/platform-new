@@ -1,6 +1,6 @@
 package cn.hopever.platform.crm.service.impl;
 
-import cn.hopever.platform.crm.config.CommonMethods;
+import cn.hopever.platform.utils.security.CommonMethods;
 import cn.hopever.platform.crm.domain.ProductPriceHistoryTable;
 import cn.hopever.platform.crm.domain.ProductTable;
 import cn.hopever.platform.crm.repository.*;
