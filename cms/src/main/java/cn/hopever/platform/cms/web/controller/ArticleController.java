@@ -148,4 +148,12 @@ public class ArticleController implements GenericController<ArticleVo> {
     public void copy(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         articleTableService.copy(key);
     }
+
+    @RequestMapping(value = "/preview", method = {RequestMethod.GET})
+    public String preview(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        // 计算从header到footer的html body的整个文档内容，然后返回，使用redis的缓存机制，当有更新时进行redis delete
+        return null;
+    }
+
+
 }

@@ -1,9 +1,6 @@
 package cn.hopever.platform.cms.service.impl;
 
-import cn.hopever.platform.cms.domain.BlockTable;
-import cn.hopever.platform.cms.domain.TemplateTable;
-import cn.hopever.platform.cms.domain.ThemeTable;
-import cn.hopever.platform.cms.domain.WebsiteTable;
+import cn.hopever.platform.cms.domain.*;
 import cn.hopever.platform.cms.repository.*;
 import cn.hopever.platform.cms.service.TemplateTableService;
 import cn.hopever.platform.cms.vo.TemplateVo;
@@ -13,10 +10,12 @@ import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,6 +45,9 @@ public class TemplateTableServiceImpl implements TemplateTableService {
     private WebsiteTableRepository websiteTableRepository;
     @Autowired
     private BlockTableRepository blockTableRepository;
+    @Autowired
+    @Qualifier("redisTemplate")
+    private RedisTemplate redisTemplate;
 
     @Override
     public Page<TemplateVo> getList(TableParameters body, Principal principal) {
@@ -88,6 +90,7 @@ public class TemplateTableServiceImpl implements TemplateTableService {
         TemplateTable templateTable = templateTableRepository.findOne(templateVo.getId());
         templateVoAssembler.toDomain(templateVo, templateTable);
         templateTableRepository.save(templateTable);
+        redisTemplate.delete("cms-template-" + templateTable.getId());
         return null;
     }
 
@@ -206,5 +209,17 @@ public class TemplateTableServiceImpl implements TemplateTableService {
             }
         }
         templateTableRepository.save(listSave);
+    }
+
+    @Override
+    public String preview(Long id) {
+        TemplateTable templateTable = templateTableRepository.findOne(id);
+        Object cache = redisTemplate.boundValueOps("cms-template-" + templateTable.getId()).get();
+        if (cache != null) {
+            return cache.toString();
+        } else {
+            // 进行组合
+        }
+        return null;
     }
 }

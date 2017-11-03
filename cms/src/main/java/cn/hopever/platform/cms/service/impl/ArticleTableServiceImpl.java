@@ -13,10 +13,12 @@ import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -59,6 +61,10 @@ public class ArticleTableServiceImpl implements ArticleTableService {
 
     @Autowired
     private BlockTableRepository blockTableRepository;
+
+    @Autowired
+    @Qualifier("redisTemplate")
+    private RedisTemplate redisTemplate;
 
     @Override
     public Page<ArticleVo> getList(TableParameters body, Principal principal) {
@@ -162,7 +168,7 @@ public class ArticleTableServiceImpl implements ArticleTableService {
         ArticleTable articleTable = articleTableRepository.findOne(id);
         List<BlockTable> list = blockTableRepository.findByArticleTableAndTemplateTableOrderByPositionAsc(articleTable, articleTable.getTemplateTable());
         ArticleTable articleTable1 = new ArticleTable();
-        BeanUtils.copyNotNullProperties(articleTable, articleTable1, "id", "articleTagTables", "blockTables","staticResourceTables");
+        BeanUtils.copyNotNullProperties(articleTable, articleTable1, "id", "articleTagTables", "blockTables", "staticResourceTables");
         List<ArticleTagTable> articleTagTables = articleTable.getArticleTagTables();
         if (articleTagTables != null && articleTagTables.size() > 0) {
             List<ArticleTagTable> articleTagTables1 = new ArrayList<>();
@@ -200,6 +206,18 @@ public class ArticleTableServiceImpl implements ArticleTableService {
             articleTable1.setBlockTables(list1);
         }
         articleTableRepository.save(articleTable1);
+    }
+
+    @Override
+    public String preview(Long id) {
+        ArticleTable articleTable = articleTableRepository.findOne(id);
+        Object cache = redisTemplate.boundValueOps("cms-article-website" + articleTable.getWebsiteTable().getWebsiteId() + "-article" + articleTable.getId()).get();
+        if (cache != null) {
+            return cache.toString();
+        } else {
+            // 进行组合
+        }
+        return null;
     }
 
     private Page<ArticleVo> getInternalList(TableParameters body, short type) {
@@ -283,6 +301,9 @@ public class ArticleTableServiceImpl implements ArticleTableService {
             }
         }
         articleTableRepository.save(articleTable);
+        if ("update".equals(operation)) {
+            redisTemplate.delete("cms-article-website" + articleTable.getWebsiteTable().getWebsiteId() + "-article" + articleTable.getId());
+        }
     }
 
 

@@ -10,10 +10,12 @@ import cn.hopever.platform.cms.vo.BlockVoAssembler;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +42,9 @@ public class BlockTableServiceImpl implements BlockTableService {
     private CustomBlockTableRepository customBlockTableRepository;
     @Autowired
     private BlockVoAssembler blockVoAssembler;
+    @Autowired
+    @Qualifier("redisTemplate")
+    private RedisTemplate redisTemplate;
 
     @Override
     // 在没有过滤时，是否需要进行显示, 首先应该关联到website，才会有数据出现！！！ 下午继续
@@ -92,6 +97,17 @@ public class BlockTableServiceImpl implements BlockTableService {
         BlockTable blockTable = blockTableRepository.findOne(blockVo.getId());
         blockVoAssembler.toDomain(blockVo, blockTable);
         blockTableRepository.save(blockTable);
+        if (blockTable.getArticleTable() != null) {
+            redisTemplate.delete("cms-article-website" + blockTable.getArticleTable().getWebsiteTable().getWebsiteId() + "-article" + blockTable.getArticleTable().getId());
+        } else if (blockTable.getTemplateTable() != null) {
+            redisTemplate.delete("cms-template-" + blockTable.getTemplateTable().getId());
+            List<ArticleTable> articleTables = blockTable.getTemplateTable().getArticleTables();
+            if (articleTables != null && articleTables.size() > 0) {
+                for (ArticleTable articleTable : articleTables) {
+                    redisTemplate.delete("cms-article-website" + articleTable.getWebsiteTable().getWebsiteId() + "-article" + articleTable.getId());
+                }
+            }
+        }
         return VueResults.generateSuccess("更新成功", "更新成功");
     }
 

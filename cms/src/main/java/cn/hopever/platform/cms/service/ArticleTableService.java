@@ -34,4 +34,6 @@ public interface ArticleTableService extends GenericService<ArticleVo> {
     public List<SelectOption> getArticleOptionsForNavigate(short relateType, Long websiteId);
 
     public void copy(Long id);
+
+    public String preview(Long id);
 }

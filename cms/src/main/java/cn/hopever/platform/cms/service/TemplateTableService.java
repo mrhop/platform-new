@@ -13,4 +13,7 @@ public interface TemplateTableService extends GenericService<TemplateVo> {
     public List<SelectOption> getOptionsByWebsiteId(Long websiteId);
 
     public void copy(Long id);
+
+    public String preview(Long id);
+
 }
