@@ -1,6 +1,7 @@
 package cn.hopever.platform.cms.repository;
 
 import cn.hopever.platform.cms.domain.MediaTagTable;
+import cn.hopever.platform.cms.domain.ThemeTable;
 import cn.hopever.platform.cms.domain.WebsiteTable;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
@@ -13,4 +14,6 @@ public interface MediaTagTableRepository extends PagingAndSortingRepository<Medi
     public MediaTagTable findOneByTagId(String tagId);
 
     public List<MediaTagTable> findByWebsiteTable(WebsiteTable websiteTable);
+
+    public List<MediaTagTable> findByThemeTable(ThemeTable themeTable);
 }

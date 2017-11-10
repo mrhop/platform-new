@@ -37,7 +37,7 @@ public class MediaTagController implements GenericController<MediaTagVo> {
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Map filter = CommonMethods.generateInitFilter(body.getFilters(), httpServletRequest);
-        if (filter != null && filter.containsKey("websiteId")) {
+        if (filter != null && (filter.containsKey("websiteId") || filter.containsKey("themeId"))) {
             Page<MediaTagVo> list = mediaTagTableService.getList(body, principal);
             Map<String, Object> map = new HashMap<>();
             List<HashMap<String, Object>> listReturn = null;
@@ -75,8 +75,12 @@ public class MediaTagController implements GenericController<MediaTagVo> {
     @RequestMapping(value = "/options", method = {RequestMethod.GET})
     public List<SelectOption> options(Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Map<String, Long> keys = CommonMethods.generateKey(httpServletRequest);
+        // 媒体库一般都是website需要的，所以主题模板需要提供占位即可
         if (keys.get("websiteId") != null) {
             return mediaTagTableService.getOptionsByWebsiteId(keys.get("websiteId"));
+        }
+        if (keys.get("themeId") != null) {
+            return mediaTagTableService.getOptionsByThemeId(keys.get("themeId"));
         }
         return null;
     }
@@ -100,8 +104,12 @@ public class MediaTagController implements GenericController<MediaTagVo> {
         if (keys.get("websiteId") != null) {
             mediaTagVo.setWebsiteId(keys.get("websiteId"));
             return mediaTagTableService.save(mediaTagVo, null, principal);
+        } else if (keys.get("themeId") != null) {
+            mediaTagVo.setThemeId(keys.get("themeId"));
+            return mediaTagTableService.save(mediaTagVo, null, principal);
         }
-        return VueResults.generateError("创建失败", "模板必须和网站关联");
+
+        return VueResults.generateError("创建失败", "模板必须和主题或网站关联");
     }
 
     @Override

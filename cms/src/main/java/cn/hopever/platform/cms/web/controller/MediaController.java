@@ -41,7 +41,7 @@ public class MediaController implements GenericController<MediaVo> {
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Map filter = CommonMethods.generateInitFilter(body.getFilters(), httpServletRequest);
-        if (filter != null && filter.containsKey("websiteId")) {
+        if (filter != null && (filter.containsKey("websiteId") || filter.containsKey("themeId"))) {
             body.setFilters(filter);
             Page<MediaVo> list = mediaTableService.getList(body, principal);
             Map<String, Object> map = new HashMap<>();
@@ -78,7 +78,7 @@ public class MediaController implements GenericController<MediaVo> {
     @RequestMapping(value = "/ckfile/list", method = {RequestMethod.POST})
     public Map getFileList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Map filter = CommonMethods.generateInitFilter(body.getFilters(), httpServletRequest);
-        if (filter != null && filter.containsKey("websiteId")) {
+        if (filter != null && (filter.containsKey("websiteId") || filter.containsKey("themeId"))) {
             if (filter.get("fileLibId") != null) {
                 filter.put("mediaTagId", filter.remove("fileLibId"));
             }
@@ -147,6 +147,9 @@ public class MediaController implements GenericController<MediaVo> {
         if (keys.get("websiteId") != null) {
             mediaVo.setWebsiteId(keys.get("websiteId"));
             return mediaTableService.save(mediaVo, files, principal);
+        } else if (keys.get("themeId") != null) {
+            mediaVo.setThemeId(keys.get("themeId"));
+            return mediaTableService.save(mediaVo, files, principal);
         }
         return VueResults.generateError("创建错误", "无法找到正确从属网站");
     }
@@ -154,8 +157,8 @@ public class MediaController implements GenericController<MediaVo> {
     @RequestMapping(value = "/upload", method = {RequestMethod.POST})
     public VueResults.Result upload(@RequestParam(name = "upload", required = true) MultipartFile[] files, @RequestParam(name = "type", required = false) String tagId, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Map<String, Long> keys = CommonMethods.generateKey(httpServletRequest);
-        if (keys.get("websiteId") != null) {
-            return mediaTableService.upload(files, tagId, keys.get("websiteId"), principal);
+        if (keys.get("websiteId") != null || keys.get("themeId") != null) {
+            return mediaTableService.upload(files, tagId, keys.get("websiteId"), keys.get("themeId"), principal);
         }
         return VueResults.generateError("创建错误", "无法找到正确从属网站");
     }
@@ -175,15 +178,25 @@ public class MediaController implements GenericController<MediaVo> {
             mapReturn.put("mediaTags", mediaTagTableService.getOptionsByWebsiteId(keys.get("websiteId")));
             return mapReturn;
         }
+        if (keys.get("themeId") != null) {
+            Map mapReturn = new HashMap<>();
+            mapReturn.put("mediaTags", mediaTagTableService.getOptionsByThemeId(keys.get("themeId")));
+            return mapReturn;
+        }
         return null;
     }
 
     @RequestMapping(value = "/ckfile/rulechange", method = {RequestMethod.GET, RequestMethod.POST})
     public Map fileRuleChange(@RequestParam(required = false) Long key, @RequestBody(required = false) Map<String, Object> body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         Map<String, Long> keys = CommonMethods.generateKey(httpServletRequest);
-        if (keys.get("websiteId") != null) {
+        if (keys.get("websiteId") != null||keys.get("themeId") != null) {
             Map mapReturn = new HashMap<>();
-            mapReturn.put("fileLibs", mediaTagTableService.getOptionsByWebsiteId(keys.get("websiteId")));
+            if(keys.get("websiteId")!=null){
+                mapReturn.put("fileLibs", mediaTagTableService.getOptionsByWebsiteId(keys.get("websiteId")));
+            }
+            if(keys.get("themeId")!=null){
+                mapReturn.put("fileLibs", mediaTagTableService.getOptionsByThemeId(keys.get("themeId")));
+            }
             List<SelectOption> list = new ArrayList<>();
             list.add(new SelectOption("图片", "image"));
             list.add(new SelectOption("视频", "video"));

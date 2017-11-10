@@ -15,8 +15,15 @@ public class MediaTagVoAssembler implements GenericVoAssembler<MediaTagVo, Media
     public MediaTagVo toResource(MediaTagTable mediaTagTable) {
         MediaTagVo mediaTagVo = new MediaTagVo();
         BeanUtils.copyNotNullProperties(mediaTagTable, mediaTagVo);
-        mediaTagVo.setWebsiteId(mediaTagTable.getWebsiteTable().getId());
-        mediaTagVo.setWebsiteName(mediaTagTable.getWebsiteTable().getName());
+        if(mediaTagTable.getWebsiteTable()!=null){
+            mediaTagVo.setWebsiteId(mediaTagTable.getWebsiteTable().getId());
+            mediaTagVo.setWebsiteName(mediaTagTable.getWebsiteTable().getName());
+        }
+        if(mediaTagTable.getThemeTable()!=null){
+            mediaTagVo.setThemeId(mediaTagTable.getThemeTable().getId());
+            mediaTagVo.setThemeName(mediaTagTable.getThemeTable().getName());
+        }
+
         return mediaTagVo;
     }
 

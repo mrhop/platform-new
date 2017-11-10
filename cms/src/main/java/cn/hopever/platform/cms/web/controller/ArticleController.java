@@ -150,9 +150,12 @@ public class ArticleController implements GenericController<ArticleVo> {
     }
 
     @RequestMapping(value = "/preview", method = {RequestMethod.GET})
-    public String preview(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    public String preview(@RequestParam Long key, @RequestParam(required = false) String originPath, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         // 计算从header到footer的html body的整个文档内容，然后返回，使用redis的缓存机制，当有更新时进行redis delete
-        return null;
+        if (originPath == null) {
+            originPath = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName() + ((httpServletRequest.getServerPort() == 80) ? "" : (":" + httpServletRequest.getServerPort()));
+        }
+        return articleTableService.preview(key,originPath);
     }
 
 

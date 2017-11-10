@@ -76,7 +76,7 @@ public class WebsiteTable {
     @OneToMany(mappedBy = "websiteTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<StaticResourceTable> staticResourceTables;
 
-    @OneToMany(mappedBy = "websiteTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    @OneToMany(mappedBy = "websiteTable", cascade = {CascadeType.ALL})
     private List<MediaTagTable> mediaTagTables;
 
 

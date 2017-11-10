@@ -23,10 +23,14 @@ public class MediaVoAssembler implements GenericVoAssembler<MediaVo, MediaTable>
         }
         mediaVo.setMediaTagId(mediaTable.getMediaTagTable().getId());
         mediaVo.setMediaTagName(mediaTable.getMediaTagTable().getName());
-
-        mediaVo.setWebsiteId(mediaTable.getWebsiteTable().getId());
-        mediaVo.setWebsiteName(mediaTable.getWebsiteTable().getName());
-
+        if(mediaTable.getWebsiteTable()!=null){
+            mediaVo.setWebsiteId(mediaTable.getWebsiteTable().getId());
+            mediaVo.setWebsiteName(mediaTable.getWebsiteTable().getName());
+        }
+        if(mediaTable.getThemeTable()!=null){
+            mediaVo.setThemeId(mediaTable.getThemeTable().getId());
+            mediaVo.setThemeName(mediaTable.getThemeTable().getName());
+        }
         return mediaVo;
     }
 

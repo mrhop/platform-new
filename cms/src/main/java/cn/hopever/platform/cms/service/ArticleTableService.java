@@ -35,5 +35,5 @@ public interface ArticleTableService extends GenericService<ArticleVo> {
 
     public void copy(Long id);
 
-    public String preview(Long id);
+    public String preview(Long id, String originPath);
 }

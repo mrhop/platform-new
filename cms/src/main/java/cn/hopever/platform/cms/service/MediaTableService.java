@@ -15,7 +15,7 @@ import java.util.List;
 public interface MediaTableService extends GenericService<MediaVo> {
     public List<MediaVo> getListByMediaTagAndPublished(Long mediaTagId);
 
-    public VueResults.Result upload(MultipartFile[] files, String tagId, Long websiteId, Principal principal);
+    public VueResults.Result upload(MultipartFile[] files, String tagId, Long websiteId, Long themeId, Principal principal);
 
     public VueResults.Result updatePublished(Long id, boolean published, Principal principal);
 

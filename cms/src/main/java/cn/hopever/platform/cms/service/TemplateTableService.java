@@ -14,6 +14,6 @@ public interface TemplateTableService extends GenericService<TemplateVo> {
 
     public void copy(Long id);
 
-    public String preview(Long id);
+    public String preview(Long id,String originPath);
 
 }

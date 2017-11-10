@@ -50,6 +50,9 @@ public class ThemeTable {
     @OneToMany(mappedBy = "themeTable", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<WebsiteTable> websiteTables;
 
+    @OneToMany(mappedBy = "themeTable", cascade = {CascadeType.ALL})
+    private List<MediaTagTable> mediaTagTables;
+
     @Column(name = "created_date")
     private Date createdDate;
 

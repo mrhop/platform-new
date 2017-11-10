@@ -2,6 +2,7 @@ package cn.hopever.platform.cms.service.impl;
 
 import cn.hopever.platform.cms.domain.MediaTable;
 import cn.hopever.platform.cms.domain.MediaTagTable;
+import cn.hopever.platform.cms.domain.ThemeTable;
 import cn.hopever.platform.cms.domain.WebsiteTable;
 import cn.hopever.platform.cms.repository.*;
 import cn.hopever.platform.cms.service.MediaTableService;
@@ -47,6 +48,8 @@ public class MediaTableServiceImpl implements MediaTableService {
     private MediaVoAssembler mediaVoAssembler;
     @Autowired
     private WebsiteTableRepository websiteTableRepository;
+    @Autowired
+    private ThemeTableRepository themeTableRepository;
 
     @Override
     public Page<MediaVo> getList(TableParameters body, Principal principal) {
@@ -60,6 +63,10 @@ public class MediaTableServiceImpl implements MediaTableService {
         if (body.getFilters() != null && body.getFilters().containsKey("websiteId")) {
             body.getFilters().put("websiteTable", websiteTableRepository.findOne(Long.valueOf(body.getFilters().get("websiteId").toString())));
             body.getFilters().remove("websiteId");
+        }
+        if (body.getFilters() != null && body.getFilters().containsKey("themeId")) {
+            body.getFilters().put("themeTable", themeTableRepository.findOne(Long.valueOf(body.getFilters().get("themeId").toString())));
+            body.getFilters().remove("themeId");
         }
         if (body.getFilters() != null && body.getFilters().containsKey("mediaTagId")) {
             body.getFilters().put("mediaTagTable", mediaTagTableRepository.findOne(Long.valueOf(body.getFilters().get("mediaTagId").toString())));
@@ -118,6 +125,9 @@ public class MediaTableServiceImpl implements MediaTableService {
         if (mediaVo.getWebsiteId() != null) {
             mediaTable.setWebsiteTable(websiteTableRepository.findOne(mediaVo.getWebsiteId()));
         }
+        if (mediaVo.getThemeId() != null) {
+            mediaTable.setThemeTable(themeTableRepository.findOne(mediaVo.getWebsiteId()));
+        }
         if (mediaVo.getMediaTagId() != null) {
             mediaTable.setMediaTagTable(mediaTagTableRepository.findOne(mediaVo.getMediaTagId()));
         }
@@ -156,12 +166,19 @@ public class MediaTableServiceImpl implements MediaTableService {
     }
 
     @Override
-    public VueResults.Result upload(MultipartFile[] files, String tagId, Long websiteId, Principal principal) {
+    public VueResults.Result upload(MultipartFile[] files, String tagId, Long websiteId, Long themeId, Principal principal) {
         // 如果tagId是空，那么根据上传文件的类型，来判断出需要的tagId
         if (tagId == null) {
             tagId = FileUtil.getFileGeneralType(files[0].getOriginalFilename());
         }
-        WebsiteTable websiteTable = websiteTableRepository.findOne(websiteId);
+        WebsiteTable websiteTable = null;
+        ThemeTable themeTable = null;
+        if (websiteId != null) {
+            websiteTable = websiteTableRepository.findOne(websiteId);
+        }
+        if (themeId != null) {
+            themeTable = themeTableRepository.findOne(websiteId);
+        }
         MediaTable mediaTable = new MediaTable();
         MediaTagTable mediaTagTable = mediaTagTableRepository.findOneByTagId(tagId);
         if (mediaTagTable == null) {
@@ -169,6 +186,7 @@ public class MediaTableServiceImpl implements MediaTableService {
             mediaTagTable.setName(tagId);
             mediaTagTable.setTagId(tagId);
             mediaTagTable.setWebsiteTable(websiteTable);
+            mediaTagTable.setThemeTable(themeTable);
             mediaTagTableRepository.save(mediaTagTable);
         }
         mediaTable.setCreatedDate(new Date());
@@ -176,6 +194,7 @@ public class MediaTableServiceImpl implements MediaTableService {
         mediaTable.setPublished(true);
         mediaTable.setPublishDate(new Date());
         mediaTable.setWebsiteTable(websiteTable);
+        mediaTable.setThemeTable(themeTable);
         mediaTable.setMediaTagTable(mediaTagTable);
         // do with file
         if (files != null && files.length > 0) {

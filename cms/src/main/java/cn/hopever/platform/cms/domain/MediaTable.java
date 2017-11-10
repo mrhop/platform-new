@@ -46,9 +46,13 @@ public class MediaTable {
     @JoinColumn(name = "media_tag_id")
     private MediaTagTable mediaTagTable;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "website_id")
     private WebsiteTable websiteTable;
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "theme_id")
+    private ThemeTable themeTable;
 
     @Column(name = "publish_date")
     private Date publishDate;

@@ -16,4 +16,7 @@ public class MediaTagVo {
 
     private String websiteName;
     private Long websiteId;
+
+    private String themeName;
+    private Long themeId;
 }

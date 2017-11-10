@@ -44,7 +44,7 @@ public class CustomMediaTagTableRepositoryImpl extends SimpleJpaRepository<Media
                 Predicate predicateReturn = null;
                 if (mapFilter != null && mapFilter.size() > 0) {
                     for (String key : mapFilter.keySet()) {
-                        if ("websiteTable".equals(key)) {
+                        if ("websiteTable".equals(key) || "themeTable".equals("key")) {
                             if (predicateReturn != null) {
                                 predicateReturn = builder.and(predicateReturn, builder.equal(root.get(key), mapFilter.get(key)));
                             } else {

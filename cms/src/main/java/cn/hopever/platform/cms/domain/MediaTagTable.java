@@ -29,9 +29,13 @@ public class MediaTagTable {
     @Column(name = "tag_id", length = 50, unique = true)
     private String tagId;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true)
     @JoinColumn(name = "website_id")
     private WebsiteTable websiteTable;
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "theme_id")
+    private ThemeTable themeTable;
 
 
     @OneToMany(mappedBy = "mediaTagTable", cascade = {CascadeType.ALL}, orphanRemoval = true)

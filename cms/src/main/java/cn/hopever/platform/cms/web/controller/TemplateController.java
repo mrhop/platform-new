@@ -79,6 +79,14 @@ public class TemplateController implements GenericController<TemplateVo> {
         templateTableService.copy(key);
     }
 
+    @RequestMapping(value = "/preview", method = {RequestMethod.GET})
+    public String preview(@RequestParam Long key, @RequestParam(required = false) String originPath, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        if (originPath == null) {
+            originPath = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName() + ((httpServletRequest.getServerPort() == 80) ? "" : (":" + httpServletRequest.getServerPort()));
+        }
+        return templateTableService.preview(key, originPath);
+    }
+
     @Override
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public VueResults.Result update(@RequestParam Long key, @RequestBody TemplateVo templateVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {

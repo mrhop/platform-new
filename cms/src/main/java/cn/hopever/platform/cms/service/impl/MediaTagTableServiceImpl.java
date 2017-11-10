@@ -3,6 +3,7 @@ package cn.hopever.platform.cms.service.impl;
 import cn.hopever.platform.cms.domain.MediaTagTable;
 import cn.hopever.platform.cms.repository.CustomMediaTagTableRepository;
 import cn.hopever.platform.cms.repository.MediaTagTableRepository;
+import cn.hopever.platform.cms.repository.ThemeTableRepository;
 import cn.hopever.platform.cms.repository.WebsiteTableRepository;
 import cn.hopever.platform.cms.service.MediaTagTableService;
 import cn.hopever.platform.cms.vo.MediaTagVo;
@@ -41,6 +42,9 @@ public class MediaTagTableServiceImpl implements MediaTagTableService {
     @Autowired
     private WebsiteTableRepository websiteTableRepository;
 
+    @Autowired
+    private ThemeTableRepository themeTableRepository;
+
     @Override
     public Page<MediaTagVo> getList(TableParameters body, Principal principal) {
         PageRequest pageRequest;
@@ -53,6 +57,10 @@ public class MediaTagTableServiceImpl implements MediaTagTableService {
         if (body.getFilters() != null && body.getFilters().containsKey("websiteId")) {
             body.getFilters().put("websiteTable", websiteTableRepository.findOne(Long.valueOf(body.getFilters().get("websiteId").toString())));
             body.getFilters().remove("websiteId");
+        }
+        if (body.getFilters() != null && body.getFilters().containsKey("themeId")) {
+            body.getFilters().put("themeTable", themeTableRepository.findOne(Long.valueOf(body.getFilters().get("themeId").toString())));
+            body.getFilters().remove("themeId");
         }
         Page<MediaTagTable> page = customMediaTagTableRepository.findByFilters(body.getFilters(), pageRequest);
         List<MediaTagVo> list = new ArrayList<>();
@@ -89,7 +97,12 @@ public class MediaTagTableServiceImpl implements MediaTagTableService {
         MediaTagTable mediaTagTable = new MediaTagTable();
         mediaTagVoAssembler.toDomain(mediaTagVo, mediaTagTable);
         mediaTagTable.setTagId(mediaTagVo.getTagId());
-        mediaTagTable.setWebsiteTable(websiteTableRepository.findOne(mediaTagVo.getWebsiteId()));
+        if (mediaTagVo.getWebsiteId() != null) {
+            mediaTagTable.setWebsiteTable(websiteTableRepository.findOne(mediaTagVo.getWebsiteId()));
+        }
+        if (mediaTagVo.getThemeId() != null) {
+            mediaTagTable.setThemeTable(themeTableRepository.findOne(mediaTagVo.getThemeId()));
+        }
         mediaTagTableRepository.save(mediaTagTable);
         return null;
     }
@@ -98,6 +111,15 @@ public class MediaTagTableServiceImpl implements MediaTagTableService {
     public List<SelectOption> getOptionsByWebsiteId(Long websiteId) {
         List<SelectOption> listReturn = new ArrayList<>();
         List<MediaTagTable> list = mediaTagTableRepository.findByWebsiteTable(websiteTableRepository.findOne(websiteId));
+        for (MediaTagTable mediaTagTable : list) {
+            listReturn.add(new SelectOption(mediaTagTable.getName(), mediaTagTable.getId()));
+        }
+        return listReturn;
+    }
+    @Override
+    public List<SelectOption> getOptionsByThemeId(Long themeId) {
+        List<SelectOption> listReturn = new ArrayList<>();
+        List<MediaTagTable> list = mediaTagTableRepository.findByThemeTable(themeTableRepository.findOne(themeId));
         for (MediaTagTable mediaTagTable : list) {
             listReturn.add(new SelectOption(mediaTagTable.getName(), mediaTagTable.getId()));
         }
