@@ -5,6 +5,7 @@ import cn.hopever.platform.cms.repository.BlockTagTableRepository;
 import cn.hopever.platform.cms.service.BlockTagTableService;
 import cn.hopever.platform.cms.vo.BlockTagVo;
 import cn.hopever.platform.cms.vo.BlockTagVoAssembler;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,5 +71,15 @@ public class BlockTagTableServiceImpl implements BlockTagTableService {
         blockTagVoAssembler.toDomain(blockTagVo, blockTagTable);
         blockTagTableRepository.save(blockTagTable);
         return null;
+    }
+
+    @Override
+    public List<SelectOption> getOptions() {
+        List<SelectOption> listReturn = new ArrayList<>();
+        Iterable<BlockTagTable> list = blockTagTableRepository.findAll();
+        for (BlockTagTable blockTagTable : list) {
+            listReturn.add(new SelectOption(blockTagTable.getName(), blockTagTable.getTagId()));
+        }
+        return listReturn;
     }
 }

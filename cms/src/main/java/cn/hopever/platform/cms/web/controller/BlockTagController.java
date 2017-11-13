@@ -3,6 +3,7 @@ package cn.hopever.platform.cms.web.controller;
 import cn.hopever.platform.cms.service.BlockTagTableService;
 import cn.hopever.platform.cms.vo.BlockTagVo;
 import cn.hopever.platform.utils.web.GenericController;
+import cn.hopever.platform.utils.web.SelectOption;
 import cn.hopever.platform.utils.web.TableParameters;
 import cn.hopever.platform.utils.web.VueResults;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ public class BlockTagController implements GenericController<BlockTagVo> {
     Logger logger = LoggerFactory.getLogger(BlockTagController.class);
     @Autowired
     private BlockTagTableService blockTagTableService;
+
     @Override
     @RequestMapping(value = "/list", method = {RequestMethod.POST})
     public Map getList(@RequestBody TableParameters body, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
@@ -68,8 +70,8 @@ public class BlockTagController implements GenericController<BlockTagVo> {
     @Override
     @RequestMapping(value = "/update", method = {RequestMethod.POST})
     public VueResults.Result update(@RequestParam Long key, @RequestBody BlockTagVo blockTagVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-       blockTagVo.setId(key);
-        return blockTagTableService.update(blockTagVo,null,principal);
+        blockTagVo.setId(key);
+        return blockTagTableService.update(blockTagVo, null, principal);
     }
 
     @Override
@@ -80,7 +82,7 @@ public class BlockTagController implements GenericController<BlockTagVo> {
     @Override
     @RequestMapping(value = "/save", method = {RequestMethod.POST})
     public VueResults.Result save(@RequestBody BlockTagVo blockTagVo, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        return blockTagTableService.save(blockTagVo,null,principal);
+        return blockTagTableService.save(blockTagVo, null, principal);
     }
 
     @Override
@@ -92,6 +94,11 @@ public class BlockTagController implements GenericController<BlockTagVo> {
     @RequestMapping(value = "/delete", method = {RequestMethod.GET})
     public void delete(@RequestParam Long key, Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
         blockTagTableService.delete(key, principal);
+    }
+
+    @RequestMapping(value = "/options", method = {RequestMethod.GET})
+    public List<SelectOption> options(Principal principal, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        return blockTagTableService.getOptions();
     }
 
     @Override
